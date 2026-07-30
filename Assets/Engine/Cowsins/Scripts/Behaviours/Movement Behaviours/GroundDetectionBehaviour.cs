@@ -160,7 +160,8 @@ namespace cowsins
             if (isGrounded)
             {
                 float angle = Vector3.Angle(Vector3.up, hit.normal);
-                return angle < maxSlopeAngle && angle != 0;
+                // Minimum slope threshold of 2.0 degrees prevents micro-roughness on terrain/dirt meshes from flapping slope state per frame.
+                return angle < maxSlopeAngle && angle > 2.0f;
             }
             return false;
         }
