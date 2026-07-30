@@ -40,9 +40,7 @@
     max-width: 660px;
     position: absolute;
     left: 6%;
-    top: 50%;
-    translate: 0 -50%;
-    min-height: 630px;
+    top: 20.37%;
     justify-content: flex-start;
     padding: 0 0 0 36px;
     border-left-width: 2px;
@@ -147,7 +145,7 @@
 
 /* --- Module 1: Header Terminal --- */
 .header-module {
-    padding: 20px 16px 10px 16px;
+    padding: 16px 14px 8px 14px;
     align-items: center;
     margin-top: 0;
 }
