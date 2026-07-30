@@ -51,8 +51,12 @@ public class BasicMovementBehaviour
     {
         if(!playerControl.IsMovementControllable) return;
 
-        if (playerMovement.Grounded && context.IsPlayerOnSlope && inputManager.X == 0 && inputManager.Y == 0 && !context.HasJumped)
+        if (playerMovement.Grounded && context.IsPlayerOnSlope && inputManager.X == 0 && inputManager.Y == 0 && !context.HasJumped && rb.linearVelocity.y <= 0.1f)
         {
+            if (inputManager != null && inputManager.Jumping)
+            {
+                Debug.Log($"[SlopeDiag] Slope Freeze ACTIVE during Jump press! Grounded={playerMovement.Grounded}, HasJumped={context.HasJumped}, Vy={rb.linearVelocity.y}");
+            }
             rb.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
             rb.linearVelocity = Vector3.zero;
         }

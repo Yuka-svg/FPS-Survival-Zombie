@@ -26,6 +26,7 @@ public class MovementContext
     public RaycastHit SlopeHit;
 
     public bool HasJumped;
+    public int TraceFixedFrames;
     public float CoyoteTimer;
     public float CoyoteJumpTime;
 

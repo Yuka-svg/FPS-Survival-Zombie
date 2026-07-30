@@ -101,10 +101,10 @@ public class CompanionZombieSiege : MonoBehaviour
         if (!_siegeActive || lockZone == null) return;
         if (_player == null) { FindPlayer(); return; }
 
-        // Check if the player is inside the lock zone. Use the closest point
-        // on the zone's bounds to determine "inside" — if the player's position
-        // is outside the bounds, teleport them back.
+        // Check if the player is inside the lock zone. Expand Y bounds so jumping
+        // up does not trigger false boundary containment violation & teleport back.
         var bounds = lockZone.bounds;
+        bounds.Expand(new Vector3(0f, 500f, 0f));
         bool inside = bounds.Contains(_player.position);
 
         if (inside)
@@ -130,6 +130,7 @@ public class CompanionZombieSiege : MonoBehaviour
     private void TeleportPlayerBack()
     {
         if (_player == null) return;
+        Debug.Log($"[SiegeDiag] Frame={Time.frameCount} TELEPORT BACK EXECUTED! Pos={_player.position}, LastInside={_lastInsidePos}, Bounds={lockZone.bounds}");
         Vector3 back = _lastInsidePos;
         back.y += lockZoneTeleportYOffset;
         if (_playerRb != null)

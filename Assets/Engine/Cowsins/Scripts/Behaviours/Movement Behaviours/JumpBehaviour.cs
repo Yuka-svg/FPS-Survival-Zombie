@@ -19,6 +19,7 @@ public class JumpBehaviour
     private bool wallOpposite = false; // Needs to be passed in the shared state, depends on wall jump directly.
 
     private float jumpCooldownTimer;
+    private float takeoffTimer;
     private bool isCoyoteJumpAvailable = false;
     public int jumpCount {  get; private set; }
 
@@ -47,12 +48,17 @@ public class JumpBehaviour
     {
         if (rb == null) return;
 
+        // Un-freeze position constraints to allow PhysX upward jump force
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+
         jumpCooldownTimer = playerSettings.jumpCooldown;
+        takeoffTimer = 0.1f;
 
         jumpCount--;
 
         isJumpAvailable = false;
         context.HasJumped = true;
+        context.TraceFixedFrames = 10;
 
         // Store velocity
         Vector3 velocity = rb.linearVelocity;
@@ -65,6 +71,8 @@ public class JumpBehaviour
         //Add jump forces
         if (playerMovement.IsWallRunning) playerEvents.Events.OnWallJump?.Invoke();
         else Jump();
+
+        Debug.Log($"[JumpDiag] Frame={Time.frameCount} Jump EXECUTED! Pos={context.Transform.position}, PostForceVel={rb.linearVelocity}, Grounded={playerMovement.Grounded}, IsOnSlope={context.IsPlayerOnSlope}, constraints={rb.constraints}");
 
         SoundManager.Instance.PlaySound(playerSettings.sounds.jumpSFX, 0, 0, false);
 
@@ -84,12 +92,18 @@ public class JumpBehaviour
             }
         }
 
-        // Reset HasJumped whenever the player is grounded, regardless of
-        // canCoyote. Without this, jumping on a slope (where Grounded stays
-        // true through the jump) leaves HasJumped = true forever because
-        // OnLand never fires, trapping the player in PlayerJumpState.
-        if (playerMovement.Grounded)
+        // Reset HasJumped whenever the player is grounded and not ascending upward from a jump.
+        // takeoffTimer prevents Frame 0 reset before PhysX integrates impulse Y in FixedUpdate.
+        if (takeoffTimer > 0f)
         {
+            takeoffTimer -= Time.deltaTime;
+        }
+        else if (playerMovement.Grounded && rb.linearVelocity.y <= 0.1f)
+        {
+            if (context.HasJumped)
+            {
+                Debug.Log($"[JumpDiag] Frame={Time.frameCount} HasJumped reset to FALSE in Tick! Grounded={playerMovement.Grounded}, Vy={rb.linearVelocity.y}, takeoffTimer={takeoffTimer}");
+            }
             context.HasJumped = false;
         }
 
@@ -126,11 +140,19 @@ public class JumpBehaviour
             (playerMovement.IsWallRunning && hasStamina) ||
             (hasJumpsLeft && playerSettings.maxJumps > 1 && hasStamina);
 
-        return playerSettings.allowJump
+        bool canJump = playerSettings.allowJump
             && hasJumpsLeft
             && playerControl.IsControllable
             && isJumpAvailable
             && isValidJumpCondition;
+
+        if (inputManager != null && inputManager.Jumping)
+        {
+            context.TraceFixedFrames = 10;
+            Debug.Log($"[JumpDiag] Frame={Time.frameCount} Jump Key Input! CanExecute={canJump} (allowJump={playerSettings.allowJump}, jumpsLeft={jumpCount}, IsControllable={playerControl.IsControllable}, isJumpAvailable={isJumpAvailable}, Grounded={playerMovement.Grounded}, IsOnSlope={context.IsPlayerOnSlope}, Stamina={hasStamina}, HasJumped={context.HasJumped}, takeoffTimer={takeoffTimer})");
+        }
+
+        return canJump;
     }
 
     public bool CanExecuteDoubleJump()
@@ -153,7 +175,7 @@ public class JumpBehaviour
         float inputX = inputManager.X;
         float inputY = inputManager.Y;
 
-        rb.AddForce(Vector3.up * playerSettings.jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * playerSettings.jumpForce, ForceMode.VelocityChange);
 
         // Handle directional jumping
         if (!playerMovement.Grounded && playerSettings.directionalJumpMethod != PlayerMovementSettings.DirectionalJumpMethod.None && playerSettings.maxJumps > 1 && !wallOpposite)

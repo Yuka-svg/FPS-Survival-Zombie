@@ -115,6 +115,11 @@ namespace cowsins
 
         private void FixedUpdate()
         {
+            if (movementContext != null && movementContext.TraceFixedFrames > 0)
+            {
+                Debug.Log($"[CentralPhysicsStart] Frame={Time.frameCount} Trace #{11 - movementContext.TraceFixedFrames}: State={playerStates?.CurrentState?.GetType().Name}, Controllable={playerDependencies?.PlayerControl?.IsControllable}, Grounded={Grounded}, IsOnSlope={movementContext.IsPlayerOnSlope}, HasJumped={movementContext.HasJumped}, PreVel={rb.linearVelocity}, Constraints={rb.constraints}, Kinematic={rb.isKinematic}");
+            }
+
             groundDetectionBehaviour?.FixedTick();
             
             // Centralized Custom Gravity
@@ -125,7 +130,7 @@ namespace cowsins
                 // Check if standing still on a stable slope using vertical raycast
                 bool standingStillOnSlope = false;
                 Vector3 slopeNormal = Vector3.up;
-                if (Grounded && movementContext != null && movementContext.IsPlayerOnSlope)
+                if (Grounded && movementContext != null && movementContext.IsPlayerOnSlope && rb.linearVelocity.y <= 0.1f)
                 {
                     bool noInput = inputManager.X == 0f && inputManager.Y == 0f;
                     if (noInput)
@@ -166,6 +171,12 @@ namespace cowsins
             rb.linearVelocity = Vector3.ClampMagnitude(rb.linearVelocity, playerSettings.maxSpeedAllowed);
 
             staminaBehaviour?.Tick();
+
+            if (movementContext != null && movementContext.TraceFixedFrames > 0)
+            {
+                movementContext.TraceFixedFrames--;
+                Debug.Log($"[CentralPhysicsEnd] Frame={Time.frameCount} Trace #{10 - movementContext.TraceFixedFrames}: PostVel={rb.linearVelocity}, Grounded={Grounded}, HasJumped={movementContext.HasJumped}");
+            }
         }
 
         /// <summary>

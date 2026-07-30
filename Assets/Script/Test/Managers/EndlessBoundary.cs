@@ -21,10 +21,17 @@ public class EndlessBoundary : MonoBehaviour
 
     private void Awake()
     {
+        if (GameModeManager.CurrentMode != GameMode.Endless)
+        {
+            enabled = false;
+            return;
+        }
+
+        wallHeight = 100f;
         _trigger = GetComponent<BoxCollider>();
         _trigger.isTrigger = true;
         _trigger.size = new Vector3(boundarySize.x, wallHeight, boundarySize.y);
-        _trigger.center = new Vector3(0, wallHeight * 0.5f, 0);
+        _trigger.center = Vector3.zero;
 
         if (_built) return;
         _built = true;
@@ -33,10 +40,10 @@ public class EndlessBoundary : MonoBehaviour
         float hz = boundarySize.y * 0.5f;
 
         Vector3[] centers = {
-            new Vector3(0, wallHeight * 0.5f, -hz),
-            new Vector3(0, wallHeight * 0.5f, hz),
-            new Vector3(-hx, wallHeight * 0.5f, 0),
-            new Vector3(hx, wallHeight * 0.5f, 0),
+            new Vector3(0, 0, -hz),
+            new Vector3(0, 0, hz),
+            new Vector3(-hx, 0, 0),
+            new Vector3(hx, 0, 0),
         };
         Vector3[] sizes = {
             new Vector3(hx * 2 + wallThickness, wallHeight, wallThickness),
@@ -63,6 +70,8 @@ public class EndlessBoundary : MonoBehaviour
 
     private void Update()
     {
+        if (GameModeManager.CurrentMode != GameMode.Endless) return;
+
         if (_player == null)
         {
             _player = GameObject.FindGameObjectWithTag("Player");
@@ -70,6 +79,22 @@ public class EndlessBoundary : MonoBehaviour
         }
 
         Vector3 pos = _player.transform.position;
+
+        // Fall out of map protection: If player falls below Y = -50f, reset velocity and teleport back to Y = 1f
+        if (pos.y < -50f)
+        {
+            var rb = _player.GetComponent<Rigidbody>();
+            if (rb)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+            Vector3 respawnPos = _lastInsidePos != Vector3.zero ? _lastInsidePos : pos;
+            respawnPos.y = 1f;
+            _player.transform.position = respawnPos;
+            return;
+        }
+
         if (!_trigger.bounds.Contains(pos))
         {
             var rb = _player.GetComponent<Rigidbody>();
@@ -78,7 +103,9 @@ public class EndlessBoundary : MonoBehaviour
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
-            _player.transform.position = _lastInsidePos != Vector3.zero ? _lastInsidePos : transform.position;
+            Vector3 safePos = _lastInsidePos != Vector3.zero ? _lastInsidePos : transform.position;
+            if (safePos.y < 1f) safePos.y = 1f;
+            _player.transform.position = safePos;
         }
     }
 

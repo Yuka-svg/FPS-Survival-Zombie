@@ -16,6 +16,7 @@ namespace cowsins
 
         public sealed override void EnterState()
         {
+            Debug.Log($"[JumpStateDiag] Frame={Time.frameCount} ENTERED PlayerJumpState! Vy={_ctx.Rigidbody.linearVelocity.y}, Grounded={playerMovement.Grounded}");
             playerMovement.jumpBehaviour.Enter();
 
             inputManager.OnStartGrapple += StartGrapple;
@@ -41,6 +42,7 @@ namespace cowsins
 
         public sealed override void ExitState() 
         {
+            Debug.Log($"[JumpStateDiag] Frame={Time.frameCount} EXITED PlayerJumpState! Grounded={playerMovement.Grounded}, HasJumped={playerMovement.movementContext?.HasJumped}, Vy={_ctx.Rigidbody.linearVelocity.y}");
             inputManager.OnStartGrapple -= StartGrapple;
             inputManager.OnStopGrapple -= StopGrapple;
             statsProvider.RemoveOnDieListener(SwitchToDie);
@@ -61,18 +63,21 @@ namespace cowsins
 
             if (playerMovement.climbLadderBehaviour.CanExecute())
             {
+                Debug.Log($"[JumpStateDiag] Frame={Time.frameCount} Exit JumpState -> ClimbState");
                 SwitchState(_factory.Climb());
                 return;
             }
 
             if (inputManager.Jumping && playerMovement.jumpBehaviour.CanExecuteDoubleJump())
             {
+                Debug.Log($"[JumpStateDiag] Frame={Time.frameCount} Re-Enter JumpState (Double Jump)");
                 SwitchState(_factory.Jump());
                 return;
             }
 
-            if (playerMovement.Grounded || playerMovement.IsWallRunning)
+            if ((playerMovement.Grounded && (playerMovement.movementContext == null || !playerMovement.movementContext.HasJumped) && _ctx.Rigidbody.linearVelocity.y <= 0.1f) || playerMovement.IsWallRunning)
             {
+                Debug.Log($"[JumpStateDiag] Frame={Time.frameCount} Exit JumpState -> DefaultState (Grounded={playerMovement.Grounded}, HasJumped={playerMovement.movementContext?.HasJumped}, Vy={_ctx.Rigidbody.linearVelocity.y}, IsWallRunning={playerMovement.IsWallRunning})");
                 SwitchState(_factory.Default());
                 return;
             }
