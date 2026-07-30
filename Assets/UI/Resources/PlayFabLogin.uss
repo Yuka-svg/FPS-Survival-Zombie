@@ -40,7 +40,9 @@
     max-width: 660px;
     position: absolute;
     left: 6%;
-    top: 20.37%;
+    top: 50%;
+    translate: 0 -50%;
+    min-height: 560px;
     justify-content: flex-start;
     padding: 0 0 0 36px;
     border-left-width: 2px;
@@ -57,8 +59,8 @@
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
     position: relative;
-    padding: 14px 20px;
-    margin-top: 10px;
+    padding: 10px 18px;
+    margin-top: 8px;
     margin-bottom: 0;
     flex-shrink: 0;
     translate: -800px 0px;
@@ -174,7 +176,7 @@
 
 /* --- Modules 2 & 3: Input Scanner Terminals --- */
 .input-module {
-    padding: 28px 24px 34px 24px;
+    padding: 10px 18px;
     flex-direction: column;
 }
 
@@ -253,7 +255,7 @@
 
 /* --- Module 4: Action & Diagnostics Terminal --- */
 .action-module {
-    padding: 36px;
+    padding: 14px 18px;
     flex-direction: column;
 }
 
