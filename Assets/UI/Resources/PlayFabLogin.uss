@@ -42,7 +42,7 @@
     left: 6%;
     top: 50%;
     translate: 0 -50%;
-    min-height: 640px;
+    min-height: 580px;
     justify-content: flex-start;
     padding: 0 0 0 36px;
     border-left-width: 2px;
@@ -59,8 +59,9 @@
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
     position: relative;
-    padding: 14px 18px;
-    margin-top: 14px;
+    height: 99px;
+    padding: 8px 18px;
+    margin-top: 12px;
     margin-bottom: 0;
     flex-shrink: 0;
     translate: -800px 0px;
@@ -147,7 +148,8 @@
 
 /* --- Module 1: Header Terminal --- */
 .header-module {
-    padding: 16px 14px 10px 14px;
+    height: 104px;
+    padding: 14px 14px 6px 14px;
     align-items: center;
     margin-top: 0;
 }
@@ -176,7 +178,9 @@
 
 /* --- Modules 2 & 3: Input Scanner Terminals --- */
 .input-module {
-    padding: 16px 20px;
+    height: 124px;
+    padding: 12px 20px;
+    margin-top: 12px;
     flex-direction: column;
 }
 
@@ -209,7 +213,7 @@
     background-color: rgba(6, 8, 12, 0.5);
     border-bottom-width: 1.5px;
     border-bottom-color: rgba(230, 80, 40, 0.15);
-    padding: 8px 16px;
+    padding: 6px 14px;
     transition: border-bottom-color 0.12s ease-in-out;
 }
 
@@ -255,7 +259,9 @@
 
 /* --- Module 4: Action & Diagnostics Terminal --- */
 .action-module {
-    padding: 22px 20px;
+    height: 192px;
+    padding: 16px 20px;
+    margin-top: 12px;
     flex-direction: column;
 }
 
@@ -440,12 +446,18 @@
 
 /* --- Main Menu Plaque Button Text --- */
 .menu-btn-main-text {
-    font-size: 26px;
+    font-size: 22px;
     color: var(--color-accent-gold, rgb(217, 199, 115));
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
-    margin-top: 6px;
+    margin-top: 4px;
     letter-spacing: 1px;
+}
+
+.rankings-module {
+    height: 131px;
+    padding: 10px 18px;
+    margin-top: 12px;
 }
 
 .button-trigger {
