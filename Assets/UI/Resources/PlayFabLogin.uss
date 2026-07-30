@@ -60,8 +60,8 @@
     border-bottom-left-radius: 0;
     position: relative;
     height: auto;
-    padding: 10px 18px;
-    margin-top: 12px;
+    padding: 14px 18px;
+    margin-top: 18px;
     margin-bottom: 0;
     flex-shrink: 0;
     translate: -800px 0px;
@@ -149,7 +149,7 @@
 /* --- Module 1: Header Terminal --- */
 .header-module {
     height: auto;
-    padding: 14px 14px 6px 14px;
+    padding: 18px 14px 10px 14px;
     align-items: center;
     margin-top: 0;
 }
@@ -179,8 +179,8 @@
 /* --- Modules 2 & 3: Input Scanner Terminals --- */
 .input-module {
     height: auto;
-    padding: 12px 18px;
-    margin-top: 12px;
+    padding: 16px 20px;
+    margin-top: 18px;
     flex-direction: column;
 }
 
@@ -260,8 +260,8 @@
 /* --- Module 4: Action & Diagnostics Terminal --- */
 .action-module {
     height: auto;
-    padding: 14px 18px;
-    margin-top: 12px;
+    padding: 22px 20px;
+    margin-top: 18px;
     flex-direction: column;
 }
 
@@ -456,8 +456,8 @@
 
 .rankings-module {
     height: auto;
-    padding: 12px 18px;
-    margin-top: 12px;
+    padding: 15px 18px;
+    margin-top: 18px;
 }
 
 .button-trigger {
