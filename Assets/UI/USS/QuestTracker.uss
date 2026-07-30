@@ -97,3 +97,29 @@
     margin-bottom: 2px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
 }
+
+#MinimapContainer {
+    width: 292px;
+    height: 292px;
+    position: relative;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+}
+
+#MinimapImage {
+    width: 292px;
+    height: 292px;
+    background-color: rgb(12, 16, 24);
+}
+
+#MinimapPlayerArrow {
+    position: absolute;
+    left: 136px;
+    top: 136px;
+    width: 20px;
+    height: 20px;
+    transform-origin: 50% 50%;
+}
+

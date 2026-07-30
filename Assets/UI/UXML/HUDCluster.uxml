@@ -105,6 +105,10 @@
     <ui:VisualElement name="LowHealthVignette" />
     <!-- Quest + Journal -->
     <ui:VisualElement name="QuestTracker">
+        <ui:VisualElement name="MinimapContainer" style="display: none;">
+            <ui:VisualElement name="MinimapImage" />
+            <ui:VisualElement name="MinimapPlayerArrow" />
+        </ui:VisualElement>
         <ui:VisualElement name="MainPanel">
             <ui:Label name="Chapter" text="" />
             <ui:Label name="Title" text="" />

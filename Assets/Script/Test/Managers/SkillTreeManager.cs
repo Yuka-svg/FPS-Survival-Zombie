@@ -57,7 +57,7 @@ namespace cowsins
                 ExperienceManager.Instance.AddExperience(1000);
             }
 
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(KeyCode.K))
             {
                 UpgradeMovement();
             }
