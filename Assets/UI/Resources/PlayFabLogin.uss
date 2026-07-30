@@ -42,7 +42,7 @@
     left: 6%;
     top: 50%;
     translate: 0 -50%;
-    min-height: 560px;
+    min-height: 640px;
     justify-content: flex-start;
     padding: 0 0 0 36px;
     border-left-width: 2px;
@@ -59,8 +59,8 @@
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
     position: relative;
-    padding: 10px 18px;
-    margin-top: 8px;
+    padding: 14px 18px;
+    margin-top: 14px;
     margin-bottom: 0;
     flex-shrink: 0;
     translate: -800px 0px;
@@ -147,7 +147,7 @@
 
 /* --- Module 1: Header Terminal --- */
 .header-module {
-    padding: 16px 14px 8px 14px;
+    padding: 16px 14px 10px 14px;
     align-items: center;
     margin-top: 0;
 }
@@ -176,7 +176,7 @@
 
 /* --- Modules 2 & 3: Input Scanner Terminals --- */
 .input-module {
-    padding: 10px 18px;
+    padding: 16px 20px;
     flex-direction: column;
 }
 
@@ -255,7 +255,7 @@
 
 /* --- Module 4: Action & Diagnostics Terminal --- */
 .action-module {
-    padding: 14px 18px;
+    padding: 22px 20px;
     flex-direction: column;
 }
 
