@@ -20,6 +20,11 @@ public class QuestTrackerWidget : MonoBehaviour
     private VisualElement _sideLinesContainer;
     private readonly List<Label> _sideLines = new();
 
+    private VisualElement _minimapContainer;
+    private VisualElement _minimapImage;
+    private VisualElement _minimapPlayerArrow;
+    private bool _isMinimapMode = false;
+
     private void Awake()
     {
         var doc = GetComponent<UIDocument>();
@@ -37,6 +42,16 @@ public class QuestTrackerWidget : MonoBehaviour
         _sideHeader = root.Q<Label>("SideHeader");
         _sideLinesContainer = root.Q("SideLines");
 
+        _minimapContainer = root.Q("MinimapContainer");
+        _minimapImage = root.Q("MinimapImage");
+        _minimapPlayerArrow = root.Q("MinimapPlayerArrow");
+
+        bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
+        if (isEndless)
+        {
+            _isMinimapMode = true;
+        }
+
         if (_chapter == null || _title == null || _objective == null || _sideLinesContainer == null)
             enabled = false;
     }
@@ -44,17 +59,50 @@ public class QuestTrackerWidget : MonoBehaviour
     private void OnEnable()
     {
         if (_container != null)
+        {
             _container.generateVisualContent += OnGenerateCardBackground;
+            _container.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+
+        if (_minimapPlayerArrow != null)
+        {
+            _minimapPlayerArrow.generateVisualContent += OnDrawPlayerArrow;
+        }
+
+        bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
+        if (isEndless)
+        {
+            _isMinimapMode = true;
+        }
 
         SubscribeToManagers();
         UpdateDisplay();
         StartCoroutine(PollRoutine());
     }
 
+    private void OnGeometryChanged(GeometryChangedEvent evt)
+    {
+        _container?.MarkDirtyRepaint();
+    }
+
     private void Start()
     {
-        // Retry subscription in case StoryManager/SideQuestManager awakened
-        // after this widget's OnEnable (script execution order race).
+        // Ensure MinimapController component exists in scene
+        if (MinimapController.Instance == null)
+        {
+            var mc = FindAnyObjectByType<MinimapController>();
+            if (mc == null)
+            {
+                var mcObj = new GameObject("MinimapController");
+                mcObj.AddComponent<MinimapController>();
+            }
+        }
+
+        if (GameModeManager.CurrentMode == GameMode.Endless)
+        {
+            _isMinimapMode = true;
+        }
+
         SubscribeToManagers();
         UpdateDisplay();
     }
@@ -80,7 +128,25 @@ public class QuestTrackerWidget : MonoBehaviour
     private void OnDisable()
     {
         if (_container != null)
+        {
             _container.generateVisualContent -= OnGenerateCardBackground;
+            _container.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+
+        if (_minimapPlayerArrow != null)
+        {
+            _minimapPlayerArrow.generateVisualContent -= OnDrawPlayerArrow;
+        }
+
+        if (MinimapController.Instance != null)
+        {
+            MinimapController.Instance.SetCameraActive(false);
+        }
+
+        if (_minimapImage != null)
+        {
+            _minimapImage.style.backgroundImage = StyleKeyword.Null;
+        }
 
         if (StoryManager.Instance != null)
         {
@@ -93,6 +159,53 @@ public class QuestTrackerWidget : MonoBehaviour
             SideQuestManager.Instance.OnSideQuestActivated -= HandleSideQuestChanged;
         }
         StopAllCoroutines();
+    }
+
+    private void Update()
+    {
+        // Update Player Arrow rotation matching FPS Camera Yaw
+        if (_isMinimapMode && _minimapPlayerArrow != null && MinimapController.Instance != null)
+        {
+            float rot = MinimapController.Instance.CameraYawRotation;
+            _minimapPlayerArrow.style.rotate = new Rotate(Angle.Degrees(rot));
+        }
+
+        // Story Mode - Key M Toggle
+        bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
+        if (!isEndless)
+        {
+            bool mPressed = false;
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && kb.mKey.wasPressedThisFrame)
+            {
+                mPressed = true;
+            }
+            if (!mPressed)
+            {
+                try { if (Input.GetKeyDown(KeyCode.M)) mPressed = true; } catch {}
+            }
+
+            if (mPressed)
+            {
+                var focusEl = _container?.panel?.focusController?.focusedElement;
+                if (focusEl is TextField || focusEl is TextInputBaseField<string>)
+                    return;
+
+                bool pauseActive = cowsins.PauseMenu.isPaused || (PauseManager.Instance != null && PauseManager.Instance.IsOpenOrTransitioning);
+                bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
+                bool panelActive = PanelManager.Instance != null && PanelManager.Instance.IsAnyPanelActive();
+                bool journalActive = JournalUI.Instance != null && JournalUI.Instance.IsOpenOrTransitioning;
+                var skillTree = FindAnyObjectByType<SkillTreeWidget>();
+                bool skillTreeActive = skillTree != null && skillTree.IsOpenOrTransitioning;
+
+                if (!pauseActive && !gameOver && !panelActive && !journalActive && !skillTreeActive)
+                {
+                    _isMinimapMode = !_isMinimapMode;
+                    Debug.Log($"[QuestTrackerWidget] M Key Pressed! Toggle _isMinimapMode = {_isMinimapMode}");
+                    UpdateDisplay();
+                }
+            }
+        }
     }
 
     private IEnumerator PollRoutine()
@@ -143,6 +256,12 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void TriggerUpdateAnimation()
     {
+        if (_isMinimapMode)
+        {
+            UpdateDisplay();
+            return;
+        }
+
         if (_container == null)
         {
             UpdateDisplay();
@@ -169,6 +288,41 @@ public class QuestTrackerWidget : MonoBehaviour
     private void UpdateDisplay()
     {
         if (_chapter == null || _title == null || _objective == null) return;
+
+        // Endless mode check
+        bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
+        if (isEndless)
+        {
+            _isMinimapMode = true;
+        }
+
+        // Camera lifecycle management
+        if (MinimapController.Instance != null)
+        {
+            MinimapController.Instance.SetCameraActive(_isMinimapMode && enabled);
+        }
+
+        // If Minimap mode is active
+        if (_isMinimapMode)
+        {
+            if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.Flex;
+            if (_mainPanel != null) _mainPanel.style.display = DisplayStyle.None;
+            if (_sidePanel != null) _sidePanel.style.display = DisplayStyle.None;
+            if (_divider != null) _divider.style.display = DisplayStyle.None;
+
+            if (_minimapImage != null && MinimapController.Instance?.MinimapTexture != null)
+            {
+                _minimapImage.style.backgroundImage = Background.FromRenderTexture(MinimapController.Instance.MinimapTexture);
+            }
+
+            if (_container != null) _container.MarkDirtyRepaint();
+            return;
+        }
+
+        // Story mode Quest View
+        if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.None;
+        if (_mainPanel != null) _mainPanel.style.display = DisplayStyle.Flex;
+
         var sm = StoryManager.Instance;
         if (sm == null)
         {
@@ -208,6 +362,44 @@ public class QuestTrackerWidget : MonoBehaviour
         UpdateCollectibleDisplay();
         RebuildSideBlock();
         if (_container != null) _container.MarkDirtyRepaint();
+    }
+
+    private void OnDrawPlayerArrow(MeshGenerationContext mgc)
+    {
+        var painter = mgc.painter2D;
+        var rect = mgc.visualElement.layout;
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        float w = rect.width;
+        float h = rect.height;
+
+        // Shadow / Outer Glow
+        painter.fillColor = new Color(0f, 0f, 0f, 0.7f);
+        painter.BeginPath();
+        painter.MoveTo(new Vector2(w * 0.5f, 1f));
+        painter.LineTo(new Vector2(w - 1f, h - 2f));
+        painter.LineTo(new Vector2(w * 0.5f, h - 6f));
+        painter.LineTo(new Vector2(1f, h - 2f));
+        painter.ClosePath();
+        painter.Fill();
+
+        // Metallic Gold Body
+        painter.fillColor = new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.95f);
+        painter.BeginPath();
+        painter.MoveTo(new Vector2(w * 0.5f, 0f));
+        painter.LineTo(new Vector2(w - 2f, h - 3f));
+        painter.LineTo(new Vector2(w * 0.5f, h - 7f));
+        painter.LineTo(new Vector2(2f, h - 3f));
+        painter.ClosePath();
+        painter.Fill();
+
+        // Bright Accent Spine
+        painter.strokeColor = new Color(255f / 255f, 245f / 255f, 180f / 255f, 0.9f);
+        painter.lineWidth = 1.2f;
+        painter.BeginPath();
+        painter.MoveTo(new Vector2(w * 0.5f, 2f));
+        painter.LineTo(new Vector2(w * 0.5f, h - 7f));
+        painter.Stroke();
     }
 
     private void RebuildSideBlock()

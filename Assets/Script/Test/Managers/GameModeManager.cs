@@ -13,12 +13,12 @@ public class GameModeManager : MonoBehaviour
 
     [SerializeField] private GameMode currentMode = GameMode.Story;
 
-    public static GameMode CurrentMode => Instance != null ? Instance.currentMode : _persistedMode;
+    public static GameMode CurrentMode => StoryManager.Instance != null ? GameMode.Story : (Instance != null ? Instance.currentMode : _persistedMode);
 
     private void Awake()
     {
-        currentMode = _persistedMode;
         Instance = this;
+        _persistedMode = currentMode;
     }
 
     public void SetMode(GameMode mode)
