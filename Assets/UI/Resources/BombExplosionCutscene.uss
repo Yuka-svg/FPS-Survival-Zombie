@@ -1,0 +1,6 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+#FadeOverlay {
+    transition: opacity var(--transition-fast, 0.6s) ease-out;
+}

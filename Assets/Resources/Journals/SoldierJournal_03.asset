@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: SoldierJournal_03
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 6
+  title: "Nh\u1EADt k\xFD ng\u01B0\u1EDDi l\xEDnh #3"
+  category: 1
+  content: "T\u1EA5t c\u1EA3 l\xE0 t\u1EA1i t\xEAn b\xE1c s\u0129 \u0111\xF3!!! Gi\u1EDD
+    t\xF4i l\u1EA1i ph\u1EA3i b\u1EA3o v\u1EC7 h\u1EAFn t\u1EA1i c\xF4ng tr\u01B0\u1EDDng
+    \u0111\u1EC3 h\u1EAFn l\xE0m thu\u1ED1c gi\u1EA3i. Li\u1EC1u thu\u1ED1c \u0111\u1EA7u
+    ti\xEAn \u0111\xE3 th\xE0nh c\xF4ng r\u1EF1c r\u1EE1 nh\u01B0ng th\u1EA5t l\u1EA1c
+    r\u1ED3i, c\xF3 l\u1EBD m\xECnh n\xEAn \u0111i t\xECm n\xF3."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

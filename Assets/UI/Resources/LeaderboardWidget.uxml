@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/Resources/LeaderboardWidget.uss" />
+
+    <ui:VisualElement name="LeaderboardRoot" picking-mode="Ignore">
+        <ui:VisualElement name="LeaderboardChip" class="leaderboard-chip" />
+        <ui:VisualElement name="LeaderboardScrim" class="overlay" picking-mode="Ignore" />
+        <ui:VisualElement name="LeaderboardPanel" class="leaderboard-panel">
+            <ui:VisualElement name="PanelHeader" class="panel-header">
+                <ui:Label name="PanelTitle" class="panel-title" text="LEADERBOARD" />
+                <ui:VisualElement name="LeaderboardCloseButton" class="leaderboard-close-btn">
+                    <ui:Label name="CloseLabel" class="btn-label" text="x" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="PanelDivider" class="panel-divider" />
+            <ui:VisualElement name="ColHeader" class="col-header">
+                <ui:Label name="ColRank" class="col-rank" text="#" />
+                <ui:Label name="ColName" class="col-name" text="PLAYER" />
+                <ui:Label name="ColScore" class="col-score" text="SCORE" />
+            </ui:VisualElement>
+            <ui:ScrollView name="ListContent" class="list-content" mode="Vertical" show-vertical-scrollbar="Auto" />
+            <ui:Label name="StatusText" class="status-text" text="" />
+            <ui:VisualElement name="PanelFooter" class="panel-footer" />
+            <ui:VisualElement name="RefreshButton" class="leaderboard-btn" style="margin-top: 8px;">
+                <ui:Label name="RefreshLabel" class="btn-label" text="REFRESH" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

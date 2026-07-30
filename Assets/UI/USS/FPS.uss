@@ -1,0 +1,22 @@
+@import url("Shared.uss");
+
+/* FPS.uss — Phase 12: FPS Counter */
+
+* {
+    --color-fps-good: var(--color-stamina, #4FE08A);
+    --color-fps-ok: var(--color-chip-score, #FFD44D);
+    --color-fps-bad: var(--color-ammo-low, #D95926);
+}
+
+.fps-counter {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    translate: -50% 0;
+    font-size: 11px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-text-align: middle-center;
+    color: rgba(235, 224, 199, 0.45);
+    width: 100px;
+    height: 16px;
+}

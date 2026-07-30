@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_07
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 37
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #7 \u2014 K\u1EBF ho\u1EA1ch tho\xE1t"
+  category: 5
+  content: "\u0110\u1EA1i \xFAy Reyes \u0111\xE2y. Ch\xFAng t\xF4i t\xECm th\u1EA5y
+    m\u1ED9t chi\u1EBFc xe t\u1EA3i qu\xE2n s\u1EF1 c\xF2n nguy\xEAn v\u1EB9n \u1EDF
+    tr\u1EA1m s\u1EEDa xe b\xEAn c\u1EA1nh khu d\xE2n c\u01B0. K\xEDp c\u1EE7a t\xF4i
+    \u2014 4 ng\u01B0\u1EDDi \u2014 \u0111\xE3 c\u1ED1 s\u1EEDa n\xF3 trong hai ng\xE0y.
+    Nh\u01B0ng zombie nghe ti\u1EBFng m\xE1y v\xE0 k\xE9o \u0111\u1EBFn h\xE0ng ch\u1EE5c.
+    Ch\u1EC9 c\xF2n t\xF4i v\xE0 Taylor. Taylor b\u1ECB c\u1EAFn h\xF4m qua. T\xF4i
+    m\u1ED9t m\xECnh kh\xF4ng th\u1EC3 s\u1EEDa n\u1ED5i. N\u1EBFu ai \u0111\u1ECDc
+    \u0111\u01B0\u1EE3c n\xE0y: chi\u1EBFc xe v\u1EABn \u1EDF \u0111\xF3, ch\u1EC9
+    thi\u1EBFu b\u1ED9 \u0111\u1EC1. T\xECm b\u1ED9 \u0111\u1EC1 \u1EDF kho ph\u1EE5
+    t\xF9ng."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

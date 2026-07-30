@@ -1,0 +1,22 @@
+@import url("Shared.uss");
+
+#LowHealthVignette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: var(--opacity-zero, 0);
+    transition: opacity var(--transition-normal, 0.15s) ease;
+    -unity-background-scale-mode: stretch-to-fill;
+    background-image: resource("Images/ui_vignette");
+    -unity-background-image-tint-color: var(--color-accent-red-dark, rgb(168, 23, 33));
+}
+
+#LowHealthVignette.low {
+    opacity: var(--opacity-low, 0.45);
+}
+
+#LowHealthVignette.critical {
+    opacity: var(--opacity-high, 0.85);
+}

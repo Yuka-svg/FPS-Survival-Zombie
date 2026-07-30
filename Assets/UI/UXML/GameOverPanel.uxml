@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/GameOverPanel.uss" />
+    <ui:VisualElement name="GameOverPanel" style="display: none;">
+        <ui:VisualElement name="Vignette" />
+        <ui:VisualElement name="CardShadow" />
+        <ui:VisualElement name="Card" view-data-key="CardPivot">
+            <ui:VisualElement name="TopAccent" />
+            <ui:VisualElement name="SkullIcon" />
+            <ui:Label name="Title" text="GAME OVER" />
+            <ui:VisualElement name="Divider" />
+            <ui:VisualElement name="StatWell">
+                <ui:Label name="FinalScoreText" text="" class="stat-text gold" />
+                <ui:Label name="WaveReachedText" text="" class="stat-text" />
+                <ui:Label name="KillsText" text="" class="stat-text" />
+                <ui:Label name="BestScoreText" text="" class="stat-text gold" />
+            </ui:VisualElement>
+            <ui:Button name="RestartButton" text="RESTART" class="gameover-button" />
+            <ui:Button name="MainMenuButton" text="MAIN MENU" class="gameover-button" />
+            <ui:Button name="QuitButton" text="QUIT" class="gameover-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

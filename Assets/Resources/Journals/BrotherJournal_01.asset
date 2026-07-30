@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: BrotherJournal_01
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 7
+  title: "Nh\u1EADt k\xFD anh trai #1"
+  category: 2
+  content: "H\xF4m nay em m\xECnh r\u1EDDi th\xE0nh ph\u1ED1 r\u1ED3i, c\xF3 l\u1EBD
+    s\u1EBD kh\xF4ng g\u1EB7p l\u1EA1i n\u1EEFa. M\xECnh \u0111\xE3 \u0111\u1ED3ng
+    \xFD th\u1EED thu\u1ED1c cho b\xE1c s\u0129 Edward, c\xF3 l\u1EBD \u0111\xE2y
+    l\xE0 quy\u1EBFt \u0111\u1ECBnh \u0111\xFAng \u0111\u1EAFn. S\u1ED1 ti\u1EC1n
+    m\xE0 b\xE1c s\u0129 Edward \u0111\u01B0a c\xF3 l\u1EBD s\u1EBD gi\xFAp n\xF3
+    th\xE0nh c\xF4ng."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

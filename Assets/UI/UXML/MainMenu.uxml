@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/MainMenu.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/MainMenuTheme.uss" />
+
+    <ui:Template name="PlayFabLogin" src="project://database/Assets/UI/Resources/PlayFabLogin.uxml" />
+    <ui:Template name="PlayerProfile" src="project://database/Assets/UI/Resources/PlayerProfileWidget.uxml" />
+    <ui:Template name="Leaderboard" src="project://database/Assets/UI/Resources/LeaderboardWidget.uxml" />
+
+    <ui:VisualElement name="MainMenuRoot">
+        <!-- Background layer -->
+        <ui:VisualElement name="Background" />
+        <ui:VisualElement name="Vignette" />
+        <ui:VisualElement name="SkullWatermark" />
+
+
+
+        <!-- Bottom bar -->
+        <ui:Label name="Version" text="v1.0" />
+
+        <!-- Templates instances -->
+        <ui:Instance template="PlayFabLogin" name="PlayFabLogin" class="fullscreen-container" />
+        <ui:Instance template="PlayerProfile" name="PlayerProfile" class="fullscreen-container" />
+        <ui:Instance template="Leaderboard" name="Leaderboard" class="fullscreen-container" />
+    </ui:VisualElement>
+</ui:UXML>

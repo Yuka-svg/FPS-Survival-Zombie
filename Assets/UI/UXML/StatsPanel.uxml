@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/StatsPanel.uss" />
+    <ui:VisualElement name="StatsPanel" class="stats-root">
+        <ui:VisualElement name="StatsScrim" class="stats-scrim" />
+        <ui:VisualElement name="StatsCard" class="stats-card">
+            <ui:VisualElement name="StatsAccent" class="stats-accent" />
+            <ui:Label name="StatsTitle" class="stats-title" text="STATISTICS" />
+            <ui:VisualElement name="StatsDivider" class="stats-divider" />
+            <ui:VisualElement name="StatsGrid" class="stats-grid" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

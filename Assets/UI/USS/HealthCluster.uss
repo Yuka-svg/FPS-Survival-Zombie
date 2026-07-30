@@ -1,0 +1,147 @@
+/* ===== HealthCluster.uss ===== */
+@import url("Shared.uss");
+
+#HealthCluster {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    flex-direction: column;
+    width: 320px;
+    padding: 10px 14px;
+    background-color: transparent;
+    border-width: 0;
+    border-radius: 0;
+}
+
+#HealthHeaderRow {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.header-badge {
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 8px;
+    background-color: rgba(14, 18, 24, 0.6);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+.level-badge {
+    border-color: rgba(217, 199, 115, 0.3);
+}
+
+.health-badge {
+    border-color: rgba(229, 72, 60, 0.3);
+}
+
+.header-badge-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.level-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+    -unity-background-image-tint-color: var(--color-accent-gold, rgb(217, 199, 115));
+}
+
+.health-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_target.svg");
+    -unity-background-image-tint-color: var(--color-accent-red, rgb(229, 72, 60));
+}
+
+#LevelValue {
+    font-size: 14px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    margin: 0;
+    padding: 0;
+}
+
+#HealthValue {
+    font-size: 14px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    color: rgb(235, 224, 199);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    margin: 0;
+    padding: 0;
+}
+
+#HealthBarRow {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+#HealthTrack {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    flex-shrink: 0;
+    background-color: rgba(20, 25, 32, 0.9);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#HealthGhost {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-health-low, rgba(184, 31, 31, 0.7));
+    transition: width var(--transition-normal, 0.3s) ease-out;
+}
+
+#HealthFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-health-full, rgb(217, 199, 115));
+    transition: width var(--transition-fast, 0.15s) ease-out, background-color var(--transition-fast, 0.15s) ease-out;
+}
+
+#ShieldRoot {
+    flex-shrink: 0;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+#ShieldTrack {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background-color: rgba(20, 25, 32, 0.9);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#ShieldFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-shield, rgb(115, 199, 242));
+    transition: width var(--transition-fast, 0.15s) ease-out;
+}
+
+.track-notches-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}

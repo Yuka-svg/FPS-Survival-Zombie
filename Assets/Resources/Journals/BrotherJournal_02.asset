@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: BrotherJournal_02
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 8
+  title: "Nh\u1EADt k\xFD anh trai #2"
+  category: 2
+  content: "Kh\u1ED1n th\u1EADt, t\xEAn b\xE1c s\u0129 n\xE0y l\xE0 m\u1ED9t t\xEAn
+    \u0111i\xEAn!! Sau khi th\u1EED thu\u1ED1c c\u1EE7a h\u1EAFn, m\xECnh ng\xE0y
+    c\xE0ng \u0111\u1EDD \u0111\u1EABn, ng\u01B0\u1EDDi th\xEC c\xE0ng ng\xE0y c\xE0ng
+    to. C\xF3 l\u1EBD m\xECnh s\u1EBD t\xECm c\xE1ch tho\xE1t kh\u1ECFi b\u1EC7nh
+    vi\u1EC7n."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

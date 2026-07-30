@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/Resources/EnemyHealthBar.uss" />
+
+    <ui:VisualElement name="HealthBarRoot">
+        <ui:VisualElement name="Icon" />
+        <ui:VisualElement name="FillArea">
+            <ui:VisualElement name="Fill" />
+        </ui:VisualElement>
+        <ui:Label name="NameLabel" />
+    </ui:VisualElement>
+</ui:UXML>

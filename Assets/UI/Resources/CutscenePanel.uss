@@ -1,0 +1,51 @@
+@import url("project://database/Assets/UI/USS/Theme.uss");
+@import url("project://database/Assets/UI/USS/Shared.uss");
+
+/* CutscenePanel.uss — Runtime-loaded styles for CutscenePlayer (Phase B) */
+.cutscene-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.cutscene-scrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.cutscene-title {
+    font-size: var(--fs-hero, 64px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: var(--color-text-gold);
+    -unity-text-align: middle-center;
+    width: 90%;
+    height: auto;
+    max-height: 20%;
+    position: absolute;
+    top: 35%;
+    left: 5%;
+    white-space: normal;
+}
+
+.cutscene-body {
+    font-size: var(--fs-xxl, 36px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
+    width: 90%;
+    height: auto;
+    max-height: 35%;
+    position: absolute;
+    top: 55%;
+    left: 5%;
+    white-space: normal;
+}

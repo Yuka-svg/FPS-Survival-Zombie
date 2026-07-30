@@ -1,0 +1,99 @@
+@import url("Shared.uss");
+
+#QuestTracker {
+    position: absolute;
+    right: 20px;
+    left: auto;
+    top: 20px;
+    width: 320px;
+    flex-direction: column;
+    padding: 12px 14px;
+    background-color: transparent;
+    border-width: 0;
+
+    transition: opacity 0.25s ease-out, translate 0.25s ease-out;
+}
+
+#QuestTracker.quest-updating {
+    opacity: 0.1;
+    translate: 30px 0;
+}
+
+#MainPanel {
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
+
+#Chapter {
+    color: var(--color-accent-gold, rgb(217, 199, 115)); /* Gold accent for chapter heading */
+    font-size: 11px;
+    -unity-font-definition: var(--font-display-sdf);
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+    white-space: normal;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+}
+
+#Title {
+    color: var(--color-text-primary, rgb(245, 245, 245));
+    font-size: 17px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+    white-space: normal;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+#Objective {
+    color: var(--color-text-muted, rgb(158, 168, 184));
+    font-size: 12px;
+    -unity-font-definition: var(--font-body-sdf);
+    white-space: normal;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+#Collectibles {
+    color: var(--color-accent-cyan, rgb(78, 205, 196)); /* Cyan accent matching HUD chips */
+    font-size: 11px;
+    -unity-font-definition: var(--font-body-sdf);
+    margin-top: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.quest-divider {
+    height: 1px;
+    background-color: rgba(217, 199, 115, 0.15);
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#SidePanel {
+    padding: 0;
+    margin: 0;
+    flex-direction: column;
+}
+
+#SideHeader {
+    color: var(--color-accent-cyan, rgb(78, 205, 196)); /* Cyan accent for side quests header */
+    font-size: 11px;
+    -unity-font-style: bold;
+    -unity-font-definition: var(--font-body-sdf);
+    margin-bottom: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+}
+
+#SideLines {
+    flex-direction: column;
+}
+
+.side-line {
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    font-size: 12px;
+    -unity-font-definition: var(--font-body-sdf);
+    height: 18px;
+    margin-bottom: 2px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}

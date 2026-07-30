@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/HUDChips.uss" />
+    <ui:VisualElement name="HUDChips">
+        <ui:VisualElement name="WaveChip" class="hud-chip-root hud-chip-wave hud-chip-hidden">
+            <ui:VisualElement name="WaveIcon" class="hud-chip-icon hud-chip-wave-icon" />
+            <ui:Label name="WaveLabel" class="hud-chip-label" text="Wave 1 · 0/10" />
+        </ui:VisualElement>
+        <ui:VisualElement name="KillsChip" class="hud-chip-root hud-chip-kills hud-chip-hidden">
+            <ui:VisualElement name="KillsIcon" class="hud-chip-icon hud-chip-kills-icon" />
+            <ui:Label name="KillsLabel" class="hud-chip-label" text="Kills : 0" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ScoreChip" class="hud-chip-root hud-chip-score hud-chip-hidden">
+            <ui:VisualElement name="ScoreIcon" class="hud-chip-icon hud-chip-score-icon" />
+            <ui:Label name="ScoreLabel" class="hud-chip-label" text="Score : 0" />
+        </ui:VisualElement>
+        <ui:VisualElement name="CoinsChip" class="hud-chip-root hud-chip-coins hud-chip-hidden">
+            <ui:VisualElement name="CoinsIcon" class="hud-chip-icon hud-chip-coins-icon" />
+            <ui:Label name="CoinsLabel" class="hud-chip-label" text="Coins : 0" />
+        </ui:VisualElement>
+        <ui:VisualElement name="HeadshotsChip" class="hud-chip-root hud-chip-headshots hud-chip-hidden">
+            <ui:VisualElement name="HeadshotsIcon" class="hud-chip-icon hud-chip-headshots-icon" />
+            <ui:Label name="HeadshotsLabel" class="hud-chip-label" text="Crits : 0" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TimerChip" class="hud-chip-root hud-chip-timer hud-chip-hidden">
+            <ui:VisualElement name="TimerIcon" class="hud-chip-icon hud-chip-timer-icon" />
+            <ui:Label name="TimerLabel" class="hud-chip-label" text="00:00" />
+        </ui:VisualElement>
+        <ui:VisualElement name="CollectiblesChip" class="hud-chip-root hud-chip-collectibles hud-chip-hidden">
+            <ui:VisualElement name="CollectiblesIcon" class="hud-chip-icon hud-chip-collectibles-icon" />
+            <ui:Label name="CollectiblesLabel" class="hud-chip-label" text="Journals : 0/0" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

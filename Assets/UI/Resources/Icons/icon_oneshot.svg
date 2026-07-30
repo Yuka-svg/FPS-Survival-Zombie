@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="8" stroke-width="2"/>
+  <circle cx="12" cy="12" r="4" stroke-width="1"/>
+  <line x1="12" y1="2" x2="12" y2="22" stroke-width="1.5"/>
+  <line x1="2" y1="12" x2="22" y2="12" stroke-width="1.5"/>
+  <!-- Diagonal bullet path -->
+  <line x1="3" y1="21" x2="21" y2="3" stroke-width="2.5"/>
+</svg>

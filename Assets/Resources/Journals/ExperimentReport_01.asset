@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: ExperimentReport_01
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 13
+  title: "B\xE1o c\xE1o th\xED nghi\u1EC7m #1"
+  category: 4
+  content: "T\xEAn thu\u1ED1c : XC-1. C\xF4ng d\u1EE5ng: T\u0103ng c\u01B0\u1EDDng
+    s\u1EE9c m\u1EA1nh, c\u01A1 b\u1EAFp, tr\xED th\xF4ng minh cho ng\u01B0\u1EDDi
+    d\xF9ng. B\xE1o c\xE1o s\u01A1 b\u1ED9 : \u0110\xE3 th\u1EED nghi\u1EC7m th\xE0nh
+    c\xF4ng tr\xEAn \u0111\u1ED9ng v\u1EADt. M\u1EE5c ti\xEAu: Thu\u1ED1c c\xF3 th\u1EC3
+    s\u1EED d\u1EE5ng tr\xEAn ng\u01B0\u1EDDi."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

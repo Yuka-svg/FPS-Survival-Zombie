@@ -1,0 +1,482 @@
+/* ===== PausePanel.uss — Gold Tactical Pause Theme ===== */
+@import url("Shared.uss");
+
+/* Override Shared.uss overlay to make it fully transparent */
+#GameUIRoot #PausePanel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#GameUIRoot #PausePanel.visible {
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#PauseVignette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: resource("Images/ui_vignette");
+    -unity-background-scale-mode: scale-and-crop;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#PausePanel.visible #PauseVignette {
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+/* Card container transitions: pop up like skill tree (scale 0 to 1, opacity 0 to 1) over 1.5s for both entry & exit */
+#PausePanel #PauseCard {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 760px;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    opacity: 0;
+    scale: 0;
+    translate: -50% -50%;
+    transition-property: opacity, scale, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in, ease-in, ease-in-out;
+    justify-content: flex-start; /* Top-aligned, spacing handled by margins */
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 0;
+}
+
+#PausePanel.visible #PauseCard {
+    opacity: 1;
+    scale: 1;
+    translate: -50% -50%;
+    transition-property: opacity, scale, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-out-back, ease-out-back, ease-in-out;
+}
+
+#PausePanel #PauseCardShadow {
+    display: none;
+}
+
+#PausePanel #PauseTopAccent {
+    display: none;
+}
+
+#PauseIcon {
+    width: 58px;
+    height: 58px;
+    margin-top: 0;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_pause.svg");
+    -unity-background-image-tint-color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+#PauseTitle {
+    font-size: var(--fs-display, 48px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    letter-spacing: 8px;
+    width: 100%;
+    height: auto;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-outline-color: var(--color-text-shadow, rgba(0, 0, 0, 0.8));
+    -unity-text-outline-width: var(--shadow-text-md, 2px);
+}
+
+#PauseDivider {
+    width: 620px;
+    height: 2px;
+    flex-shrink: 0;
+    margin-top: 8px;
+    margin-bottom: 0;
+    background-color: rgba(217, 199, 115, 0.2);
+}
+
+#PauseButtonsContainer {
+    width: 100%;
+    height: auto;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+/* === Pause Buttons — High Specificity Overrides to completely bypass Shared.uss pill style === */
+#PausePanel .pause-button {
+    width: 540px;
+    height: 84px;
+    margin: 0 auto;
+    margin-top: 24px;
+    align-self: center;
+    background-color: rgba(16, 22, 30, 0.9);
+    background-image: none;
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.3);
+    border-radius: 4px;
+    font-size: 30px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(217, 199, 115);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    letter-spacing: 8px;
+    transition-property: scale, background-color, border-color, color;
+    transition-duration: 0.15s, 0.15s, 0.15s, 0.15s;
+    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+#PausePanel .pause-button:hover {
+    scale: 1.05;
+    background-color: rgba(217, 199, 115, 0.15);
+    border-color: rgb(217, 199, 115);
+    color: rgb(217, 199, 115);
+}
+
+#PausePanel .pause-button:active {
+    scale: 0.95;
+    background-color: rgba(217, 199, 115, 0.05);
+}
+
+/* Symmetrical spacing overrides for top and bottom button bounds */
+#PausePanel #ResumeButton {
+    margin-top: 32px;
+}
+
+#PausePanel #PauseQuitButton {
+    margin-bottom: 40px;
+}
+
+/* ===== SettingsCard container ===== */
+#PausePanel #SettingsCard {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 960px;
+    height: 820px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    opacity: 0;
+    translate: -50% -170%; /* Hidden above the screen, using -50% base offset for perfect centering */
+    transition-property: opacity, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 25px;
+}
+
+#PausePanel #SettingsCard.active {
+    opacity: 1;
+    translate: -50% -50%; /* Centered in the screen */
+    transition-property: opacity, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+/* Slide down for PauseCard when Settings is active */
+#PausePanel #PauseCard.slide-down {
+    opacity: 0;
+    translate: -50% 70%; /* Slide down out of screen, keeping -50% horizontal offset */
+    scale: 1; /* Keep scale 1 so it only slides down */
+    transition-property: opacity, translate, scale;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#SettingsTitle {
+    font-size: var(--fs-display, 48px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    letter-spacing: 8px;
+    width: 100%;
+    height: auto;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-outline-color: var(--color-text-shadow, rgba(0, 0, 0, 0.8));
+    -unity-text-outline-width: var(--shadow-text-md, 2px);
+}
+
+#SettingsDivider {
+    width: 860px;
+    height: 2px;
+    flex-shrink: 0;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    background-color: rgba(217, 199, 115, 0.2);
+}
+
+.settings-scroll {
+    width: 860px;
+    height: 520px;
+    margin-bottom: 15px;
+}
+
+.settings-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 820px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.settings-label {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(217, 199, 115);
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    width: 380px;
+}
+
+.settings-slider {
+    flex-grow: 1;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+}
+
+.settings-slider-container {
+    flex-direction: row;
+    align-items: center;
+    width: 400px;
+    height: 24px;
+}
+
+.settings-value-label {
+    width: 60px;
+    margin-left: 10px;
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(217, 199, 115);
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+.settings-slider .unity-base-slider__input {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    justify-content: center;
+}
+
+/* Style the sliders to look gold and sci-fi */
+.settings-slider .unity-base-slider__tracker {
+    background-color: rgba(217, 199, 115, 0.15);
+    border-color: rgba(217, 199, 115, 0.3);
+    height: 8px;
+    border-radius: 4px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    margin: 0;
+}
+
+/* Add progress fill tracking */
+.settings-slider .unity-base-slider__fill {
+    background-color: rgb(217, 199, 115);
+    height: 8px;
+    border-radius: 4px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    margin: 0;
+    display: flex;
+}
+
+.settings-slider .unity-base-slider__dragger {
+    background-color: rgb(217, 199, 115);
+    border-color: rgb(217, 199, 115);
+    width: 14px;
+    height: 20px;
+    border-radius: 2px;
+    position: absolute;
+    top: 2px;
+    margin: 0;
+    transition: scale 0.1s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.settings-slider .unity-base-slider__dragger:hover {
+    scale: 1.15;
+    background-color: rgb(255, 235, 140);
+    border-color: rgb(255, 235, 140);
+}
+
+.settings-slider .unity-base-slider__dragger:active {
+    scale: 0.95;
+}
+
+.settings-toggle {
+    width: 400px;
+    align-items: flex-start;
+}
+
+/* Style toggle checkmark to look gold */
+.settings-toggle .unity-toggle__checkmark {
+    background-color: rgba(16, 22, 30, 0.9);
+    border-color: rgba(217, 199, 115, 0.5);
+    border-width: 1px;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    -unity-background-image-tint-color: rgb(217, 199, 115);
+    transition: border-width 0.15s ease-out, border-color 0.15s ease-out, background-color 0.15s ease-out;
+}
+
+.settings-toggle:hover .unity-toggle__checkmark {
+    border-width: 2px;
+    border-color: rgb(255, 235, 140);
+    background-color: rgba(217, 199, 115, 0.25);
+}
+
+.settings-toggle:active .unity-toggle__checkmark {
+    border-width: 3px;
+    border-color: rgb(255, 235, 140);
+    background-color: rgba(217, 199, 115, 0.35);
+}
+
+.settings-toggle:checked .unity-toggle__checkmark {
+    background-color: rgba(217, 199, 115, 0.2);
+    border-color: rgb(217, 199, 115);
+    border-width: 1px;
+}
+
+.settings-toggle:checked:hover .unity-toggle__checkmark {
+    background-color: rgba(217, 199, 115, 0.55);
+    border-color: rgb(255, 235, 140);
+    border-width: 2px;
+}
+
+.settings-toggle:checked:active .unity-toggle__checkmark {
+    background-color: rgba(217, 199, 115, 0.65);
+    border-color: rgb(255, 235, 140);
+    border-width: 3px;
+}
+
+/* back and reset buttons match pause button style but smaller */
+.settings-back-button,
+.settings-reset-button {
+    width: 820px;
+    height: 54px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    align-self: center;
+    background-color: rgba(16, 22, 30, 0.9);
+    background-image: none;
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.3);
+    border-radius: 4px;
+    font-size: 22px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(217, 199, 115);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    letter-spacing: 6px;
+    transition-property: scale, background-color, border-color, color;
+    transition-duration: 0.15s, 0.15s, 0.15s, 0.15s;
+    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+.settings-back-button:hover,
+.settings-reset-button:hover {
+    scale: 1.05;
+    background-color: rgba(217, 199, 115, 0.15);
+    border-color: rgb(217, 199, 115);
+    color: rgb(217, 199, 115);
+}
+
+.settings-back-button:active,
+.settings-reset-button:active {
+    scale: 0.95;
+    background-color: rgba(217, 199, 115, 0.05);
+}
+
+/* Custom Sci-Fi Gold Scrollbar styling */
+.settings-scroll .unity-scroller {
+    width: 10px;
+    background-color: transparent;
+}
+
+.settings-scroll .unity-scroller--vertical {
+    width: 10px;
+}
+
+/* Hide low/high arrow buttons for a sleek modern look */
+.settings-scroll .unity-scroller__low-button,
+.settings-scroll .unity-scroller__high-button {
+    display: none;
+}
+
+/* Scrollbar track */
+.settings-scroll .unity-scroller__slider {
+    min-width: 10px;
+    width: 10px;
+    margin: 0;
+    background-color: rgba(217, 199, 115, 0.05);
+    border-left-width: 1px;
+    border-left-color: rgba(217, 199, 115, 0.15);
+}
+
+.settings-scroll .unity-scroller__slider .unity-base-slider__tracker {
+    background-color: transparent;
+    border-width: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+
+/* Scrollbar thumb (dragger) */
+.settings-scroll .unity-scroller__slider .unity-base-slider__dragger {
+    background-color: rgba(217, 199, 115, 0.6);
+    border-color: rgba(217, 199, 115, 0.8);
+    border-width: 1px;
+    border-radius: 4px;
+    width: 8px;
+    left: 1px;
+    position: absolute;
+    margin: 0;
+}
+
+.settings-scroll .unity-scroller__slider .unity-base-slider__dragger:hover {
+    background-color: rgb(217, 199, 115);
+}
+
+.settings-scroll .unity-scroller__slider .unity-base-slider__dragger:active {
+    background-color: rgb(217, 199, 115);
+    scale: 1;
+}
+
+
+

@@ -1,0 +1,14 @@
+﻿<Solution>
+  <Project Path="AD_FimpAnimating.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="AD_FimpoPropertyDraw.csproj" />
+  <Project Path="PlayFab.csproj" />
+  <Project Path="AD_Fimpos.Editor.csproj" />
+  <Project Path="AD_FimpSharedTools.csproj" />
+  <Project Path="AD_FimpoPropertyAttr.csproj" />
+  <Project Path="AD_FimpAnimating.Editor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="PlayFabSDKEditor.csproj" />
+  <Project Path="AD_FimpShared.csproj" />
+  <Project Path="AD_FimpSharedTools.Editor.csproj" />
+</Solution>

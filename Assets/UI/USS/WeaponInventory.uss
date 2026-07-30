@@ -1,0 +1,52 @@
+/* ===== WeaponInventory.uss ===== */
+@import url("Shared.uss");
+
+#WeaponInventoryCluster {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+}
+
+.weapon-inventory-slot {
+    width: 44px;
+    height: 44px;
+    margin-left: 6px;
+    position: relative;
+    border-radius: 4px;
+    border-width: 1.5px;
+    border-color: rgba(217, 199, 115, 0.3);
+    background-color: rgba(14, 18, 24, 0.7);
+    transition-property: scale, border-color, background-color;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-out;
+}
+
+.weapon-inventory-slot.selected {
+    scale: 1.12;
+    border-color: var(--color-accent-gold, rgb(217, 199, 115));
+    background-color: rgba(217, 199, 115, 0.22);
+}
+
+.weapon-inventory-icon {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 6px;
+    bottom: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.weapon-inventory-index {
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    font-size: 10px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}

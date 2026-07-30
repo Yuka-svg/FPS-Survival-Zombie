@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: DoctorJournal_03
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 3
+  title: "Nh\u1EADt k\xFD b\xE1c s\u0129 #3"
+  category: 0
+  content: "Kh\xF4ng k\u1ECBp r\u1ED3i !! Th\xE0nh ph\u1ED1 \u0111\xE3 b\u1ECB phong
+    to\u1EA3. L\xE0m sao \u0111\xE2y!!! Tr\u1ED1n trong c\xF4ng tr\u01B0\u1EDDng
+    kh\xF4ng ph\u1EA3i l\xE0 c\xE1ch, nh\u01B0ng gi\u1EDD c\xF2n ch\u1ED7 n\xE0o
+    an to\xE0n n\u1EEFa \u0111\xE2u. C\xF3 l\u1EBD m\xECnh s\u1EBD b\u1ECF m\u1EA1ng
+    t\u1EA1i \u0111\xE2y m\u1EA5t. B\xE1c s\u0129 Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

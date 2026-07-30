@@ -1,0 +1,144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5116105978656957058
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1164828658887116, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_Name
+      value: Zombie_Biker_Male_01 Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.5097294
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0000015780545
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.1482139
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4310467188196834, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 95421449593400676, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: d49c109e9e1d92e468674ccf05e8c41c, type: 2}
+    - target: {fileID: 8901207075478252851, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      propertyPath: giftBoxPrefab
+      value: 
+      objectReference: {fileID: 5597026042441387653, guid: aeda1d4ad92c1ab4ba7a0b2cef51e203, type: 3}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1164828658887116, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4539582473160787364}
+  m_SourcePrefab: {fileID: 100100000, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+--- !u!1 &5117263660421892942 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1164828658887116, guid: 6cb63163261c5a84a8a7410cf0775135, type: 3}
+  m_PrefabInstance: {fileID: 5116105978656957058}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4539582473160787364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5117263660421892942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1e28ed3790c85e4bb5cf41289fb9830, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieAI
+  target: {fileID: 0}
+  walkSpeed: 1.5
+  runSpeed: 3.5
+  detectDistance: 20
+  attackDistance: 2
+  wanderRadius: 15
+  wanderInterval: 5
+  loseSightDistance: 28
+  alertMemoryDuration: 3
+  lungeChancePerSecond: 0.25
+  lungeSpeedMultiplier: 1.8
+  lungeDuration: 0.7
+  feintPauseChancePerSecond: 0.12
+  feintPauseDuration: 0.4
+  chaseJitterRadius: 2.5
+  requireLineOfSight: 1
+  sightObstructionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  sightEyeHeight: 1.5
+  stuckTimeThreshold: 3
+  stuckMoveThreshold: 1
+  stuckRepathRadius: 5
+  playerMovedRepathThreshold: 1
+  maxRepathInterval: 0.1
+  attackCooldown: 2
+  attackDamage: 20
+  maxHealth: 100
+  growlClip: {fileID: 0}
+  attackClip: {fileID: 0}
+  hitClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  footstepClip: {fileID: 0}
+  lootTable: []
+  dropPrefab: {fileID: 0}
+  dropChance: 50
+  dropHeightOffset: 1.5
+  popLootOnDeath: 1
+  lootPopUpwardSpeed: 4.5
+  lootPopHorizontalSpeed: 2.5
+  lootTrailSettings:
+    trailTime: 0.45
+    startWidth: 0.35
+    endWidth: 0.02
+    enableGlow: 1
+    glowMaxParticles: 60
+    glowEmissionRate: 35
+    glowStartSize: 0.18
+    glowStartLifetime: 0.5
+    coinColor: {r: 1, g: 0.85, b: 0.25, a: 1}
+    xpColor: {r: 0.7, g: 0.25, b: 1, a: 1}
+    defaultColor: {r: 1, g: 0.7, b: 0.4, a: 1}
+  experienceReward: 10
+  headshotBonusExperience: 5
+  coinReward: 5
+  headshotBonusCoins: 5
+  forceDetectPlayer: 1

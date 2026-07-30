@@ -1,0 +1,149 @@
+/* ===== AdRewardPanel.uss ===== */
+@import url("Shared.uss");
+
+#AdRewardPanel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--color-bg-root);
+}
+
+#AdRewardPanel #AdVignette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: resource("Images/ui_vignette");
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+#AdRewardPanel #AdCard {
+    height: 520px;
+    max-height: 95%;
+    max-width: 95%;
+}
+
+#AdRewardPanel #AdCardShadow {
+    height: 560px;
+    margin-top: -280px;
+    max-height: 95%;
+    max-width: 95%;
+}
+
+#AdRewardPanel #AdTopAccent {
+    background-color: var(--color-accent-cyan);
+}
+
+#AdRewardPanel #AdTitle {
+    font-size: var(--fs-display);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    letter-spacing: 6px;
+    width: 720px;
+    height: 90px;
+    margin-top: var(--space-l);
+    flex-shrink: 0;
+    color: var(--color-accent-cyan-light);
+    -unity-text-outline-color: var(--shadow-color-default);
+    -unity-text-outline-width: var(--shadow-text-md);
+}
+
+#AdRewardPanel #AdDivider {
+    width: 620px;
+    height: 2px;
+    flex-shrink: 0;
+    margin-top: var(--space-s);
+    background-color: var(--color-divider);
+}
+
+#AdRewardPanel #AdContent {
+    width: 620px;
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: var(--space-l) 0;
+    background-color: var(--color-surface-mid);
+    border-radius: var(--radius-s);
+    transition: background-color var(--transition-medium) ease-out;
+}
+
+#AdRewardPanel #AdContent.ad-playing {
+    background-color: var(--color-surface-hover);
+}
+
+#AdRewardPanel #AdContent.ad-playing .ad-placeholder-icon {
+    opacity: 0.5;
+    transition: opacity 1.2s ease-in-out;
+}
+
+#AdRewardPanel #AdContent.ad-playing .ad-playing-overlay {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: var(--radius-s);
+}
+
+#AdRewardPanel #AdContent.ad-playing .ad-playing-overlay .ad-placeholder-label {
+    color: var(--color-accent-cyan-light);
+}
+
+#AdRewardPanel .ad-placeholder {
+    width: 100%;
+    height: 120px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#AdRewardPanel .ad-placeholder-icon {
+    width: 64px;
+    height: 64px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_ad.svg");
+    -unity-background-image-tint-color: var(--color-accent-cyan);
+    margin-bottom: var(--space-s);
+}
+
+#AdRewardPanel .ad-placeholder-label {
+    font-size: var(--fs-l);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-muted);
+    -unity-text-align: middle-center;
+}
+
+#AdRewardPanel #AdTimer {
+    font-size: var(--fs-xl);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
+    width: 100%;
+    height: 40px;
+    margin-top: var(--space-s);
+}
+
+#AdRewardPanel #AdRewardText {
+    font-size: var(--fs-hero);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    letter-spacing: 2px;
+    width: 100%;
+    height: 80px;
+    margin-top: var(--space-m);
+    color: var(--color-accent-gold);
+    -unity-text-outline-color: var(--shadow-color-default);
+    -unity-text-outline-width: var(--shadow-text-md);
+}

@@ -1,0 +1,4 @@
+Assets/Map/PolygonApocalypse/Scenes/Demo_City_Test/OcclusionCullingData.asset filter=lfs diff=lfs merge=lfs -text
+Assets/Scenes/Play[[:space:]]Scene[[:space:]](Story)/OcclusionCullingData.asset filter=lfs diff=lfs merge=lfs -text
+Assets/Scenes/Play[[:space:]]Scene[[:space:]](Story)/NavMesh-NavMesh.asset filter=lfs diff=lfs merge=lfs -text
+*.unity filter=lfs diff=lfs merge=lfs -text

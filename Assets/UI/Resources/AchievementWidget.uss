@@ -1,0 +1,143 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* ===== AchievementWidget.uss (Runtime-loaded) ===== */
+
+/* --- Root --- */
+#AchievementRoot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/* --- Achievement Popup --- */
+#AchievementPopup {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    background-color: var(--color-surface-bottom, rgba(19, 23, 28, 1));
+    border-radius: var(--radius-s, 8px);
+    transition: opacity var(--transition-medium, 0.3s) ease-out;
+}
+
+#AchievementPopup #AccentBar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: var(--color-accent-gold, rgb(217, 199, 115));
+    border-top-left-radius: var(--radius-s, 8px);
+    border-bottom-left-radius: var(--radius-s, 8px);
+}
+
+#AchievementPopup #Icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    translate: 0 -50%;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-s, 8px);
+}
+
+#AchievementPopup #Title {
+    position: absolute;
+    left: 92px;
+    top: 14px;
+    font-size: var(--fs-xl, 28px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+}
+
+#AchievementPopup #Desc {
+    position: absolute;
+    left: 92px;
+    top: 46px;
+    font-size: var(--fs-s, 16px);
+    color: var(--color-text-muted, rgba(158, 168, 184, 1));
+}
+
+/* --- Scrim --- */
+#AchievementScrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: var(--color-surface-bottom, rgba(19, 23, 28, 1));
+    transition: opacity var(--transition-medium, 0.2s) ease-out;
+}
+
+/* --- List Panel --- */
+#AchievementListPanel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    background-color: var(--color-surface-bottom, rgba(19, 23, 28, 1));
+    border-radius: var(--radius-m, 16px);
+    padding: var(--space-xl, 20px);
+    transition: opacity var(--transition-medium, 0.2s) ease-out;
+}
+
+#AchievementListPanel .list-header {
+    font-size: var(--fs-xxl, 36px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    margin-bottom: var(--space-s, 8px);
+}
+
+#AchievementListPanel .list-hint {
+    font-size: var(--fs-s, 16px);
+    color: var(--color-text-muted, rgba(158, 168, 184, 1));
+    -unity-text-align: middle-center;
+    margin-bottom: var(--space-l, 16px);
+}
+
+#AchievementListPanel #ScrollArea {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* --- Achievement Row --- */
+.ach-row {
+    flex-direction: row;
+    align-items: center;
+    padding-left: var(--space-m, 12px);
+    padding-top: var(--space-xs, 4px);
+    padding-bottom: var(--space-xs, 4px);
+    border-radius: var(--radius-s, 8px);
+}
+
+.ach-row .ach-icon {
+    width: 46px;
+    height: 46px;
+    margin-right: var(--space-s, 8px);
+    flex-shrink: 0;
+    border-radius: var(--radius-xs, 4px);
+}
+
+.ach-row .ach-text-col {
+    flex-grow: 1;
+}
+
+.ach-row .ach-title {
+    font-size: var(--fs-xl, 28px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+}
+
+.ach-row .ach-desc {
+    font-size: var(--fs-xs, 14px);
+    color: var(--color-text-muted, rgba(158, 168, 184, 1));
+}
+
+.ach-row .ach-badge {
+    font-size: var(--fs-xs, 14px);
+    width: 40px;
+    -unity-text-align: middle-right;
+    flex-shrink: 0;
+}

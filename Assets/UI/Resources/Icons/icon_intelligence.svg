@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Health/Vitality Shield Outer -->
+  <polygon points="12,2 20,5 20,11 12,21 4,11 4,5" fill="rgba(255,255,255,0.08)"/>
+  <!-- Scaled-down central medical cross to fit perfectly inside the shield -->
+  <path d="M12 8v8M8 12h8" stroke-width="2.5"/>
+</svg>

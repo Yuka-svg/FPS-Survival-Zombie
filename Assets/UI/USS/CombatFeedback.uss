@@ -1,0 +1,129 @@
+/* ===== CombatFeedback.uss — Hitmarker, Damage Numbers, Killfeed ===== */
+@import url("Shared.uss");
+
+#CombatFeedbackHUD {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#Hitmarker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    translate: -50% -50%;
+    opacity: var(--opacity-zero, 0);
+    transition: opacity 0.18s ease-out;
+}
+
+#Hitmarker.hitmarker--visible {
+    opacity: var(--opacity-full, 1);
+}
+
+.hitmarker-bar {
+    position: absolute;
+    width: 12px;
+    height: 2px;
+    border-radius: var(--radius-xs, 4px);
+    background-color: rgb(0, 240, 255); /* Default Neon Cyan for premium look */
+}
+
+/* Match classes added in C# (hm-tl, hm-tr, hm-bl, hm-br) */
+.hm-tl { left: 13px; top: 18px; rotate: 45deg; }
+.hm-tr { left: 13px; top: 18px; rotate: -45deg; }
+.hm-bl { left: 21px; top: 18px; rotate: -45deg; }
+.hm-br { left: 21px; top: 18px; rotate: 45deg; }
+
+.hitmarker-bar--kill {
+    background-color: var(--color-accent-red, rgb(229, 72, 60));
+}
+
+.hitmarker-bar--crit {
+    background-color: var(--color-chip-score, rgb(255, 199, 51));
+}
+
+#DamageNumbers {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.dmg-number {
+    position: absolute;
+    width: 140px;
+    height: 44px;
+    margin-left: -70px;
+    margin-top: -22px; /* Center vertically on projected point */
+    -unity-font-definition: var(--font-body-sdf, resource("Fonts/Outfit-SemiBold SDF"));
+    -unity-text-align: middle-center;
+    font-size: var(--fs-xl, 28px);
+    color: rgb(255, 234, 167); /* Stylized soft gold for normal hits */
+    text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.95);
+    -unity-text-outline-width: 1.2px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.95);
+}
+
+.dmg-number--hidden {
+    display: none;
+}
+
+.dmg-number--kill {
+    color: rgb(255, 46, 99); /* Premium neon red-pink for headshots/kills */
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1.5px;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.95);
+}
+
+.dmg-number--crit {
+    color: rgb(255, 118, 117); /* Vibrant orange-red for critical hits */
+    -unity-font-style: bold-and-italic;
+    -unity-text-outline-width: 2.0px;
+    -unity-text-outline-color: rgb(16, 14, 14);
+    text-shadow: 2px 3px 6px rgba(255, 118, 117, 0.4); /* Glow shadow */
+}
+
+#Killfeed {
+    position: absolute;
+    right: var(--space-xxl, 24px);
+    top: 90px; /* Shifted down slightly to clear QuestTracker at top-right */
+    width: 360px;
+    height: 400px;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.killfeed-entry {
+    width: 240px; /* Slimmer tactical look */
+    height: 34px;
+    background-color: var(--color-bg-root, rgba(9, 13, 19, 0.85));
+    flex-shrink: 0;
+    opacity: 0.9;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--space-m, 12px);
+    margin-bottom: var(--space-s, 8px);
+    border-right-width: 3.5px;
+    border-right-color: var(--color-accent-red, rgb(229, 72, 60));
+    border-radius: var(--radius-xs, 4px);
+    transition: opacity 0.4s ease-out;
+}
+
+.killfeed-entry--hidden {
+    display: none;
+}
+
+.killfeed-entry-label {
+    -unity-font-definition: var(--font-body-sdf, resource("Fonts/Outfit-SemiBold SDF"));
+    -unity-text-align: middle-right;
+    font-size: 14px;
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}

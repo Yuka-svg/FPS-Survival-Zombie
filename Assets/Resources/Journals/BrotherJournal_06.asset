@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: BrotherJournal_06
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 45
+  title: "Nh\u1EADt k\xFD anh trai #6 \u2014 Tr\u1ED1n trong khu d\xE2n c\u01B0"
+  category: 2
+  content: "T\xF4i \u0111\xE3 tr\u1ED1n kh\u1ECFi b\u1EC7nh vi\u1EC7n \u0111\u01B0\u1EE3c
+    3 ng\xE0y. Hi\u1EC7n \u0111ang \u1EA9n trong m\u1ED9t c\u0103n nh\xE0 b\u1ECF
+    hoang \u1EDF khu d\xE2n c\u01B0. Ng\u01B0\u1EDDi th\xEC ng\xE0y c\xE0ng to, \u0111\u1EA7u
+    th\xEC ng\xE0y c\xE0ng n\u1EB7ng. T\xF4i kh\xF4ng c\xF2n nh\u1EADn r\xF5 m\u1EB7t
+    m\xECnh trong g\u01B0\u01A1ng n\u1EEFa. \u0110\xF4i khi t\xF4i nghe th\u1EA5y
+    ti\u1EBFng ai \u0111\xF3 trong \u0111\u1EA7u b\u1EA3o t\xF4i '\u0111i t\xECm
+    \u0103n' \u2014 t\xF4i s\u1EE3 m\xECnh \u0111ang m\u1EA5t ki\u1EC3m so\xE1t.
+    BS. Edward n\xF3i thu\u1ED1c gi\u1EA3i c\xF3 \u1EDF \u0111\xE2u \u0111\xF3 trong
+    th\xE0nh ph\u1ED1. T\xF4i ph\u1EA3i t\xECm n\xF3 tr\u01B0\u1EDBc khi qu\xE1 mu\u1ED9n.
+    N\u1EBFu em \u0111\u1ECDc \u0111\u01B0\u1EE3c d\xF2ng n\xE0y, bi\u1EBFt r\u1EB1ng
+    anh v\u1EABn c\u1ED1 g\u1EAFng."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

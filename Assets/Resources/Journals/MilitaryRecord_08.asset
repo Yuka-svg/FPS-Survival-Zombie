@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_08
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 40
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #8 \u2014 B\xE1o c\xE1o th\u01B0\u01A1ng
+    vong"
+  category: 5
+  content: "\u0110\u1EA1i t\xE1 Morrison \u2014 b\xE1o c\xE1o th\u01B0\u01A1ng vong
+    cu\u1ED1i c\xF9ng. T\xEDnh \u0111\u1EBFn 04:00 ng\xE0y 14/10: Thi\u1EBFu t\xE1
+    Chen \u2014 KIA. Trung \xFAy Park \u2014 KIA. Trung s\u0129 Lopez \u2014 MIA
+    (b\u1ECB c\u1EAFn, t\u1EF1 c\xE1ch ly). H\u01A1n 200 l\xEDnh th\u01B0\u01A1ng
+    vong. Ch\xFAng t\xF4i m\u1EA5t ki\u1EC3m so\xE1t ho\xE0n to\xE0n khu d\xE2n c\u01B0
+    v\xE0 chung c\u01B0. L\u1EC7nh cu\u1ED1i: to\xE0n qu\xE2n r\xFAt v\u1EC1 c\u0103n
+    c\u1EE9 ph\xEDa nam, \u0111\u1EC3 l\u1EA1i v\u0169 kh\xED v\xE0 h\u1ED3 s\u01A1.
+    N\u1EBFu ai c\xF2n s\u1ED1ng \u0111\u1ECDc \u0111\u01B0\u1EE3c: l\u1EA5y b\u1ED9
+    k\xEDch n\u1ED5 \u1EDF t\xF2a cao t\u1EA7ng g\u1EA7n c\u1EA7u, k\xEDch ho\u1EA1t
+    qu\u1EA3 bom \u1EDF tr\u1EA1m ph\xE1t s\xF3ng. \u0110\xE2y l\xE0 l\u1EC7nh cu\u1ED1i
+    c\xF9ng c\u1EE7a t\xF4i."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

@@ -1,0 +1,67 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/Resources/PlayerProfileWidget.uss" />
+
+    <ui:VisualElement name="ProfileRoot" picking-mode="Ignore">
+        <ui:VisualElement name="PlayerChip" class="player-chip">
+            <ui:VisualElement name="Avatar" class="player-avatar" />
+            <ui:VisualElement name="TextCol" class="player-textcol">
+                <ui:Label name="Username" class="player-username" text="Not logged in" />
+                <ui:Label name="Status" class="player-status" text="Click to login" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="ProfilePanel" class="profile-panel">
+            <!-- Header Group -->
+            <ui:VisualElement name="PanelHeader" class="panel-header">
+                <ui:Label name="PanelTitle" class="panel-title" text="PLAYER PROFILE" />
+                <ui:VisualElement name="ProfileCloseButton" class="profile-btn profile-close-btn">
+                    <ui:Label name="CloseLabel" class="btn-label" text="X" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="PanelDivider1" class="panel-divider" />
+            
+            <!-- Username Field -->
+            <ui:VisualElement class="field-row">
+                <ui:VisualElement class="field-icon user-icon" />
+                <ui:Label name="FieldLabel_USERNAME" class="field-label" text="USERNAME" />
+            </ui:VisualElement>
+            <ui:Label name="PanelUsername" class="field-value" text="---" />
+            
+            <!-- PlayFab ID Field -->
+            <ui:VisualElement class="field-row">
+                <ui:VisualElement class="field-icon id-icon" />
+                <ui:Label name="FieldLabel_ID" class="field-label" text="PLAYFAB ID" />
+            </ui:VisualElement>
+            <ui:Label name="PanelId" class="field-value-sm" text="---" />
+            
+            <ui:VisualElement name="PanelDivider2" class="panel-divider" />
+            
+            <!-- Best Score Field -->
+            <ui:VisualElement class="field-row">
+                <ui:VisualElement class="field-icon score-icon" />
+                <ui:Label name="FieldLabel_SCORE" class="field-label" text="BEST SCORE" />
+            </ui:VisualElement>
+            <ui:Label name="PanelBestScore" class="field-value-lg" text="0" />
+            
+            <!-- Best Wave Field -->
+            <ui:VisualElement class="field-row">
+                <ui:VisualElement class="field-icon wave-icon" />
+                <ui:Label name="FieldLabel_WAVE" class="field-label" text="BEST WAVE" />
+            </ui:VisualElement>
+            <ui:Label name="PanelBestWave" class="field-value-lg" text="0" />
+            
+            <ui:VisualElement name="PanelDivider3" class="panel-divider" />
+            
+            <!-- Achievements Field -->
+            <ui:VisualElement class="field-row">
+                <ui:VisualElement class="field-icon ach-icon" />
+                <ui:Label name="FieldLabel_ACH" class="field-label" text="ACHIEVEMENTS" />
+            </ui:VisualElement>
+            <ui:Label name="PanelAchievements" class="field-value" text="0 / 0" />
+            <ui:ScrollView name="AchList" class="ach-list" mode="Vertical" show-vertical-scrollbar="Auto" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

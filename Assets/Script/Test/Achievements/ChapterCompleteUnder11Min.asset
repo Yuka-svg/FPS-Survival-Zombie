@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be01a296c703bc140bc95f696de3de32, type: 3}
+  m_Name: ChapterCompleteUnder11Min
+  m_EditorClassIdentifier: Assembly-CSharp::AchievementData
+  id: chapter_complete_under_11min
+  title: Ain't Going To Be Left For Dead
+  description: "Ho\xE0n th\xE0nh m\u1ED9t m\xE0n ch\u01A1i trong 11 ph\xFAt ho\u1EB7c
+    \xEDt h\u01A1n."
+  icon: {fileID: 0}
+  isProgression: 0
+  targetValue: 0

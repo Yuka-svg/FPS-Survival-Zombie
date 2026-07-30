@@ -1,0 +1,305 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* ===== LeaderboardWidget.uss (Runtime-loaded) ===== */
+
+/* --- Root --- */
+#LeaderboardRoot {
+    position: absolute;
+    left: 39%;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/* --- Chip --- */
+#LeaderboardChip {
+    position: absolute;
+    right: var(--space-l, 16px);
+    bottom: var(--space-3xl, 32px);
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-panel-bg, rgba(14, 17, 21, 0.92));
+    border-radius: var(--radius-l, 22px);
+    transition: background-color var(--transition-fast, 0.08s), scale var(--transition-fast, 0.08s);
+    padding-left: 14px;
+    padding-right: 14px;
+    display: none;
+}
+
+#LeaderboardChip:hover {
+    background-color: var(--color-surface-top, rgba(31, 38, 46, 1));
+}
+
+#LeaderboardChip:active {
+    scale: var(--press-scale, 0.95);
+}
+
+#LeaderboardChip #Icon {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--space-s, 8px);
+    background-color: var(--color-accent-gold, rgb(217, 199, 115));
+    border-radius: var(--radius-xs, 4px);
+}
+
+#LeaderboardChip .chip-label {
+    font-size: var(--fs-xs, 14px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary, white);
+}
+
+/* --- Scrim --- */
+#LeaderboardScrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    display: none;
+}
+
+/* --- Panel --- */
+#LeaderboardPanel {
+    position: absolute;
+    left: 50%;
+    top: 8%;
+    bottom: 10.2%;
+    width: 660px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 32px;
+    padding-right: 32px;
+    background-color: rgba(0, 0, 0, 0);
+    display: none;
+    border-width: 0;
+    /* Slide up transition (starts below bottom boundary centered at 50% left) */
+    translate: -50% 120%;
+    transition: translate 1.5s ease-out-back;
+}
+
+#LeaderboardPanel.slide-in {
+    translate: -50% 0;
+}
+
+#LeaderboardPanel .panel-header {
+    flex-direction: row;
+    align-items: center;
+    height: 36px;
+    margin-bottom: 12px;
+}
+
+#LeaderboardPanel .panel-title {
+    font-size: 28px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    flex-grow: 1;
+    color: rgb(230, 80, 40);
+    letter-spacing: 2px;
+}
+
+#LeaderboardPanel .panel-divider {
+    height: 1px;
+    background-color: rgba(230, 80, 40, 0.15);
+    margin-bottom: 12px;
+}
+
+/* --- Column Headers --- */
+#LeaderboardPanel .col-header {
+    flex-direction: row;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-bottom: 6px;
+}
+
+#LeaderboardPanel .col-header Label {
+    font-size: 15px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(230, 80, 40);
+    letter-spacing: 1px;
+}
+
+#LeaderboardPanel .col-header .col-rank {
+    width: 60px;
+}
+
+#LeaderboardPanel .col-header .col-name {
+    flex-grow: 1;
+}
+
+#LeaderboardPanel .col-header .col-score {
+    width: 120px;
+    -unity-text-align: middle-right;
+}
+
+/* --- List Container --- */
+#LeaderboardPanel #ListContent {
+    background-color: rgba(5, 7, 10, 0.85);
+    min-height: 120px;
+    flex-grow: 1;
+    padding: 12px;
+    border-width: 1px;
+    border-color: rgba(230, 80, 40, 0.25);
+    border-radius: 0px;
+}
+
+#LeaderboardPanel .status-text {
+    font-size: 16px;
+    color: rgba(158, 168, 184, 1);
+    -unity-text-align: middle-center;
+    height: 24px;
+    margin-top: 8px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+}
+
+#LeaderboardPanel .panel-footer {
+    height: 12px;
+}
+
+/* --- Tactical Row Styling --- */
+.leaderboard-row {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(230, 80, 40, 0.1);
+}
+
+.leaderboard-row .row-rank {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    width: 60px;
+    color: rgb(180, 190, 200);
+}
+
+.leaderboard-row .row-name {
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    flex-grow: 1;
+    color: rgb(180, 190, 200);
+}
+
+.leaderboard-row .row-score {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    width: 120px;
+    color: rgb(180, 190, 200);
+    -unity-text-align: middle-right;
+    letter-spacing: 1px;
+}
+
+/* Top 3 highlights */
+.leaderboard-row.rank-1 .row-rank { color: rgb(230, 190, 40); } /* Gold */
+.leaderboard-row.rank-2 .row-rank { color: rgb(190, 190, 190); } /* Silver */
+.leaderboard-row.rank-3 .row-rank { color: rgb(190, 120, 40); } /* Bronze */
+
+/* Local player highlight */
+.leaderboard-row.is-me {
+    background-color: rgba(230, 80, 40, 0.12);
+    border-width: 1px;
+    border-color: rgba(230, 80, 40, 0.4);
+}
+.leaderboard-row.is-me .row-rank,
+.leaderboard-row.is-me .row-name,
+.leaderboard-row.is-me .row-score {
+    color: rgb(230, 80, 40);
+}
+
+/* --- Buttons --- */
+.leaderboard-btn {
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(230, 80, 40);
+    border-radius: 0px;
+    border-width: 0;
+    transition: background-color var(--transition-fast, 0.08s), scale var(--transition-fast, 0.08s);
+}
+
+.leaderboard-btn:hover {
+    background-color: rgb(250, 100, 60);
+}
+
+.leaderboard-btn:active {
+    scale: 0.95;
+}
+
+.leaderboard-btn .btn-label {
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(9, 12, 17);
+    -unity-text-align: middle-center;
+    letter-spacing: 1px;
+}
+
+/* --- Close Button --- */
+.leaderboard-close-btn {
+    width: 38px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(230, 80, 40);
+    border-radius: 0px;
+}
+
+.leaderboard-close-btn:hover {
+    background-color: rgb(250, 100, 60);
+}
+
+.leaderboard-close-btn:active {
+    scale: 0.95;
+}
+
+.leaderboard-close-btn .btn-label {
+    font-size: 18px;
+    color: rgb(9, 12, 17);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* --- ScrollView & Scrollbar Customization --- */
+#ListContent .unity-scroller {
+    width: 8px;
+    margin: 0;
+    background-color: transparent;
+    border-width: 0;
+}
+
+#ListContent .unity-scroller__low-button,
+#ListContent .unity-scroller__high-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+#ListContent .unity-scroller__slider {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#ListContent .unity-base-slider__tracker {
+    background-color: rgba(230, 80, 40, 0.05);
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+}
+
+#ListContent .unity-base-slider__dragger {
+    background-color: rgba(230, 80, 40, 0.35);
+    border-width: 0;
+    border-radius: 4px;
+    width: 6px;
+    min-height: 20px;
+    margin-left: 1px;
+}
+
+#ListContent .unity-base-slider__dragger:hover {
+    background-color: rgba(250, 100, 60, 0.6);
+}

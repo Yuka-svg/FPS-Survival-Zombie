@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_04
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 36
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #4 \u2014 L\u1EC7nh r\xFAt lui"
+  category: 5
+  content: "L\u1EC6NH R\xDAT LUI \u2014 M\u1EACT. 23:00 ng\xE0y 19/3. To\xE0n b\u1ED9
+    qu\xE2n \u0111\u1ED9i r\xFAt kh\u1ECFi khu chung c\u01B0 v\xE0 c\u1EA7u v\u01B0\u1EE3t.
+    L\xFD do: m\u1EA5t ki\u1EC3m so\xE1t, t\u1EF7 l\u1EC7 l\xE2y nhi\u1EC5m qu\xE1
+    cao. L\u1EC7nh ph\xE1 h\u1EE7y c\u1EA7u \u0111\u1EC3 ng\u0103n l\xE2y lan sang
+    b\u1EDD b\xEAn kia. K\xEDp c\xF4ng binh \u0111\xE3 g\u1EAFn charges \u1EDF tr\u1EE5
+    ch\xEDnh. Bom s\u1EBD k\xEDch n\u1ED5 sau 24 gi\u1EDD. B\u1EA5t k\u1EF3 ai c\xF2n
+    \u1EDF khu v\u1EF1c n\xE0y \u0111\u01B0\u1EE3c xem l\xE0 \u0111\xE3 m\u1EA5t.
+    Kh\xF4ng quay l\u1EA1i c\u1EE9u. K\xFD: \u0110\u1EA1i t\xE1 Morrison."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

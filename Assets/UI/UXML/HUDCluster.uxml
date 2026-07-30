@@ -1,0 +1,128 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <!-- Health -->
+    <ui:VisualElement name="HealthCluster">
+        <ui:Label name="HealthLabel" text="HEALTH" />
+        <ui:VisualElement name="HealthBarRow">
+            <ui:VisualElement name="HealthTrack">
+                <ui:VisualElement name="HealthGhost" />
+                <ui:VisualElement name="HealthFill" />
+            </ui:VisualElement>
+            <ui:Label name="HealthValue" text="100" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ShieldRoot">
+            <ui:VisualElement name="ShieldTrack">
+                <ui:VisualElement name="ShieldFill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <!-- Ammo -->
+    <ui:VisualElement name="AmmoCluster">
+        <ui:Label name="AmmoLabel" text="AMMO" />
+        <ui:VisualElement name="AmmoValueRow">
+            <ui:VisualElement name="AmmoValueGradient" />
+            <ui:VisualElement name="AmmoPunchRoot">
+                <ui:Label name="AmmoValue" text="30" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="AmmoReserve" text="&#x221E;" />
+        <ui:VisualElement name="HeatBarTrack">
+            <ui:VisualElement name="HeatBarFill" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <!-- Progression -->
+    <ui:VisualElement name="ProgressionCluster">
+        <ui:Label name="ProgressionLabel" text="LEVEL" />
+        <ui:VisualElement name="XpBarRow">
+            <ui:VisualElement name="XpTrack">
+                <ui:VisualElement name="XpGhost" />
+                <ui:VisualElement name="XpFill" />
+            </ui:VisualElement>
+            <ui:Label name="LevelValue" text="LV 1" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <!-- Weapons -->
+    <ui:VisualElement name="WeaponIndicator">
+        <ui:Label name="WeaponName" text="" />
+        <ui:VisualElement name="WeaponIcon" />
+    </ui:VisualElement>
+    <ui:VisualElement name="ReloadIndicator">
+        <ui:VisualElement name="ReloadRing" />
+    </ui:VisualElement>
+    <ui:VisualElement name="WeaponInventoryCluster" />
+    <!-- Compass -->
+    <ui:VisualElement name="CompassViewport">
+        <ui:VisualElement name="CompassStrip" />
+        <ui:VisualElement name="CompassBlips" />
+    </ui:VisualElement>
+    <ui:Label name="CompassHeading" text="0" />
+    <!-- Stamina -->
+    <ui:VisualElement name="StaminaCluster">
+        <ui:VisualElement name="StaminaBg" />
+        <ui:VisualElement name="StaminaFill" />
+    </ui:VisualElement>
+    <!-- Crosshair -->
+    <ui:VisualElement name="Crosshair" class="crosshair-container" />
+    <!-- FPS -->
+    <ui:Label name="FPSLabel" text="-- FPS" class="fps-counter" />
+    <!-- Dash -->
+    <ui:VisualElement name="DashWidget" class="dash-widget" />
+    <!-- Interact -->
+    <ui:VisualElement name="InteractPrompt" class="interact-prompt" />
+    <!-- Wave -->
+    <ui:VisualElement name="WaveAnnouncer">
+        <ui:Label name="WaveTitle" class="wave-title" text="WAVE 1" />
+        <ui:Label name="WaveSub" class="wave-sub" text="SURVIVE" />
+    </ui:VisualElement>
+    <!-- Combat -->
+    <ui:VisualElement name="CombatFeedbackHUD">
+        <ui:VisualElement name="Hitmarker" />
+        <ui:VisualElement name="DamageNumbers" />
+        <ui:VisualElement name="Killfeed" />
+    </ui:VisualElement>
+    <ui:VisualElement name="DamageDirection" />
+    <!-- Boss -->
+    <ui:VisualElement name="BossHealthBar" class="boss-root">
+        <ui:VisualElement name="BossBg" class="boss-bg" />
+        <ui:VisualElement name="BossFillArea" class="boss-fill-area">
+            <ui:VisualElement name="BossFill" class="boss-fill" />
+        </ui:VisualElement>
+        <ui:Label name="BossLabel" class="boss-label" text="BOSS" />
+    </ui:VisualElement>
+    <!-- Threat -->
+    <ui:VisualElement name="ThreatWidget" class="threat-root">
+        <ui:Label name="ThreatState" class="threat-state" text="CALM" />
+        <ui:VisualElement name="ThreatBarBg" class="threat-bar-bg">
+            <ui:VisualElement name="ThreatFill" class="threat-fill" />
+        </ui:VisualElement>
+        <ui:Label name="ThreatWarn" class="threat-warn" text="FLANKED &#x2014; MOVE!" />
+    </ui:VisualElement>
+    <!-- Upgrades -->
+    <ui:VisualElement name="UpgradesWidget" />
+    <!-- Health Flash + Low Health Vignette -->
+    <ui:VisualElement name="HealthFlash" />
+    <ui:VisualElement name="LowHealthVignette" />
+    <!-- Quest + Journal -->
+    <ui:VisualElement name="QuestTracker">
+        <ui:VisualElement name="MainPanel">
+            <ui:Label name="Chapter" text="" />
+            <ui:Label name="Title" text="" />
+            <ui:Label name="Objective" text="" />
+            <ui:Label name="Collectibles" text="" />
+        </ui:VisualElement>
+        <ui:VisualElement name="QuestDivider" class="quest-divider" />
+        <ui:VisualElement name="SidePanel">
+            <ui:Label name="SideHeader" text="SIDE QUESTS" />
+            <ui:VisualElement name="SideLines" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="JournalUI">
+        <ui:VisualElement name="Card" class="journal-card">
+            <ui:Label name="JournalTitle" class="journal-title" text="" />
+            <ui:VisualElement name="Illustration" class="journal-illustration" />
+            <ui:Label name="JournalContent" class="journal-content" text="" />
+            <ui:Button name="CloseButton" text="CLOSE" class="journal-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

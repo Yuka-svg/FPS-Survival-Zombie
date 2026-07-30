@@ -1,0 +1,30 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* CreditsSequence.uss — Runtime-loaded for end credits scroll */
+.credits-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    transition: opacity var(--transition-normal, 1s) ease-out;
+}
+
+.credits-header {
+    font-size: var(--fs-xxl, 36px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: var(--color-text-gold);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    width: 900px;
+}
+
+.credits-line {
+    font-size: var(--fs-xl, 28px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
+    width: 900px;
+}

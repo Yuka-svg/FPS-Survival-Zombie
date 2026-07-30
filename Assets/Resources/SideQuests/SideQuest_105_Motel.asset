@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_105_Motel
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 105
+  chapter: 4
+  title: "\u0110\xEAm cu\u1ED1i c\xF9ng \u1EDF Motel"
+  description: "D\xE3y Motel b\u1ECF hoang. Nh\u1EEFng ng\u01B0\u1EDDi kh\xE1ch cu\u1ED1i
+    c\xF9ng \u0111\xE3 \u0111\u1EC3 l\u1EA1i nh\u1EADt k\xFD tr\u01B0\u1EDBc khi
+    m\u1ECDi th\u1EE9 s\u1EE5p \u0111\u1ED5..."
+  objective: "Kh\xE1m ph\xE1 2 d\xE3y Motel, thu th\u1EADp 3 nh\u1EADt k\xFD c\u1EE7a
+    kh\xE1ch tr\u1ECD cu\u1ED1i c\xF9ng"
+  expReward: 250
+  journalReward: {fileID: 11400000, guid: d6276c17cb4b3a2458d9521af3d92e33, type: 2}
+  completionNotification: 

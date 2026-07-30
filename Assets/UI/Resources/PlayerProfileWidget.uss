@@ -1,0 +1,361 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* ===== PlayerProfileWidget.uss (Runtime-loaded) ===== */
+
+/* --- Root --- */
+#ProfileRoot {
+    position: absolute;
+    left: 39%;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/* --- Chip --- */
+#PlayerChip {
+    position: absolute;
+    right: var(--space-l, 16px);
+    bottom: var(--space-5xl, 48px);
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--color-panel-bg, rgba(14, 17, 21, 0.92));
+    border-radius: var(--radius-l, 22px);
+    padding: 6px 12px;
+    transition: background-color var(--transition-fast, 0.08s), scale var(--transition-fast, 0.08s);
+    display: none;
+}
+
+#PlayerChip:hover {
+    background-color: var(--color-surface-top, rgba(31, 38, 46, 0.96));
+}
+
+#PlayerChip:active {
+    scale: var(--press-scale, 0.95);
+}
+
+#PlayerChip #Avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: var(--space-s, 8px);
+    border-radius: var(--radius-round, 50%);
+}
+
+#PlayerChip #TextCol {
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+#PlayerChip #Username {
+    font-size: var(--fs-xs, 14px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary, white);
+}
+
+#PlayerChip #Status {
+    font-size: var(--fs-xs, 14px);
+    color: var(--color-text-muted, rgba(158, 168, 184, 1));
+}
+
+/* --- Panel --- */
+#ProfilePanel {
+    position: absolute;
+    left: 50%;
+    top: 8%;
+    bottom: 10.2%;
+    width: 660px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 32px;
+    padding-right: 32px;
+    background-color: rgba(0, 0, 0, 0);
+    display: none;
+    border-width: 0;
+    /* Slide down transition (starts above top boundary centered at 50% left) */
+    translate: -50% -120%;
+    transition: translate 1.5s ease-out-back;
+}
+
+#ProfilePanel.slide-in {
+    translate: -50% 0;
+}
+
+#ProfilePanel .panel-header {
+    flex-direction: row;
+    align-items: center;
+    height: 36px;
+    margin-bottom: 12px;
+}
+
+#ProfilePanel .panel-title {
+    font-size: 28px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    flex-grow: 1;
+    color: rgb(230, 80, 40);
+    letter-spacing: 2px;
+}
+
+#ProfilePanel .panel-divider {
+    height: 1px;
+    background-color: rgba(230, 80, 40, 0.15);
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+/* --- Field Headers with Icons --- */
+.field-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.field-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(235, 140, 40);
+}
+
+.user-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_target.svg");
+}
+
+.id-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_quit.svg");
+}
+
+.score-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_trophy.svg");
+}
+
+.wave-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_wave.svg");
+}
+
+.ach-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+}
+
+#ProfilePanel .field-label {
+    font-size: 15px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(235, 140, 40);
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+#ProfilePanel .field-value {
+    font-size: 22px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: white;
+    margin-bottom: 8px;
+}
+
+#ProfilePanel .field-value-sm {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+}
+
+#ProfilePanel .field-value-lg {
+    font-size: 32px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(230, 80, 40);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+/* --- Achievement List --- */
+#ProfilePanel #AchList {
+    min-height: 120px;
+    flex-grow: 1;
+    background-color: rgba(5, 7, 10, 0.85);
+    padding: 12px;
+    border-width: 1px;
+    border-color: rgba(230, 80, 40, 0.25);
+    border-radius: 0px;
+}
+
+#ProfilePanel #AchList Label {
+    font-size: 14px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    margin-bottom: 2px;
+}
+
+/* --- Premium Achievement Items --- */
+.ach-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: rgba(36, 22, 22, 0.4);
+    border-width: 1px;
+    border-color: rgba(230, 80, 40, 0.15);
+    margin-bottom: 6px;
+    transition: background-color 0.1s ease-out;
+}
+
+.ach-item:hover {
+    background-color: rgba(230, 80, 40, 0.08);
+    border-color: rgba(230, 80, 40, 0.35);
+}
+
+.ach-item.unlocked {
+    border-color: rgba(79, 224, 138, 0.3);
+    background-color: rgba(79, 224, 138, 0.04);
+}
+
+.ach-item.unlocked:hover {
+    background-color: rgba(79, 224, 138, 0.08);
+}
+
+.ach-item-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0.3);
+}
+
+.ach-item-icon.unlocked {
+    -unity-background-image-tint-color: rgb(79, 224, 138);
+}
+
+.ach-item-title {
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: white;
+}
+
+.ach-item.unlocked .ach-item-title {
+    color: rgb(79, 224, 138);
+}
+
+.ach-item-progress-text {
+    font-size: 13px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 2px;
+}
+
+.ach-item-status {
+    font-size: 13px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 1px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.2);
+    -unity-text-align: middle-center;
+    margin: 0;
+}
+
+.ach-item-status.unlocked {
+    color: rgb(79, 224, 138);
+    border-color: rgb(79, 224, 138);
+}
+
+/* --- Buttons --- */
+.profile-btn {
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(230, 80, 40);
+    border-radius: 0px;
+    transition: background-color 0.15s ease-out, scale 0.1s ease-out;
+}
+
+.profile-btn:hover {
+    background-color: rgb(250, 100, 60);
+}
+
+.profile-btn:active {
+    scale: 0.95;
+}
+
+.profile-btn .btn-label {
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(9, 12, 17);
+    -unity-text-align: middle-center;
+    letter-spacing: 1px;
+}
+
+/* --- Close Button --- */
+.profile-close-btn {
+    width: 38px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(230, 80, 40);
+    border-radius: 0px;
+}
+
+.profile-close-btn:hover {
+    background-color: rgb(250, 100, 60);
+}
+
+.profile-close-btn:active {
+    scale: 0.95;
+}
+
+.profile-close-btn .btn-label {
+    font-size: 18px;
+    color: rgb(9, 12, 17);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* --- ScrollView & Scrollbar Customization --- */
+#AchList .unity-scroller {
+    width: 8px;
+    margin: 0;
+    background-color: transparent;
+    border-width: 0;
+}
+
+#AchList .unity-scroller__low-button,
+#AchList .unity-scroller__high-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* Clear default 17px vertical margins that Unity reserves for arrow buttons */
+#AchList .unity-scroller__slider {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#AchList .unity-base-slider__tracker {
+    background-color: rgba(230, 80, 40, 0.05);
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+}
+
+#AchList .unity-base-slider__dragger {
+    background-color: rgba(230, 80, 40, 0.35);
+    border-width: 0;
+    border-radius: 4px;
+    width: 6px;
+    min-height: 20px;
+    margin-left: 1px;
+}
+
+#AchList .unity-base-slider__dragger:hover {
+    background-color: rgba(250, 100, 60, 0.6);
+}

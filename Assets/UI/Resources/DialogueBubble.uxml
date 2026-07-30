@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="DialogueBubbleRoot" style="background-color: rgba(13, 20, 30, 0.85); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; padding: 8px 10px;">
+        <ui:Label name="LineLabel" style="color: rgba(242, 235, 204, 1); font-size: 14px; white-space: normal; -unity-text-align: upper-left; flex-shrink: 1;" />
+        <ui:Label name="ChoiceLabel" style="color: rgba(255, 217, 77, 1); font-size: 13px; margin-top: 6px; white-space: normal; -unity-text-align: upper-left; display: none;" />
+    </ui:VisualElement>
+</ui:UXML>

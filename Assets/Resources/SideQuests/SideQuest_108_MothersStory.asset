@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_108_MothersStory
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 108
+  chapter: 5
+  title: "C\xE2u chuy\u1EC7n c\u1EE7a nh\u1EEFng ng\u01B0\u1EDDi m\u1EB9"
+  description: "Ba to\xE0 nh\xE0 chung c\u01B0 v\u1EABn c\xF2n nh\u1EEFng cu\u1ED1n
+    nh\u1EADt k\xFD c\u1EE7a ng\u01B0\u1EDDi \u1EDF l\u1EA1i. C\xE2u chuy\u1EC7n
+    c\u1EE7a h\u1ECD \u2014 nh\u1EEFng ng\u01B0\u1EDDi m\u1EB9, ng\u01B0\u1EDDi cha,
+    ng\u01B0\u1EDDi gi\xE0 \u2014 c\u1EA7n \u0111\u01B0\u1EE3c ghi nh\u1EDB..."
+  objective: "Kh\xE1m ph\xE1 3 to\xE0 nh\xE0 chung c\u01B0, thu th\u1EADp 4 nh\u1EADt
+    k\xFD c\u1EE7a c\u01B0 d\xE2n cu\u1ED1i c\xF9ng"
+  expReward: 300
+  journalReward: {fileID: 11400000, guid: 81a58bf14cad48e4ebe5af07131a45d6, type: 2}
+  completionNotification: 

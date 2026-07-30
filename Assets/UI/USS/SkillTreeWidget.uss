@@ -1,0 +1,355 @@
+@import url("Shared.uss");
+
+/* SkillTreeWidget.uss — Skill Tree Panel (Phase 21) */
+
+/* Root — fills screen, hidden by default */
+#SkillTreeWidget {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0) !important;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+#SkillTreeWidget.visible {
+    flex-direction: column;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+/* Scrim — full-screen click blocker and vignette overlay */
+#scrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-image: resource("Images/ui_vignette");
+    -unity-background-scale-mode: scale-and-crop;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#SkillTreeWidget.visible #scrim {
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+/* Card — centered panel */
+#card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 1080px;
+    height: 800px;
+    max-width: 95%;
+    max-height: 95%;
+    background-color: rgba(0, 0, 0, 0); /* Drawn by C# Vector API */
+    border-width: 0;
+    opacity: 0;
+    scale: 0;
+    transition-property: opacity, scale;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in, ease-in;
+}
+#SkillTreeWidget.visible #card {
+    opacity: 1;
+    scale: 1;
+    transition-property: opacity, scale;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-out-back, ease-out-back;
+}
+
+/* Title */
+#title {
+    position: absolute;
+    left: 50%;
+    top: 36px;
+    translate: -50%;
+    width: 800px;
+    height: 56px;
+    color: rgb(230, 80, 40);
+    font-size: 42px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* Skill Points */
+#sp {
+    position: absolute;
+    left: 50%;
+    top: 92px;
+    translate: -50%;
+    width: 800px;
+    height: 36px;
+    color: rgba(230, 80, 40, 0.8);
+    font-size: 26px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* Branches row (3 column layout within card) */
+.branch {
+    position: absolute;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#branch0 { left: 80px; top: 155px; }
+#branch1 { left: 400px; top: 155px; }
+#branch2 { left: 720px; top: 155px; }
+
+/* SVG Branch Icons */
+.branch-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 6px;
+    -unity-background-image-tint-color: rgb(230, 80, 40);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.icon-movement {
+    background-image: resource("Icons/icon_movement");
+}
+
+.icon-aim {
+    background-image: resource("Icons/icon_target");
+}
+
+.icon-intelligence {
+    background-image: resource("Icons/icon_intelligence");
+}
+
+.branch-header {
+    height: 36px;
+    color: rgb(230, 80, 40);
+    font-size: 26px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+.branch-sub {
+    height: 24px;
+    color: rgba(230, 80, 40, 0.5);
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+.node-container {
+    position: relative;
+    width: 64px;
+    height: 440px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Skill node squares (Tactical Style) */
+.skill-node {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+    background-color: rgba(5, 7, 10, 0.85);
+    border-width: 2px;
+    border-color: rgba(230, 80, 40, 0.25);
+    align-items: center;
+    justify-content: center;
+    transition-property: background-color, scale, border-color, border-width, translate;
+    transition-duration: 0.22s, 0.08s, 0.08s, 0.08s, 0.08s;
+    transition-timing-function: ease-in-out, ease-out, ease-out, ease-out, ease-out;
+}
+
+/* Available node base styles (Pulsing is handled dynamically in C# for compatibility) */
+.skill-node.available {
+    background-color: rgba(230, 80, 40, 0.1);
+    border-color: rgba(230, 80, 40, 0.4);
+    cursor: link;
+}
+
+.skill-node.available:hover {
+    scale: var(--hover-scale, 1.08);
+    border-width: 3.5px;
+    border-color: rgb(255, 160, 60);
+    background-color: rgba(230, 80, 40, 0.45);
+}
+
+.skill-node.unlocked {
+    background-color: rgb(230, 80, 40);
+    border-color: rgb(230, 80, 40);
+}
+
+.skill-node.unlocked:hover {
+    border-width: 3px;
+    border-color: rgb(255, 220, 100);
+}
+
+.skill-node.locked {
+    background-color: rgba(5, 7, 10, 0.85);
+    border-color: rgba(230, 80, 40, 0.15);
+}
+
+.skill-node.locked:hover {
+    border-width: 3px;
+    border-color: rgba(242, 82, 69, 0.95);
+    background-color: rgba(242, 82, 69, 0.1);
+}
+
+/* Node vector icon style rules with dynamic color tinting */
+.node-icon {
+    width: 32px;
+    height: 32px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+.skill-node.unlocked .node-icon {
+    -unity-background-image-tint-color: rgb(9, 12, 17);
+}
+.skill-node.available .node-icon {
+    -unity-background-image-tint-color: rgb(230, 80, 40);
+}
+.skill-node.locked .node-icon {
+    -unity-background-image-tint-color: rgba(230, 80, 40, 0.25);
+}
+
+/* Responsive transition states for click feedback */
+.skill-node.pop {
+    scale: 1.25;
+}
+.skill-node.shake-left {
+    translate: -6px 0;
+}
+.skill-node.shake-right {
+    translate: 6px 0;
+}
+
+/* Node connection mappings for 15 SVGs */
+.node-icon-0-0 { background-image: resource("Icons/icon_walk"); }
+.node-icon-0-1 { background-image: resource("Icons/icon_run"); }
+.node-icon-0-2 { background-image: resource("Icons/icon_dash"); }
+.node-icon-0-3 { background-image: resource("Icons/icon_wallrun"); }
+.node-icon-0-4 { background-image: resource("Icons/icon_doublejump"); }
+
+.node-icon-1-0 { background-image: resource("Icons/icon_recoil"); }
+.node-icon-1-1 { background-image: resource("Icons/icon_target_crit10"); }
+.node-icon-1-2 { background-image: resource("Icons/icon_target_crit20"); }
+.node-icon-1-3 { background-image: resource("Icons/icon_crit_dmg"); }
+.node-icon-1-4 { background-image: resource("Icons/icon_oneshot"); }
+
+.node-icon-2-0 { background-image: resource("Icons/icon_xp_rad5"); }
+.node-icon-2-1 { background-image: resource("Icons/icon_xp_mult10"); }
+.node-icon-2-2 { background-image: resource("Icons/icon_xp_rad10"); }
+.node-icon-2-3 { background-image: resource("Icons/icon_xp_mult15"); }
+.node-icon-2-4 { background-image: resource("Icons/icon_xp_highlight"); }
+
+/* Connection lines */
+.skill-line {
+    position: absolute;
+    width: 6px;
+    height: 26px;
+    background-color: rgba(230, 80, 40, 0.08);
+    transition: background-color var(--transition-medium, 0.22s);
+}
+
+/* Next-node description */
+.next-desc {
+    height: 22px;
+    width: 280px;
+    color: rgba(230, 80, 40, 0.6);
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* Cost / status label */
+.cost-label {
+    height: 24px;
+    width: 280px;
+    font-size: 20px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+.cost-label.ready {
+    color: rgb(230, 80, 40);
+}
+.cost-label.muted {
+    color: rgba(230, 80, 40, 0.35);
+}
+.cost-label.accent {
+    color: rgb(230, 80, 40);
+}
+
+/* Hint */
+#hint {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    translate: -50%;
+    width: 800px;
+    height: 28px;
+    color: rgba(230, 80, 40, 0.5);
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+}
+
+/* Stylized Tactical HUD Tooltip */
+#tooltip {
+    position: absolute;
+    translate: -50% -100%;
+    background-color: rgba(9, 13, 19, 0.96);
+    border-color: rgba(230, 80, 40, 0.6);
+    border-width: 1px;
+    border-top-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 12px 16px;
+    min-width: 200px;
+    max-width: 320px;
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
+
+.tooltip-header {
+    color: rgb(255, 160, 60);
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    margin-bottom: 4px;
+}
+
+.tooltip-body {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    white-space: normal;
+    margin-bottom: 8px;
+}
+
+.tooltip-divider {
+    height: 1px;
+    background-color: rgba(230, 80, 40, 0.25);
+    margin-bottom: 6px;
+}
+
+.tooltip-status {
+    font-size: 12px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+}
+.tooltip-status.acquired {
+    color: rgb(90, 220, 90);
+}
+.tooltip-status.available {
+    color: rgb(255, 160, 60);
+}
+.tooltip-status.locked {
+    color: rgb(242, 82, 69);
+}

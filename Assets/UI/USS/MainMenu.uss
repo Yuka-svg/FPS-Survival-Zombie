@@ -1,0 +1,214 @@
+@import url("Theme.uss");
+@import url("MainMenuTheme.uss");
+
+/* ===== ROOT ===== */
+#MainMenuRoot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+}
+
+/* ===== BACKGROUND LAYER ===== */
+#Background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#Vignette {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: resource("Images/ui_vignette");
+    
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+#SkullWatermark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.08;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_skull.svg");
+    
+    -unity-background-scale-mode: scale-to-fit;
+    display: none;
+}
+
+/* ===== CENTER GROUP ===== */
+#CenterGroup {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== TITLE ===== */
+#Title {
+    font-size: var(--fs-hero, 64px);
+    color: var(--mm-gold);
+    -unity-font-style: bold;
+    letter-spacing: 8px;
+    margin-bottom: var(--space-xl, 20px);
+}
+
+#Subtitle {
+    font-size: var(--fs-xxl);
+    color: var(--mm-text-muted);
+    letter-spacing: 4px;
+    margin-bottom: var(--space-3xl, 32px);
+}
+
+/* ===== MENU BUTTONS ===== */
+.menu-button {
+    width: 280px;
+    height: 60px;
+    position: relative;
+    transition: opacity var(--transition-normal, 0.2s), scale var(--transition-fast, 0.08s) var(--panel-easing, ease-out);
+}
+
+#PlayButton {
+    margin-bottom: var(--space-l, 16px);
+}
+
+.menu-button:hover {
+    opacity: var(--hover-opacity, 0.9);
+    scale: 1.05;
+}
+
+.menu-button:active {
+    opacity: var(--active-opacity, 0.8);
+    scale: 0.95;
+}
+
+.button-shadow {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    right: -2px;
+    bottom: -2px;
+    background-color: var(--mm-shadow);
+    background-image: resource("Images/ui_shadow");
+    
+    -unity-background-scale-mode: scale-and-crop;
+    border-radius: var(--radius-s, 8px);
+}
+
+.button-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--mm-button-fill);
+    background-image: resource("Images/ui_button");
+    
+    -unity-background-scale-mode: scale-and-crop;
+    border-radius: var(--radius-s);
+    border-color: var(--mm-gold-dim);
+    border-width: 1px;
+    transition: background-color var(--transition-normal, 0.2s);
+}
+
+.menu-button:hover .button-fill {
+    background-color: var(--mm-button-hover);
+}
+
+.menu-button:active .button-fill {
+    background-color: var(--mm-button-active);
+}
+
+.button-icon {
+    position: absolute;
+    left: var(--space-l, 16px);
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    translate: 0 -50%;
+    
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.button-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--mm-text-primary);
+    font-size: var(--fs-l, 22px);
+    -unity-font-style: bold;
+    letter-spacing: 4px;
+    -unity-text-align: middle-center;
+}
+
+#PlayButton_Icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_play.svg");
+}
+
+#QuitButton_Icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_exit.svg");
+}
+
+/* ===== CHIP (Best Score) ===== */
+.chip {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--color-surface-mid);
+    background-image: resource("Images/ui_panel");
+    
+    -unity-background-scale-mode: scale-and-crop;
+    border-radius: var(--radius-s);
+    margin-top: var(--space-l, 16px);
+}
+
+#BestChip_Icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_trophy.svg");
+    margin-right: var(--space-s);
+}
+
+.chip-icon {
+    width: 24px;
+    height: 24px;
+    
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.chip-label {
+    font-size: var(--fs-s, 16px);
+    color: var(--mm-gold);
+    -unity-font-style: bold;
+}
+
+/* ===== CONTENT (bottom decoration) ===== */
+#Content {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 80px;
+}
+
+/* ===== VERSION ===== */
+#Version {
+    position: absolute;
+    right: var(--space-xl, 20px);
+    bottom: var(--space-m, 12px);
+    font-size: var(--fs-xxs, 12px);
+    color: var(--mm-text-muted);
+    -unity-font-style: normal;
+}

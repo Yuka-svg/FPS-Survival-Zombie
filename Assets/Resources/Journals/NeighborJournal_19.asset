@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: NeighborJournal_19
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 36
+  title: "Nh\u1EADt k\xFD h\xE0ng x\xF3m #19 \u2014 Linh m\u1EE5c cu\u1ED1i c\xF9ng"
+  category: 3
+  content: "T\xF4i l\xE0 cha Pedro, linh m\u1EE5c c\u1EE7a nh\xE0 th\u1EDD nh\u1ECF
+    gi\u1EEFa th\xE0nh ph\u1ED1. Khi d\u1ECBch b\u1EC7nh b\u1EAFt \u0111\u1EA7u,
+    ng\u01B0\u1EDDi d\xE2n k\xE9o \u0111\u1EBFn \u0111\xE2y tr\xFA \u1EA9n \u2014
+    t\xF4i nh\u1EDB c\xF3 gia \u0111\xECnh Zoe, \xF4ng Mathew, v\xE0 v\xE0i ng\u01B0\u1EDDi
+    n\u1EEFa. Ch\xFAng t\xF4i c\u1EA7u nguy\u1EC7n m\u1ED7i \u0111\xEAm. Nh\u01B0ng
+    r\u1ED3i Zoe b\u1EAFt \u0111\u1EA7u ho s\u1ED1t, r\u1ED3i Mathew c\u0169ng v\u1EADy.
+    T\xF4i hi\u1EC3u r\u1ED3i \u2014 nh\xE0 th\u1EDD kh\xF4ng th\u1EC3 b\u1EA3o v\u1EC7
+    ai. T\xF4i ph\u1EA3i b\u1ECF h\u1ECD l\u1EA1i, b\u1ECF Ch\xFAa l\u1EA1i, \u0111\u1EC3
+    t\u1EF1 c\u1EE9u m\xECnh. Xin tha th\u1EE9 cho t\xF4i."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

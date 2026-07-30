@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: NeighborJournal_03
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 12
+  title: "Nh\u1EADt k\xFD h\xE0ng x\xF3m #3"
+  category: 3
+  content: "T\u1EC7 th\u1EADt, Th\xE0nh ph\u1ED1 b\u1ECB phong t\u1ECFa r\u1ED3i!!
+    T\xEAn \u0111i\xEAn n\xE0o \u0111\xF3 \u0111\xE3 t\u1EA1o ra thu\u1ED1c bi\u1EBFn
+    ng\u01B0\u1EDDi kh\xE1c th\xE0nh zombie, xong th\u1EA3 \u0111\xE1m qu\xE1i v\u1EADt
+    \u1EA5y \u0111\u1EA7y \u0111\u01B0\u1EDDng. Qu\xE2n \u0111\u1ED9i bu\u1ED9c ph\u1EA3i
+    th\u1EA3 bom \u0111\u1EC3 d\u1ECDn d\u1EB9p nh\u01B0ng qu\u1EA3 bom kh\xF4ng
+    n\u1ED5. May m\u1EAFn sao m\xECnh ch\xF4m \u0111\u01B0\u1EE3c m\u1ED9t kh\u1EA9u
+    bazooka tr\u01B0\u1EDBc khi qu\xE2n \u0111\u1ED9i r\xFAt lui. M\u1EA5y ng\xE0y
+    nay c\u1EE9 th\u1EA5y m\u1ED9t t\xEAn to con cao h\u01A1n c\u1EA3 xe bu\xFDt
+    \u0111i l\xF9ng s\u1EE5c kh\u1EAFp n\u01A1i, c\xF3 l\u1EBD m\xECnh n\xEAn d\xF9ng
+    kh\u1EA9u bazoka \u0111\u1EC3 gi\u1EBFt h\u1EAFn. M\xECnh c\u1EA5t \u1EDF s\xE2n
+    sau nh\xE0 m\xECnh, ch\u1EAFc kh\xF4ng ai nh\xECn th\u1EA5y \u0111\xE2u."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

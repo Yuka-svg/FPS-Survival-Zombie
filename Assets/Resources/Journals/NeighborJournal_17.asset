@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: NeighborJournal_17
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 34
+  title: "Nh\u1EADt k\xFD h\xE0ng x\xF3m #17 \u2014 Sinh vi\xEAn y khoa"
+  category: 3
+  content: "T\xF4i l\xE0 sinh vi\xEAn y khoa n\u0103m cu\u1ED1i, \u0111ang th\u1EF1c
+    t\u1EADp \u1EDF b\u1EC7nh vi\u1EC7n th\xEC d\u1ECBch b\xF9ng. T\xF4i v\u1EC1
+    chung c\u01B0 v\xE0 barricade trong ph\xF2ng. T\u1EEB nh\u1EEFng g\xEC quan s\xE1t
+    \u0111\u01B0\u1EE3c, virus l\xE2y qua c\u1EAFn, \u1EE7 b\u1EC7nh 4-6 gi\u1EDD.
+    Bi\u1EC3u hi\u1EC7n: m\u1EAFt tr\u1EAFng, m\u1EA5t \xFD th\u1EE9c, hung d\u1EEF.
+    T\xF4i nghi ng\u1EDD \u0111\xE2y l\xE0 bi\u1EBFn th\u1EC3 c\u1EE7a virus rage
+    \u0111\xE3 \u0111\u01B0\u1EE3c ch\u1EC9nh s\u1EEDa. N\u1EBFu c\xF3 ai \u0111ang
+    nghi\xEAn c\u1EE9u thu\u1ED1c gi\u1EA3i, h\xE3y li\xEAn h\u1EC7 t\u1EA7n s\u1ED1
+    radio 87.5. T\xF4i c\xF3 ki\u1EBFn th\u1EE9c y khoa, c\xF3 th\u1EC3 gi\xFAp \u0111\u01B0\u1EE3c."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

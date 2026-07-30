@@ -1,0 +1,14 @@
+/* MainMenu theme variables — aliases mapped to Theme.uss tokens */
+* {
+    --mm-bg-color: var(--color-bg-root);
+    --mm-gold: var(--color-accent-gold);
+    --mm-gold-dim: var(--color-accent-gold-dark);
+    --mm-text-primary: var(--color-text-primary);
+    --mm-text-muted: var(--color-text-muted);
+    --mm-overlay: var(--color-scrim-bottom);
+    --mm-button-fill: var(--color-surface-top);
+    --mm-button-hover: var(--color-surface-hover);
+    --mm-button-active: var(--color-surface-bottom);
+    --mm-shadow: var(--color-text-shadow);
+    --mm-accent-red: var(--color-accent-red-dark);
+}

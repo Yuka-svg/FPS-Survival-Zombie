@@ -1,0 +1,90 @@
+@import url("Shared.uss");
+
+#HUDChips {
+    position: absolute;
+    left: 20px; /* Offset from left screen edge for premium look */
+    top: 20px;  /* Offset from top screen edge to utilize empty space */
+    flex-direction: column;
+}
+
+.hud-chip-root {
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+    background-color: transparent; /* Override Shared.uss dark background */
+    border-radius: 0;             /* Override Shared.uss border-radius */
+    width: auto;                  /* Override Shared.uss fixed 280px width */
+    margin-bottom: 10px;
+    padding: 8px 16px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.hud-chip-hidden {
+    display: none;
+}
+
+
+/* Standard Label Styling matching Main Menu / Outfitt font */
+.hud-chip-label {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 15px; /* Premium size */
+    -unity-font-style: bold;
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    margin: 0;
+    padding: 0;
+}
+
+/* Icon Styling and Tinting */
+.hud-chip-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.hud-chip-wave .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-cyan, rgb(78, 205, 196));
+}
+.hud-chip-kills .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-red, rgb(229, 72, 60));
+}
+.hud-chip-score .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-gold, rgb(217, 199, 115));
+}
+.hud-chip-coins .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-gold-light, rgb(245, 225, 150));
+}
+.hud-chip-headshots .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-red-light, rgb(255, 100, 85));
+}
+.hud-chip-timer .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-cyan-light, rgb(120, 230, 220));
+}
+.hud-chip-collectibles .hud-chip-icon {
+    -unity-background-image-tint-color: var(--color-accent-blue-light, rgb(179, 217, 255));
+}
+
+.hud-chip-wave-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_wave.svg");
+}
+.hud-chip-kills-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_skull.svg");
+}
+.hud-chip-score-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+}
+.hud-chip-coins-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_coin.svg");
+}
+.hud-chip-headshots-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_target.svg");
+}
+.hud-chip-timer-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_timer.svg");
+}
+.hud-chip-collectibles-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_trophy.svg");
+}

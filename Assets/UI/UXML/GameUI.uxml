@@ -1,0 +1,441 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/GameOverPanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/PausePanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/HealthCluster.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/AmmoCluster.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/ProgressionCluster.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/WeaponIndicator.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/ReloadIndicator.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/WeaponInventory.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Compass.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Stamina.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Crosshair.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/FPS.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Dash.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/InteractPrompt.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/WaveAnnouncer.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/CombatFeedback.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/DamageDirection.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/BossHealthBar.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/ThreatWidget.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/UpgradesWidget.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/SkillTreeWidget.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/HealthFlash.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/LowHealthVignette.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/QuestTracker.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/JournalUI.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/StatsPanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/AdRewardPanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/WeaponSelectionPanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/HUDChips.uss" />
+    <ui:VisualElement name="GameUIRoot">
+
+
+        <!-- ==================== HUDCluster (inlined) ==================== -->
+        <!-- Health & Progression Unified Cluster -->
+        <ui:VisualElement name="HealthCluster">
+            <ui:VisualElement name="HealthHeaderRow">
+                <ui:VisualElement name="LevelBadge" class="header-badge level-badge">
+                    <ui:VisualElement name="LevelIcon" class="header-badge-icon level-icon" />
+                    <ui:Label name="LevelValue" text="LV 1" />
+                </ui:VisualElement>
+                <ui:VisualElement name="HealthBadge" class="header-badge health-badge">
+                    <ui:VisualElement name="HealthIcon" class="header-badge-icon health-icon" />
+                    <ui:Label name="HealthValue" text="100 HP" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="HealthBarRow">
+                <ui:VisualElement name="HealthTrack">
+                    <ui:VisualElement name="HealthGhost" />
+                    <ui:VisualElement name="HealthFill" />
+                    <ui:VisualElement name="HealthNotchesOverlay" class="track-notches-overlay" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="ShieldRoot">
+                <ui:VisualElement name="ShieldTrack">
+                    <ui:VisualElement name="ShieldFill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="ProgressionCluster">
+                <ui:VisualElement name="XpBarRow">
+                    <ui:VisualElement name="XpTrack">
+                        <ui:VisualElement name="XpGhost" />
+                        <ui:VisualElement name="XpFill" />
+                        <ui:VisualElement name="XpNotchesOverlay" class="track-notches-overlay" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <!-- Ammo & Weapon Unified Cluster -->
+        <ui:VisualElement name="AmmoCluster">
+            <!-- Top Header Row: Weapon Indicator + Quick Slots -->
+            <ui:VisualElement name="AmmoHeaderRow">
+                <ui:VisualElement name="WeaponIndicator">
+                    <ui:VisualElement name="WeaponIcon" />
+                    <ui:Label name="WeaponName" text="WEAPON" />
+                </ui:VisualElement>
+                <ui:VisualElement name="WeaponInventoryCluster" />
+            </ui:VisualElement>
+
+            <!-- Middle Content Row: Caliber/FireMode Info (Left) + Big Ammo Count (Right) -->
+            <ui:VisualElement name="AmmoMiddleRow">
+                <ui:VisualElement name="CaliberInfoColumn">
+                    <ui:VisualElement name="CaliberBadge">
+                        <ui:Label name="CaliberLabel" text="9MM NATO" />
+                        <ui:Label name="FireModeLabel" text="AUTO" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="BulletGauge" />
+                </ui:VisualElement>
+                <ui:VisualElement name="AmmoMainRow">
+                    <ui:VisualElement name="AmmoPunchRoot">
+                        <ui:Label name="AmmoValue" text="30" />
+                    </ui:VisualElement>
+                    <ui:Label name="AmmoDivider" text="/" />
+                    <ui:Label name="AmmoReserve" text="&#x221E;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Bottom Row: Heat Track -->
+            <ui:VisualElement name="HeatBarTrack">
+                <ui:VisualElement name="HeatBarFill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="ReloadIndicator">
+            <ui:VisualElement name="ReloadRing" />
+            <ui:Label name="ReloadPercent" text="0%" />
+            <ui:Label name="ReloadText" text="RELOADING" />
+        </ui:VisualElement>
+        <!-- Compass -->
+        <ui:VisualElement name="CompassViewport">
+            <ui:VisualElement name="CompassStrip" />
+            <ui:VisualElement name="CompassBlips" />
+        </ui:VisualElement>
+        <ui:Label name="CompassHeading" text="0" />
+        <!-- Stamina & Dash Cluster -->
+        <ui:VisualElement name="StaminaCluster">
+            <ui:VisualElement name="StaminaBarTrack">
+                <ui:VisualElement name="StaminaFill" />
+            </ui:VisualElement>
+            <ui:VisualElement name="DashWidget" class="dash-widget" />
+        </ui:VisualElement>
+        <!-- Crosshair -->
+        <ui:VisualElement name="Crosshair" class="crosshair-container" />
+        <!-- FPS -->
+        <ui:Label name="FPSLabel" text="-- FPS" class="fps-counter" />
+        <!-- Interact -->
+        <ui:VisualElement name="InteractPrompt" class="interact-prompt">
+            <ui:VisualElement name="interact-panel" class="interact-panel">
+                <ui:Label name="interact-label" class="interact-label" />
+                <ui:VisualElement name="interact-progress" class="interact-progress">
+                    <ui:VisualElement name="interact-progress-fill" class="interact-progress-fill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <!-- Wave -->
+        <ui:VisualElement name="WaveAnnouncer" picking-mode="Ignore">
+            <ui:Label name="WaveTitle" class="wave-title" text="WAVE 1" />
+            <ui:Label name="WaveSub" class="wave-sub" text="SURVIVE" />
+        </ui:VisualElement>
+        <!-- Combat -->
+        <ui:VisualElement name="CombatFeedbackHUD" picking-mode="Ignore">
+            <ui:VisualElement name="Hitmarker" />
+            <ui:VisualElement name="DamageNumbers" />
+            <ui:VisualElement name="Killfeed" />
+        </ui:VisualElement>
+        <ui:VisualElement name="DamageDirection" picking-mode="Ignore" />
+        <!-- Boss -->
+        <ui:VisualElement name="BossHealthBar" class="boss-root">
+            <ui:VisualElement name="BossBg" class="boss-bg" />
+            <ui:VisualElement name="BossFillArea" class="boss-fill-area">
+                <ui:VisualElement name="BossFill" class="boss-fill" />
+            </ui:VisualElement>
+            <ui:Label name="BossLabel" class="boss-label" text="BOSS" />
+        </ui:VisualElement>
+        <!-- Threat -->
+        <ui:VisualElement name="ThreatWidget" class="threat-root">
+            <ui:Label name="ThreatState" class="threat-state" text="CALM" />
+            <ui:VisualElement name="ThreatBarBg" class="threat-bar-bg">
+                <ui:VisualElement name="ThreatFill" class="threat-fill" />
+            </ui:VisualElement>
+            <ui:Label name="ThreatWarn" class="threat-warn" text="FLANKED &#x2014; MOVE!" />
+        </ui:VisualElement>
+        <!-- Upgrades -->
+        <ui:VisualElement name="UpgradesWidget" />
+        <!-- Health Flash + Low Health Vignette -->
+        <ui:VisualElement name="HealthFlash" picking-mode="Ignore" />
+        <ui:VisualElement name="LowHealthVignette" picking-mode="Ignore" />
+        <!-- Quest + Journal -->
+        <ui:VisualElement name="QuestTracker">
+            <ui:VisualElement name="MainPanel">
+                <ui:Label name="Chapter" text="" />
+                <ui:Label name="Title" text="" />
+                <ui:Label name="Objective" text="" />
+                <ui:Label name="Collectibles" text="" />
+            </ui:VisualElement>
+            <ui:VisualElement name="QuestDivider" class="quest-divider" />
+            <ui:VisualElement name="SidePanel">
+                <ui:Label name="SideHeader" text="SIDE QUESTS" />
+                <ui:VisualElement name="SideLines" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="JournalUI" style="display: none;">
+            <ui:VisualElement name="scrim" class="journal-scrim" picking-mode="Position" />
+            <ui:VisualElement name="Card" class="journal-card">
+                <ui:VisualElement name="BookPages" class="book-pages">
+                    <ui:Label name="JournalTitle" class="journal-title" text="" />
+                    <ui:VisualElement name="Illustration" class="journal-illustration" />
+                    <ui:VisualElement name="BinderCrease" class="binder-crease" />
+                    <ui:ScrollView name="JournalScroll" class="journal-scroll-view">
+                        <ui:Label name="JournalContent" class="journal-content" text="" />
+                    </ui:ScrollView>
+                    <ui:Button name="CloseButton" text="CLOSE" class="journal-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== HUDChips (inlined) ==================== -->
+        <ui:VisualElement name="HUDChips">
+            <ui:VisualElement name="WaveChip" class="hud-chip-root hud-chip-wave hud-chip-hidden">
+                <ui:VisualElement name="WaveIcon" class="hud-chip-icon hud-chip-wave-icon" />
+                <ui:Label name="WaveLabel" class="hud-chip-label" text="Wave 1 · 0/10" />
+            </ui:VisualElement>
+            <ui:VisualElement name="KillsChip" class="hud-chip-root hud-chip-kills hud-chip-hidden">
+                <ui:VisualElement name="KillsIcon" class="hud-chip-icon hud-chip-kills-icon" />
+                <ui:Label name="KillsLabel" class="hud-chip-label" text="Kills : 0" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ScoreChip" class="hud-chip-root hud-chip-score hud-chip-hidden">
+                <ui:VisualElement name="ScoreIcon" class="hud-chip-icon hud-chip-score-icon" />
+                <ui:Label name="ScoreLabel" class="hud-chip-label" text="Score : 0" />
+            </ui:VisualElement>
+            <ui:VisualElement name="CoinsChip" class="hud-chip-root hud-chip-coins hud-chip-hidden">
+                <ui:VisualElement name="CoinsIcon" class="hud-chip-icon hud-chip-coins-icon" />
+                <ui:Label name="CoinsLabel" class="hud-chip-label" text="Coins : 0" />
+            </ui:VisualElement>
+            <ui:VisualElement name="HeadshotsChip" class="hud-chip-root hud-chip-headshots hud-chip-hidden">
+                <ui:VisualElement name="HeadshotsIcon" class="hud-chip-icon hud-chip-headshots-icon" />
+                <ui:Label name="HeadshotsLabel" class="hud-chip-label" text="Crits : 0" />
+            </ui:VisualElement>
+            <ui:VisualElement name="TimerChip" class="hud-chip-root hud-chip-timer hud-chip-hidden">
+                <ui:VisualElement name="TimerIcon" class="hud-chip-icon hud-chip-timer-icon" />
+                <ui:Label name="TimerLabel" class="hud-chip-label" text="00:00" />
+            </ui:VisualElement>
+            <ui:VisualElement name="CollectiblesChip" class="hud-chip-root hud-chip-collectibles hud-chip-hidden">
+                <ui:VisualElement name="CollectiblesIcon" class="hud-chip-icon hud-chip-collectibles-icon" />
+                <ui:Label name="CollectiblesLabel" class="hud-chip-label" text="Journals : 0/0" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== SkillTreeWidget (inlined) ==================== -->
+        <ui:VisualElement name="SkillTreeWidget">
+            <ui:VisualElement name="scrim" picking-mode="Position" />
+            <ui:VisualElement name="card">
+                <ui:Label name="title" text="SKILL TREE" />
+                <ui:Label name="sp" text="SKILL POINTS : 0" />
+                <ui:VisualElement name="branch0" class="branch">
+                    <ui:VisualElement name="icon0" class="branch-icon icon-movement" />
+                    <ui:Label name="header0" class="branch-header" text="MOVEMENT" />
+                    <ui:Label name="sub0" class="branch-sub" text="+ STAMINA" />
+                    <ui:VisualElement name="nodes0" class="node-container" />
+                    <ui:Label name="next0" class="next-desc" text="" />
+                    <ui:Label name="cost0" class="cost-label muted" text="NEXT  2 SP" />
+                </ui:VisualElement>
+                <ui:VisualElement name="branch1" class="branch">
+                    <ui:VisualElement name="icon1" class="branch-icon icon-aim" />
+                    <ui:Label name="header1" class="branch-header" text="AIM" />
+                    <ui:Label name="sub1" class="branch-sub" text="+ DAMAGE" />
+                    <ui:VisualElement name="nodes1" class="node-container" />
+                    <ui:Label name="next1" class="next-desc" text="" />
+                    <ui:Label name="cost1" class="cost-label muted" text="NEXT  2 SP" />
+                </ui:VisualElement>
+                <ui:VisualElement name="branch2" class="branch">
+                    <ui:VisualElement name="icon2" class="branch-icon icon-intelligence" />
+                    <ui:Label name="header2" class="branch-header" text="INTELLIGENCE" />
+                    <ui:Label name="sub2" class="branch-sub" text="+ HP" />
+                    <ui:VisualElement name="nodes2" class="node-container" />
+                    <ui:Label name="next2" class="next-desc" text="" />
+                    <ui:Label name="cost2" class="cost-label muted" text="NEXT  2 SP" />
+                </ui:VisualElement>
+                <ui:Label name="hint" text="[TAB] CLOSE" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== StatsPanel (inlined) ==================== -->
+        <ui:VisualElement name="StatsPanel" class="ui-panel-root" style="display: none;">
+            <ui:VisualElement name="StatsScrim" class="ui-panel-vignette" />
+            <ui:VisualElement name="StatsCard" class="ui-panel-card stats-card">
+                <ui:VisualElement name="StatsAccent" class="ui-panel-accent" />
+                <ui:Label name="StatsTitle" class="stats-title" text="STATISTICS" />
+                <ui:VisualElement name="StatsDivider" class="stats-divider" />
+                <ui:VisualElement name="StatsGrid" class="stats-grid" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== GameOverPanel (inlined) ==================== -->
+        <ui:VisualElement name="GameOverPanel" style="display: none;">
+            <ui:VisualElement name="Vignette" />
+            <ui:VisualElement name="CardShadow" />
+            <ui:VisualElement name="Card" view-data-key="CardPivot">
+                <ui:VisualElement name="TopAccent" />
+                <ui:VisualElement name="SkullIcon" />
+                <ui:Label name="Title" text="GAME OVER" />
+                <ui:VisualElement name="Divider" />
+                <ui:VisualElement name="StatWell">
+                    <ui:VisualElement class="gameover-stat-row">
+                        <ui:VisualElement name="GameOverStatIcon0" class="gameover-stat-icon gameover-icon-chapter" />
+                        <ui:Label name="FinalScoreText" text="" class="stat-text gold" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat-row">
+                        <ui:VisualElement name="GameOverStatIcon1" class="gameover-stat-icon gameover-icon-quests" />
+                        <ui:Label name="WaveReachedText" text="" class="stat-text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat-row">
+                        <ui:VisualElement name="GameOverStatIcon2" class="gameover-stat-icon gameover-icon-journals" />
+                        <ui:Label name="KillsText" text="" class="stat-text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="gameover-stat-row">
+                        <ui:VisualElement name="GameOverStatIcon3" class="gameover-stat-icon gameover-icon-progress" />
+                        <ui:Label name="BestScoreText" text="" class="stat-text gold" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="RestartButton" class="gameover-button">
+                    <ui:VisualElement class="gameover-btn-icon gameover-icon-restart" />
+                    <ui:Label text="RESTART" class="gameover-btn-label" />
+                </ui:Button>
+                <ui:Button name="MainMenuButton" class="gameover-button">
+                    <ui:VisualElement class="gameover-btn-icon gameover-icon-menu" />
+                    <ui:Label text="MAIN MENU" class="gameover-btn-label" />
+                </ui:Button>
+                <ui:Button name="QuitButton" class="gameover-button">
+                    <ui:VisualElement class="gameover-btn-icon gameover-icon-quit" />
+                    <ui:Label text="QUIT" class="gameover-btn-label" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== PausePanel (inlined) ==================== -->
+        <ui:VisualElement name="PausePanel" style="display: none;">
+            <ui:VisualElement name="PauseVignette" />
+            <ui:VisualElement name="PauseCardShadow" />
+            <ui:VisualElement name="PauseCard" view-data-key="PauseCardPivot">
+                <ui:VisualElement name="PauseTopAccent" />
+                <ui:VisualElement name="PauseIcon" />
+                <ui:Label name="PauseTitle" text="PAUSED" />
+                <ui:VisualElement name="PauseDivider" />
+                <ui:VisualElement name="PauseButtonsContainer">
+                    <ui:Button name="ResumeButton" text="RESUME" class="pause-button" />
+                    <ui:Button name="SettingsButton" text="SETTINGS" class="pause-button" />
+                    <ui:Button name="PauseMainMenuButton" text="MAIN MENU" class="pause-button" />
+                    <ui:Button name="PauseQuitButton" text="QUIT" class="pause-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Settings Card -->
+            <ui:VisualElement name="SettingsCard">
+                <ui:Label name="SettingsTitle" text="SETTINGS" />
+                <ui:VisualElement name="SettingsDivider" />
+                <ui:ScrollView class="settings-scroll" mode="Vertical" show-horizontal-scroller="false">
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="MASTER VOLUME" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="VolumeSlider" fill="true" low-value="0.0001" high-value="1" class="settings-slider" />
+                            <ui:Label name="VolumeValueLabel" text="100%" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="MUSIC VOLUME" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="MusicVolumeSlider" fill="true" low-value="0.0001" high-value="1" class="settings-slider" />
+                            <ui:Label name="MusicVolumeValueLabel" text="100%" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="SFX VOLUME" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="SFXVolumeSlider" fill="true" low-value="0.0001" high-value="1" class="settings-slider" />
+                            <ui:Label name="SFXVolumeValueLabel" text="100%" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="MOUSE SENS X" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="MouseSensXSlider" fill="true" low-value="0.1" high-value="10" class="settings-slider" />
+                            <ui:Label name="MouseSensXValueLabel" text="5.0" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="MOUSE SENS Y" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="MouseSensYSlider" fill="true" low-value="0.1" high-value="10" class="settings-slider" />
+                            <ui:Label name="MouseSensYValueLabel" text="5.0" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="CONTROLLER SENS X" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="ControllerSensXSlider" fill="true" low-value="1" high-value="100" class="settings-slider" />
+                            <ui:Label name="ControllerSensXValueLabel" text="50" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="CONTROLLER SENS Y" class="settings-label" />
+                        <ui:VisualElement class="settings-slider-container">
+                            <ui:Slider name="ControllerSensYSlider" fill="true" low-value="1" high-value="100" class="settings-slider" />
+                            <ui:Label name="ControllerSensYValueLabel" text="50" class="settings-value-label" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="FULLSCREEN" class="settings-label" />
+                        <ui:Toggle name="FullscreenToggle" class="settings-toggle" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row">
+                        <ui:Label text="VSYNC" class="settings-label" />
+                        <ui:Toggle name="VsyncToggle" class="settings-toggle" />
+                    </ui:VisualElement>
+                </ui:ScrollView>
+                <ui:Button name="SettingsResetButton" text="RESET TO DEFAULT" class="settings-reset-button" />
+                <ui:Button name="SettingsBackButton" text="BACK" class="settings-back-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- ==================== AdRewardPanel ==================== -->
+        <ui:VisualElement name="AdRewardPanel" style="display: none;">
+            <ui:VisualElement name="AdVignette" />
+            <ui:VisualElement name="AdCardShadow" />
+            <ui:VisualElement name="AdCard">
+                <ui:VisualElement name="AdTopAccent" />
+                <ui:Label name="AdTitle" text="QUẢNG CÁO" />
+                <ui:VisualElement name="AdDivider" />
+                <ui:VisualElement name="AdContent">
+                    <ui:VisualElement class="ad-placeholder">
+                        <ui:VisualElement class="ad-placeholder-icon" />
+                        <ui:Label name="AdTimer" class="ad-placeholder-label" text="Nhấn XEM để nhận thưởng" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="AdPlayingOverlay" class="ad-playing-overlay" style="display: none;">
+                        <ui:VisualElement class="ad-placeholder-icon" />
+                        <ui:Label class="ad-placeholder-label" text="ĐANG PHÁT QUẢNG CÁO..." />
+                    </ui:VisualElement>
+                    <ui:Button name="WatchAdButton" text="XEM QUẢNG CÁO" class="gameover-button" />
+                    <ui:Label name="AdRewardText" text="" />
+                </ui:VisualElement>
+                <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="gameover-button" style="display: none;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== WeaponSelectionPanel ==================== -->
+        <ui:VisualElement name="WeaponSelectionPanel" style="display: none;">
+            <ui:VisualElement name="WeaponSelVignette" />
+            <ui:VisualElement name="WeaponSelCard">
+                <ui:VisualElement name="WeaponSelTopAccent" />
+                <ui:Label name="WeaponSelTitle" text="CHỌN VŨ KHÍ" />
+                <ui:VisualElement name="WeaponSelDivider" />
+                <ui:VisualElement name="WeaponSelGrid" class="weapon-sel-grid" />
+                <ui:Label name="WeaponSelHint" text="Chọn vũ khí để bắt đầu" class="weapon-sel-hint" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Black cinematic overlay for start transition -->
+        <ui:VisualElement name="BlackOverlay" class="black-overlay" />
+    </ui:VisualElement>
+</ui:UXML>

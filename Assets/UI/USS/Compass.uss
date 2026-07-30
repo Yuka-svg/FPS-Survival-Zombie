@@ -1,0 +1,48 @@
+/* ===== Compass.uss ===== */
+@import url("Shared.uss");
+
+#CompassViewport {
+    position: absolute;
+    top: 6px; /* Moved to very top edge */
+    left: 50%;
+    margin-left: -180px;
+    width: 360px;
+    height: 32px;
+    overflow: hidden;
+    background-color: transparent;
+    border-radius: 0;
+    border-width: 0;
+}
+
+#CompassStrip {
+    width: 100%;
+    height: 100%;
+}
+
+#CompassBlips {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.compass-blip {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+}
+
+#CompassHeading {
+    display: none;
+    position: absolute;
+    top: 42px; /* Directly below the compass strip */
+    left: 50%;
+    margin-left: -50px;
+    width: 100px;
+    height: 24px;
+    font-size: 15px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.95);
+}

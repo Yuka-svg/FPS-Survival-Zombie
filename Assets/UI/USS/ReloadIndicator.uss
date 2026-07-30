@@ -1,0 +1,48 @@
+/* ===== ReloadIndicator.uss ===== */
+@import url("Shared.uss");
+
+#ReloadIndicator {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 96px;
+    height: 96px;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition-property: opacity, scale;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-out;
+}
+
+#ReloadRing {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 96px;
+    height: 96px;
+}
+
+#ReloadPercent {
+    font-size: 16px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+    margin: 0;
+    padding: 0;
+    -unity-text-align: center;
+}
+
+#ReloadText {
+    font-size: 9px;
+    -unity-font-definition: var(--font-body-sdf);
+    -unity-font-style: bold;
+    color: rgb(235, 224, 199);
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    margin-top: 1px;
+    padding: 0;
+    -unity-text-align: center;
+}

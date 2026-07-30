@@ -1,0 +1,52 @@
+@import url("Shared.uss");
+
+/* ===== ThreatWidget.uss — Compact Tactical Threat Indicator ===== */
+
+.threat-root {
+    position: absolute;
+    width: 240px;
+    height: 36px;
+    left: 50%;
+    top: 58px;
+    translate: -50% 0;
+    background-color: transparent; /* Controlled by C# vector painter */
+    border-width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.threat-state {
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 90px;
+    font-size: 11px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    -unity-font-definition: var(--font-display-sdf, resource("Fonts/BlackOpsOne-Regular SDF"));
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.threat-bar-bg {
+    display: none; /* We draw it using C# Vector Painter directly on threat-root */
+}
+
+.threat-warn {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 12px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    -unity-font-definition: var(--font-display-sdf, resource("Fonts/BlackOpsOne-Regular SDF"));
+    color: var(--color-accent-red, rgb(229, 72, 60));
+    opacity: 0;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    transition: opacity var(--transition-fast, 0.15s) ease-out;
+}

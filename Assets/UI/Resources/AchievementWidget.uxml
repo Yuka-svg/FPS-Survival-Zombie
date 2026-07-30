@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/Resources/AchievementWidget.uss" />
+
+    <ui:VisualElement name="AchievementPopup" style="opacity: 0;">
+        <ui:VisualElement name="AccentBar" />
+        <ui:VisualElement name="Icon" />
+        <ui:Label name="Title" text="" />
+        <ui:Label name="Desc" text="" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="AchievementScrim" class="overlay" style="opacity: 0; display: none;" />
+
+    <ui:VisualElement name="AchievementListPanel" style="opacity: 0; display: none;">
+        <ui:Label name="ListHeader" class="list-header" text="ACHIEVEMENTS" />
+        <ui:Label name="ListHint" class="list-hint" text="Press J to close" />
+        <ui:VisualElement name="ScrollArea"  />
+    </ui:VisualElement>
+</ui:UXML>

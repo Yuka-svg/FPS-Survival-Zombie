@@ -1,0 +1,38 @@
+/* ===== Stamina.uss ===== */
+@import url("Shared.uss");
+
+#StaminaCluster {
+    position: absolute;
+    left: 34px; /* Align with HealthCluster content (20px + 14px padding) */
+    bottom: 114px; /* Sits 2px above the top of HealthCluster (which is 112px) */
+    width: 292px; /* Align with HealthCluster content width (320px - 28px padding) */
+    height: 24px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+}
+
+#StaminaBarTrack {
+    position: relative;
+    flex-grow: 1;
+    height: 8px;
+    background-color: rgba(20, 24, 30, 0.9);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 12px;
+}
+
+#StaminaFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 220, 180);
+    border-radius: 4px;
+    transition: width 0.15s ease-out;
+}

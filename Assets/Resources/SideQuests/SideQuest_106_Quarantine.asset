@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_106_Quarantine
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 106
+  chapter: 4
+  title: "L\u1EC1u quarantine \u2014 N\u01A1i b\u1EC7nh b\u1EAFt \u0111\u1EA7u"
+  description: "Khu l\u1EC1u quarantine qu\xE2n \u0111\u1ED9i \u2014 n\u01A1i \u0111\u1EA7u
+    ti\xEAn ph\xE1t hi\u1EC7n d\u1ECBch b\u1EC7nh. H\u1ED3 s\u01A1 y t\u1EBF c\xF3
+    th\u1EC3 c\xF2n trong l\u1EC1u ch\u1EC9 huy..."
+  objective: "Kh\xE1m ph\xE1 khu l\u1EC1u quarantine, s\u1ED1ng s\xF3t qua 3 wave
+    zombie, t\xECm h\u1ED3 s\u01A1 y t\u1EBF \u0111\u1EA7u ti\xEAn"
+  expReward: 350
+  journalReward: {fileID: 11400000, guid: a522deb1b716eeb4b806d8343cd177b6, type: 2}
+  completionNotification: 

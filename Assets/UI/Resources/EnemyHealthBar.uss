@@ -1,0 +1,125 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+#HealthBarRoot {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(9, 13, 19, 0.85);
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.15);
+    padding: 2px;
+    opacity: 0; /* Managed dynamically in C# for fade in/out transitions */
+    transition: opacity 0.2s ease-out, border-color 0.25s ease-out;
+}
+
+#Icon {
+    width: 0;
+    height: 0;
+    margin-right: 0;
+    display: none;
+    -unity-background-scale-mode: scale-to-fit;
+    transition: width 0.2s ease-out, height 0.2s ease-out;
+}
+
+#FillArea {
+    flex-grow: 1;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 3px;
+    position: relative;
+}
+
+#Fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(0, 240, 255); /* Neon Cyan by default */
+    transition: width 0.15s ease-out, background-color 0.15s ease-out;
+}
+
+#NameLabel {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    -unity-text-align: middle-center;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: white;
+    margin-bottom: 3px;
+    opacity: 0.9;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    display: none;
+    transition: opacity 0.2s ease-out;
+}
+
+/* === BASE STYLING (class-based, used by C#) === */
+.healthbar-root {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(9, 13, 19, 0.85);
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.15);
+    padding: 2px;
+    opacity: 0;
+    transition: opacity 0.2s ease-out, border-color 0.25s ease-out;
+}
+
+/* === SPECIAL ENEMY STYLING === */
+.healthbar-special {
+    border-color: rgba(255, 170, 0, 0.6); /* Gold/Orange outline */
+    border-width: 2.2px;
+    border-radius: 6px;
+    padding: 2.5px;
+}
+
+.healthbar-special #Icon {
+    display: flex;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+    -unity-background-image-tint-color: rgb(255, 170, 0);
+}
+
+.healthbar-special #NameLabel {
+    display: flex;
+    color: rgb(255, 170, 0);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* === BOSS ENEMY STYLING === */
+.healthbar-boss {
+    border-color: rgb(255, 46, 99); /* Neon Crimson Red outline */
+    border-width: 2.8px;
+    border-radius: 8px;
+    padding: 3.5px;
+}
+
+.healthbar-boss #Icon {
+    display: flex;
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_skull.svg");
+    -unity-background-image-tint-color: rgb(255, 46, 99);
+}
+
+.healthbar-boss #NameLabel {
+    display: flex;
+    color: rgb(255, 46, 99);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    -unity-font-style: bold-and-italic;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}

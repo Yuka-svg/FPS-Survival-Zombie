@@ -1,0 +1,533 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* ===== PlayFabLogin.uss (Tactical HUD Modular Redesign) ===== */
+
+/* --- Root --- */
+#PlayFabLoginRoot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* --- Black cinematic overlay on start --- */
+.black-overlay {
+    position: absolute;
+    left: -200px;
+    right: -200px;
+    top: -200px;
+    bottom: -200px;
+    background-color: black;
+    opacity: 1;
+    transition: opacity 3s ease-in-out;
+}
+
+.black-overlay.fade-out {
+    opacity: 0;
+}
+
+/* --- Main Modular Container (Transparent) --- */
+.login-panel-container {
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0);
+    width: 33%;
+    min-width: 500px;
+    max-width: 660px;
+    position: absolute;
+    left: 6%;
+    top: 8%;
+    bottom: 8%;
+    justify-content: space-between;
+    padding: 0 0 0 36px;
+    border-left-width: 2px;
+    border-left-color: rgba(230, 80, 40, 0.22);
+}
+
+/* --- HUD Module Base (Asymmetric Plaque) --- */
+.hud-module {
+    background-color: rgba(9, 13, 19, 0.94);
+    border-width: 1.5px;
+    border-color: rgba(230, 80, 40, 0.22);
+    border-top-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    position: relative;
+    padding: 36px;
+    margin-bottom: 24px;
+    translate: -800px 0px;
+    transition: translate 1.5s ease-out-back, scale 0.15s ease-out, border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+
+.hud-module.slide-in {
+    translate: 0px 0px;
+}
+
+
+.module-pop {
+    scale: 1.05;
+}
+
+.hud-module:hover {
+    border-color: rgba(230, 80, 40, 0.5);
+}
+
+.module-connector {
+    position: absolute;
+    left: -38px;
+    top: 50%;
+    width: 36px;
+    height: 1.5px;
+    background-color: rgba(230, 80, 40, 0.25);
+}
+
+/* --- HUD Corner Brackets --- */
+.hud-bracket {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: rgb(230, 80, 40);
+}
+
+.bracket-tl {
+    top: -2px;
+    left: -2px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+}
+
+.bracket-tr {
+    top: -2px;
+    right: -2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+}
+
+.bracket-bl {
+    bottom: -2px;
+    left: -2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.bracket-br {
+    bottom: -2px;
+    right: -2px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+}
+
+/* --- HUD Stamp Indicators --- */
+.hud-stamp {
+    position: absolute;
+    font-size: 14px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    letter-spacing: 1px;
+}
+
+.stamp-top-left {
+    top: 8px;
+    left: 16px;
+    color: rgba(230, 80, 40, 0.75);
+}
+
+.stamp-top-right {
+    top: 8px;
+    right: 16px;
+    color: rgba(230, 80, 40, 0.75);
+}
+
+/* --- Module 1: Header Terminal --- */
+.header-module {
+    padding: 36px 16px 16px 16px;
+    align-items: center;
+}
+
+.login-header {
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-logo-zombie {
+    font-size: 64px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(184, 38, 48);
+    -unity-text-align: middle-center;
+    margin-bottom: -4px;
+    letter-spacing: 4px;
+}
+
+.game-logo-survival {
+    font-size: 26px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(230, 80, 40);
+    -unity-text-align: middle-center;
+    letter-spacing: 8px;
+}
+
+/* --- Modules 2 & 3: Input Scanner Terminals --- */
+.input-module {
+    padding: 28px 24px 34px 24px;
+    flex-direction: column;
+}
+
+.led-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.led-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    margin-right: 8px;
+}
+
+.led-orange {
+    background-color: rgb(235, 140, 40);
+}
+
+.led-label {
+    font-size: 14px;
+    color: rgba(235, 140, 40, 0.7);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    letter-spacing: 1px;
+}
+
+.input-container-inner {
+    flex-direction: column;
+    background-color: rgba(6, 8, 12, 0.5);
+    border-bottom-width: 1.5px;
+    border-bottom-color: rgba(230, 80, 40, 0.15);
+    padding: 8px 16px;
+    transition: border-bottom-color 0.12s ease-in-out;
+}
+
+.hud-module:hover .input-container-inner {
+    border-bottom-color: rgba(230, 80, 40, 0.45);
+}
+
+.field-label {
+    font-size: 16px;
+    color: rgba(158, 168, 184, 0.5);
+    letter-spacing: 1.5px;
+    margin-bottom: 2px;
+}
+
+.login-input {
+    height: 48px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: white;
+    font-size: 22px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    padding: 0;
+}
+
+.login-input .unity-text-field__input,
+.login-input .unity-base-text-field__input {
+    background-color: rgba(0, 0, 0, 0) !important;
+    border-width: 0 !important;
+    color: white !important;
+    padding: 0 !important;
+    font-size: 22px !important;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+}
+
+.module-decals {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    font-size: 13px;
+    color: rgba(158, 168, 184, 0.6);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+}
+
+/* --- Module 4: Action & Diagnostics Terminal --- */
+.action-module {
+    padding: 36px;
+    flex-direction: column;
+}
+
+.login-title {
+    font-size: 16px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgba(230, 80, 40, 0.7);
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+
+.login-status {
+    font-size: 18px;
+    color: rgba(158, 168, 184, 0.85);
+    margin-bottom: 16px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+}
+
+/* --- Split Action Button (Proceed) --- */
+.login-action-btn {
+    height: 66px;
+    margin-bottom: 16px;
+    flex-direction: row;
+    align-items: stretch;
+    transition: scale 0.08s ease-in-out;
+}
+
+.btn-main-section {
+    flex-grow: 1;
+    background-color: rgb(230, 80, 40);
+    justify-content: center;
+    align-items: center;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    transition: background-color 0.08s ease-in-out;
+}
+
+.btn-side-section {
+    width: 70px;
+    background-color: rgb(184, 38, 48);
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    transition: background-color 0.08s ease-in-out;
+}
+
+.login-action-btn:hover {
+    scale: 1.03;
+}
+
+.login-action-btn:hover .btn-main-section {
+    background-color: rgba(230, 80, 40, 0.85);
+}
+
+.login-action-btn:hover .btn-side-section {
+    background-color: rgb(210, 45, 56);
+}
+
+.login-action-btn:active {
+    scale: 0.97;
+}
+
+.btn-label {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: rgb(9, 12, 17);
+    -unity-text-align: middle-center;
+    letter-spacing: 2px;
+}
+
+.btn-arrow {
+    font-size: 18px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: white;
+    -unity-text-align: middle-center;
+}
+
+/* --- Toggle Row --- */
+.toggle-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-label {
+    font-size: 16px;
+    color: rgba(158, 168, 184, 0.55);
+}
+
+.login-toggle-btn {
+    background-color: rgba(0, 0, 0, 0);
+    margin-left: 6px;
+    translate: 0 4.5px;
+    font-size: 16px;
+    color: rgb(230, 80, 40);
+    transition: color 0.08s ease-in-out;
+}
+
+.login-toggle-btn:hover {
+    color: white;
+}
+
+/* --- Logout Button --- */
+.login-logout-btn {
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(168, 23, 33);
+    border-radius: 6px;
+    transition: background-color 0.08s ease-in-out, scale 0.08s ease-in-out;
+}
+
+.login-logout-btn:hover {
+    background-color: rgb(190, 30, 42);
+    scale: 1.03;
+}
+
+.login-logout-btn:active {
+    scale: 0.97;
+}
+
+.login-logout-btn .btn-label {
+    font-size: 20px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: white;
+    letter-spacing: 1px;
+}
+
+/* --- Module 5: Footer Status Widget --- */
+.status-module {
+    padding: 14px 20px;
+    margin-bottom: 0;
+}
+
+.login-footer {
+    flex-direction: column;
+    align-items: center;
+}
+
+.status-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.status-dot-online {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: rgb(79, 224, 138);
+    margin-right: 8px;
+}
+
+.status-text {
+    font-size: 9px;
+    color: rgb(79, 224, 138);
+    letter-spacing: 1.5px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+}
+
+.copyright-text {
+    font-size: 8px;
+    color: rgba(158, 168, 184, 0.22);
+    letter-spacing: 0.5px;
+}
+
+/* --- Slide Out Right & Visibility Classes --- */
+.slide-out-right {
+    translate: 800px 0px;
+    opacity: 0;
+}
+
+.login-only {
+    /* visible by default during login */
+}
+
+.menu-only {
+    /* hidden off-screen to the left by default in Editor/Start */
+    display: none;
+}
+
+/* --- Main Menu Plaque Button Text --- */
+.menu-btn-main-text {
+    font-size: 26px;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    -unity-text-align: middle-center;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+.button-trigger {
+    transition: background-color 0.15s ease-out;
+}
+
+.button-trigger:hover {
+    background-color: rgba(230, 80, 40, 0.15);
+}
+
+/* --- Bottom-Right Corner Control Group --- */
+.corner-control-group {
+    position: absolute;
+    right: 36px;
+    bottom: 36px;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* --- Circular Tactical HUD Buttons --- */
+.hud-circle-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background-color: rgba(36, 22, 22, 0.94);
+    border-width: 1.5px;
+    justify-content: center;
+    align-items: center;
+    margin-left: 16px;
+    opacity: 0;
+    transition: opacity 1.5s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, scale 0.1s ease-out;
+}
+
+.hud-circle-btn.slide-in {
+    opacity: 1;
+}
+
+.hud-circle-btn:hover {
+    scale: 1.08;
+}
+
+.hud-circle-btn:active {
+    scale: 0.95;
+}
+
+/* --- Quit Button Custom Colors (Red Warning) --- */
+.hud-circle-btn.quit-btn {
+    border-color: rgba(230, 80, 40, 0.45);
+}
+
+.hud-circle-btn.quit-btn:hover {
+    background-color: rgba(230, 80, 40, 0.22);
+    border-color: rgba(230, 80, 40, 0.95);
+}
+
+.hud-circle-btn.quit-btn .btn-icon {
+    -unity-background-image-tint-color: rgb(230, 80, 40);
+}
+
+/* --- Logout Button Custom Colors (Gold Warning) --- */
+.hud-circle-btn.logout-btn {
+    border-color: rgba(235, 140, 40, 0.45);
+}
+
+.hud-circle-btn.logout-btn:hover {
+    background-color: rgba(235, 140, 40, 0.22);
+    border-color: rgba(235, 140, 40, 0.95);
+}
+
+.hud-circle-btn.logout-btn .btn-icon {
+    -unity-background-image-tint-color: rgb(235, 140, 40);
+}
+
+/* --- Inner Icon --- */
+.hud-circle-btn .btn-icon {
+    width: 24px;
+    height: 24px;
+    -unity-background-scale-mode: scale-to-fit;
+    transition: -unity-background-image-tint-color 0.15s ease-out;
+}
+
+.hud-circle-btn.logout-btn .btn-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_quit.svg");
+}
+
+.hud-circle-btn.quit-btn .btn-icon {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_exit.svg");
+}
+

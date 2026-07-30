@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: DoctorJournal_02
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 2
+  title: "Nh\u1EADt k\xFD b\xE1c s\u0129 #2"
+  category: 0
+  content: "T\u1EC7 th\u1EADt, thu\u1ED1c kh\xF4ng nh\u01B0 k\xEC v\u1ECDng r\u1ED3i
+    !!! H\u1EC5 ai ti\u1EBFp x\xFAc v\u1EDBi m\u1EA5y \u0111\u1EE9a th\u1EED thu\u1ED1c
+    \u0111\u1EC1u b\u1ECB c\xE0o v\xE0 bi\u1EBFn th\xE0nh qu\xE1i v\u1EADt. C\xF2n
+    th\u1EB1ng th\u1EED \u0111\u1EA7u ti\xEAn sao n\xF3 c\xE0ng ng\xE0y c\xE0ng to
+    \u1EA5y nh\u1EC9 ? Trong th\xE0nh ph\u1ED1 xu\u1EA5t hi\u1EC7n th\xEAm nhi\u1EC1u
+    ca nhi\u1EC5m b\u1EC7nh k\xEC l\u1EA1, gi\u1ED1ng y chang m\u1EA5y \u0111\u1EE9a
+    th\u1EED thu\u1ED1c c\u1EE7a m\xECnh. Ch\u1EAFc m\xECnh n\xEAn r\u1EDDi kh\u1ECFi
+    th\xE0nh ph\u1ED1 n\xE0y s\u1EDBm. Sau khi ho\xE0n th\xE0nh ph\u01B0\u01A1ng
+    thu\u1ED1c b\u1EA5t t\u1EED n\xE0y, m\xECnh s\u1EBD gi\xE0u to. B\xE1c s\u0129
+    Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

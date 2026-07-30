@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: SoldierJournal_02
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 5
+  title: "Nh\u1EADt k\xFD ng\u01B0\u1EDDi l\xEDnh #2"
+  category: 1
+  content: "M\xECnh nghe \u0111\u01B0\u1EE3c t\u1EEB \u0111\u1ED9i tr\u01B0\u1EDFng
+    r\u1EB1ng d\u1ECBch b\u1EC7nh xu\u1EA5t ph\xE1t t\u1EEB b\u1EC7nh vi\u1EC7n,
+    kh\xF4ng bi\u1EBFt c\xF3 ph\u1EA3i hay kh\xF4ng m\xE0 c\xF4ng nh\u1EADn xung
+    quanh khu v\u1EF1c \u0111\xF3 nhi\u1EC1u zombie th\u1EADt. H\xECnh nh\u01B0 trong
+    b\u1EC7nh vi\u1EC7n c\xF2n b\u1EC7nh \xE1n, \u0111\u1EC3 khi n\xE0o r\u1EA3nh
+    t\xECm xem c\xF2n g\xEC kh\xF4ng."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

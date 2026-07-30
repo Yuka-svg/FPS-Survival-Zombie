@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: SoldierJournal_04
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 49
+  title: "Nh\u1EADt k\xFD ng\u01B0\u1EDDi l\xEDnh #4 \u2014 Kho v\u0169 kh\xED"
+  category: 1
+  content: "Tu\u1EA7n tra khu v\u1EF1c ph\xEDa \u0111\xF4ng, t\xF4i ph\xE1t hi\u1EC7n
+    m\u1ED9t nh\xE0 kho b\u1ECF hoang. B\xEAn trong c\xF2n nguy\xEAn th\xF9ng \u0111\u1EA1n
+    v\xE0 v\xE0i kh\u1EA9u s\xFAng \u2014 qu\xE2n \u0111\u1ED9i qu\xEAn kh\xF4ng
+    thu h\u1ED3i khi r\xFAt. T\xF4i \u0111\xE3 ki\u1EC3m k\xEA: 2 kh\u1EA9u rifle,
+    1 kh\u1EA9u shotgun, kho\u1EA3ng 200 vi\xEAn \u0111\u1EA1n. T\xF4i \u0111\u1EC3
+    nguy\xEAn t\u1EA1i ch\u1ED7, kh\xF4ng mang theo v\xEC balan \u0111\xE3 \u0111\u1EA7y.
+    N\u1EBFu ai c\xF2n s\u1ED1ng c\u1EA7n v\u0169 kh\xED, \u0111\u1EBFn nh\xE0 kho
+    ph\xEDa \u0111\xF4ng khu l\u1EC1u. C\u1EEDa v\u1EABn m\u1EDF. T\xF4i \u0111\xE1nh
+    d\u1EA5u b\u1EB1ng v\u1EA1ch \u0111\u1ECF tr\xEAn t\u01B0\u1EDDng. Nh\u1EDB c\u1EA9n
+    th\u1EADn \u2014 b\xEAn trong c\xF3 v\xE0i con zombie, t\xF4i \u0111\xE3 x\u1EED
+    l\xFD h\u1EBFt nh\u01B0ng c\xF3 th\u1EC3 c\xF3 th\xEAm b\xF2 v\xE0o. B\xE1o c\xE1o:
+    H\u1EA1 s\u0129 Miller."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

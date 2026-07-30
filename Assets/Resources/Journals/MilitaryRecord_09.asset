@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_09
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 43
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #9 \u2014 V\u1EADn chuy\u1EC3n XC-1"
+  category: 5
+  content: "M\u1EACT \u2014 L\u1EC6NH V\u1EACN CHUY\u1EC2N. Ng\xE0y 18/3. \u0110\u1ED9i
+    h\u1EADu c\u1EA7n nh\u1EADn l\u1EC7nh v\u1EADn chuy\u1EC3n 12 l\u1ECD thu\u1ED1c
+    XC-1 t\u1EEB b\u1EC7nh vi\u1EC7n trung t\xE2m \u0111\u1EBFn c\xF4ng tr\u01B0\u1EDDng
+    ph\xEDa b\u1EAFc \u0111\u1EC3 BS. Edward ti\u1EBFp t\u1EE5c nghi\xEAn c\u1EE9u.
+    L\xFD do: b\u1EC7nh vi\u1EC7n kh\xF4ng c\xF2n an to\xE0n, khu v\u1EF1c c\xF4ng
+    tr\u01B0\u1EDDng \u0111\u01B0\u1EE3c qu\xE2n \u0111\u1ED9i ki\u1EC3m so\xE1t.
+    8/12 l\u1ECD \u0111\xE3 giao th\xE0nh c\xF4ng. 4 l\u1ECD m\u1EA5t t\xEDch trong
+    qu\xE1 tr\xECnh di chuy\u1EC3n \u2014 \u0111\u1ED9i v\u1EADn chuy\u1EC3n b\u1ECB
+    t\u1EA5n c\xF4ng gi\u1EEFa \u0111\u01B0\u1EDDng. To\xE0n b\u1ED9 \u0111\u1ED9i
+    h\u1ED9 t\u1ED1ng 6 ng\u01B0\u1EDDi t\u1EED vong. Thu\u1ED1c XC-1 c\xF3 nguy
+    c\u01A1 r\u01A1i v\xE0o tay d\xE2n th\u01B0\u1EDDng. C\u1EA7n thu h\u1ED3i g\u1EA5p.
+    K\xFD: Trung \xFAy Park."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

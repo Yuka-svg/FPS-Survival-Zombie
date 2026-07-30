@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: ExperimentReport_02
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 14
+  title: "B\xE1o c\xE1o th\xED nghi\u1EC7m #2"
+  category: 4
+  content: "\u0110\xE3 c\xF3 ng\u01B0\u1EDDi t\u1EF1 nguy\u1EC7n th\u1EED thu\u1ED1c,
+    m\u1EE9c gi\xE1 \u0111\u01B0a ra l\xE0 30,000$. M\u1EE5c \u0111\xEDch l\u1EA7n
+    th\u1EED nghi\u1EC7m n\xE0y l\xE0 ki\u1EC3m tra m\u1EE9c \u0111\u1ED9 t\u01B0\u01A1ng
+    th\xEDch c\u1EE7a thu\u1ED1c l\xEAn con ng\u01B0\u1EDDi. \u0110\u1ED1i t\u01B0\u1EE3ng
+    th\u1EED nghi\u1EC7m sau v\xE0i ng\xE0y th\u1EED nghi\u1EC7m c\xF3 tri\u1EC7u
+    ch\u1EE9ng suy gi\u1EA3m \xFD th\u1EE9c, c\u01A1 b\u1EAFp b\u1EAFt \u0111\u1EA7u
+    ph\xE1t tri\u1EC3n m\u1EA5t ki\u1EC3m so\xE1t, n\xF3i n\u0103ng l\u1EAFp b\u1EAFp."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

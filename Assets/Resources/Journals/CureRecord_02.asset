@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: CureRecord_02
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 38
+  title: "Ghi ch\xE9p thu\u1ED1c gi\u1EA3i #2 \u2014 B\u1EC7nh nh\xE2n 001"
+  category: 6
+  content: "Ghi ch\xE9p cu\u1ED1i. B\u1EC7nh nh\xE2n 001 \u2014 ch\xEDnh l\xE0 ng\u01B0\u1EDDi
+    anh trai c\u1EE7a m\u1ED9t thanh ni\xEAn \u0111ang t\xECm anh trong th\xE0nh
+    ph\u1ED1. Anh ta t\xECnh nguy\u1EC7n th\u1EED thu\u1ED1c gi\u1EA3i prototype.
+    L\u1EA7n th\u1EED \u0111\u1EA7u: s\u1ED1t cao, co gi\u1EADt, nh\u01B0ng kh\xF4ng
+    bi\u1EBFn. L\u1EA7n th\u1EED hai: m\u1EAFt tr\u1EDF l\u1EA1i b\xECnh th\u01B0\u1EDDng,
+    nh\u1EADn th\u1EE9c r\xF5. Nh\u01B0ng r\u1ED3i thu\u1ED1c b\u1ECB m\u1EA5t \u2014
+    b\u1ECB qu\xE2n \u0111\u1ED9i t\u1ECBch thu khi r\xFAt lui. Anh ta v\u1EABn c\xF2n
+    s\u1ED1ng, \u0111ang \u1EA9n \u1EDF \u0111\xE2u \u0111\xF3 trong t\xF2a cao t\u1EA7ng.
+    N\u1EBFu em anh \u0111\u1ECDc \u0111\u01B0\u1EE3c: anh v\u1EABn c\xF2n s\u1ED1ng.
+    T\xECm anh \u1EDF t\u1EA7ng cao nh\u1EA5t."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

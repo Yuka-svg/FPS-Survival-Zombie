@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: Quest_03_ClearExterior
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 3
+  chapter: 2
+  title: "D\u1ECDn d\u1EB9p"
+  description: "L\xE0m quen v\u1EDBi c\u01A1 ch\u1EBF Wave Zombie. Ti\xEAu di\u1EC7t
+    to\xE0n b\u1ED9 zombie xu\u1EA5t hi\u1EC7n b\xEAn ngo\xE0i b\u1EC7nh vi\u1EC7n
+    tr\u01B0\u1EDBc khi \u0111\u01B0\u1EE3c b\u01B0\u1EDBc v\xE0o b\xEAn trong."
+  objective: "Ti\xEAu di\u1EC7t to\xE0n b\u1ED9 zombie b\xEAn ngo\xE0i b\u1EC7nh
+    vi\u1EC7n"
+  expReward: 150
+  journalReward: {fileID: 11400000, guid: e43d709c24e5411289b7bef418c015f3, type: 2}
+  completionNotification: "Khu v\u1EF1c b\xEAn ngo\xE0i \u0111\xE3 an to\xE0n! Nh\u1EADn
+    B\xE1o c\xE1o th\xED nghi\u1EC7m #1."

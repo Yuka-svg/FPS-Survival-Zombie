@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: ExperimentReport_05
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 42
+  title: "B\xE1o c\xE1o th\xED nghi\u1EC7m #5 \u2014 Ph\xE2n t\xEDch m\u1EABu m\xE1u"
+  category: 4
+  content: "M\u1EABu m\xE1u b\u1EC7nh nh\xE2n zero (Ethan M.) \u2014 ng\xE0y th\u1EE9
+    5 sau ti\xEAm XC-1. K\u1EBFt qu\u1EA3 x\xE9t nghi\u1EC7m: T\u1EBF b\xE0o c\u01A1
+    b\u1EAFp t\u0103ng tr\u01B0\u1EDFng 300% so v\u1EDBi ban \u0111\u1EA7u. Hormone
+    t\u0103ng tr\u01B0\u1EDFng cortisol t\u0103ng g\u1EA5p 5 l\u1EA7n. Tuy nhi\xEAn,
+    ho\u1EA1t \u0111\u1ED9ng \u0111i\u1EC7n n\xE3o gi\u1EA3m 70% \u2014 v\xF9ng ti\u1EC1n
+    \u0111\u1EA7u\u1ED1i v\xE0 hippocampus g\u1EA7n nh\u01B0 kh\xF4ng c\xF2n ph\u1EA3n
+    x\u1EA1. M\u1EABu m\xE1u cho th\u1EA5y virus m\u1EDBi h\xECnh th\xE0nh trong
+    huy\u1EBFt t\u01B0\u01A1ng, c\xF3 kh\u1EA3 n\u0103ng l\xE2y qua ti\u1EBFp x\xFAc
+    m\xE1u. K\u1EBFt lu\u1EADn: XC-1 \u0111\xE3 bi\u1EBFn \u0111\u1ED5i c\u1EA5u
+    tr\xFAc sinh h\u1ECDc c\u1EE7a \u0111\u1ED1i t\u01B0\u1EE3ng. Kh\xF4ng th\u1EC3
+    \u0111\u1EA3o ng\u01B0\u1EE3c. Khuy\u1EBFn ngh\u1ECB: ti\xEAu h\u1EE7y m\u1EABu.
+    K\xFD: BS. Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

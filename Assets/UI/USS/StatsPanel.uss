@@ -1,0 +1,45 @@
+@import url("Shared.uss");
+
+/* Specific dimensions for the statistics card */
+.stats-card {
+    width: 620px;
+    height: 800px;
+}
+
+.stats-title {
+    position: absolute;
+    left: var(--space-xl, 20px);
+    right: var(--space-xl, 20px);
+    top: var(--space-xxl, 24px);
+    height: 56px;
+    font-size: var(--fs-xxl, 36px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-align: middle-center;
+}
+
+.stats-divider {
+    position: absolute;
+    left: var(--space-xxl, 24px);
+    right: var(--space-xxl, 24px);
+    top: 86px;
+    height: 2px;
+    background-color: rgba(217, 199, 115, 0.2);
+}
+
+.stats-grid {
+    position: absolute;
+    left: var(--space-xxl, 24px);
+    right: var(--space-xxl, 24px);
+    top: 100px;
+    bottom: var(--space-xl, 20px);
+    flex-direction: column;
+}
+
+/* Row-level divider customization to match notebook lines styling */
+.stats-row {
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(217, 199, 115, 0.12); /* Faint gold separator */
+    padding-bottom: var(--space-xs, 4px);
+    height: 36px;
+}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_104_AutoRepair
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 104
+  chapter: 3
+  title: "Tr\u1EA1m x\u0103ng ch\u1EBFt"
+  description: "Tr\u1EA1m s\u1EEDa xe b\xEAn c\u1EA1nh khu d\xE2n c\u01B0. Ch\u1EE7
+    n\xF3 \u2014 Jack \u2014 t\u1EEBng n\xF3i v\u1EC1 vi\u1EC7c s\u1EEDa m\u1ED9t
+    chi\u1EBFc xe t\u1EA3i \u0111\u1EC3 tho\xE1t kh\u1ECFi th\xE0nh ph\u1ED1. C\xF3
+    l\u1EBD cu\u1ED1n nh\u1EADt k\xFD c\u1EE7a \xF4ng ta v\u1EABn c\xF2n..."
+  objective: "Kh\xE1m ph\xE1 tr\u1EA1m s\u1EEDa xe, ti\xEAu di\u1EC7t zombie, t\xECm
+    nh\u1EADt k\xFD c\u1EE7a th\u1EE3 xe Jack"
+  expReward: 200
+  journalReward: {fileID: 11400000, guid: 8a158710c97634d459942e8e9c58c1d0, type: 2}
+  completionNotification: 

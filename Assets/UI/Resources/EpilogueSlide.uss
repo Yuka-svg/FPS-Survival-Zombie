@@ -1,0 +1,61 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+#EpilogueRoot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity var(--transition-medium, 1.5s) ease-out;
+}
+
+#Background {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgb(8, 18, 32);
+}
+
+#Content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+}
+
+.epilogue-title {
+    font-size: 64px;
+    -unity-font-style: bold;
+    color: var(--color-text-gold, #d4af37);
+    -unity-text-align: middle-center;
+    margin-bottom: 10px;
+    letter-spacing: 12px;
+}
+
+.epilogue-divider {
+    width: 400px;
+    height: 3px;
+    background-color: var(--color-text-gold, #d4af37);
+    margin-bottom: 40px;
+    opacity: 0.6;
+}
+
+#Illustration {
+    width: 720px;
+    height: 420px;
+    margin-bottom: 30px;
+}
+
+#BodyText {
+    font-size: var(--fs-xxl, 36px);
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(200, 210, 220);
+}

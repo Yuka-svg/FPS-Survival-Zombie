@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: Quest_13_RadioLastOrder
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 13
+  chapter: 4
+  title: "B\u1EA3n ghi cu\u1ED1i c\xF9ng"
+  description: "B\u1EA1n t\xECm th\u1EA5y m\u1ED9t \u0111\xE0i radio qu\xE2n \u0111\u1ED9i
+    v\u1EABn c\xF2n ho\u1EA1t \u0111\u1ED9ng b\xEAn trong c\u0103n nh\xE0 ch\xE1y.
+    C\xF3 m\u1ED9t b\u1EA3n ghi cu\u1ED1i c\xF9ng c\u1EE7a \u0110\u1EA1i t\xE1 Morrison.
+    B\u1EA3o v\u1EC7 \u0111\xE0i radio 60 gi\xE2y \u0111\u1EC3 nghe h\u1EBFt b\u1EA3n
+    ghi trong khi zombie k\xE9o \u0111\u1EBFn."
+  objective: "B\u1EA3o v\u1EC7 \u0111\xE0i radio 60 gi\xE2y \u0111\u1EC3 nghe b\u1EA3n
+    ghi cu\u1ED1i c\xF9ng"
+  expReward: 250
+  journalReward: {fileID: 11400000, guid: ef05cac5a0d724e498c528a30b78f0e0, type: 2}
+  completionNotification: "B\u1EA3n ghi \u0111\xE3 ph\xE1t xong! Nh\u1EADn B\xE1o
+    c\xE1o qu\xE2n \u0111\u1ED9i #6 \u2014 L\u1EC7nh cu\u1ED1i c\xF9ng c\u1EE7a \u0110\u1EA1i
+    t\xE1 Morrison. B\u1ED9 k\xEDch n\u1ED5 \u1EDF t\u1EA7ng tr\xEAn c\xF9ng t\xF2a
+    cao t\u1EA7ng g\u1EA7n c\u1EA7u."

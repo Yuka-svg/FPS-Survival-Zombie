@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: Quest_09_CollectJournals
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 9
+  chapter: 4
+  title: "Thu th\u1EADp nh\u1EADt k\xFD"
+  description: "T\xECm v\xE0 thu th\u1EADp \u0111\u1EE7 6 cu\u1ED1n nh\u1EADt k\xFD/h\u1ED3
+    s\u01A1 trong khu d\xE2n c\u01B0: nh\u1EADt k\xFD anh trai, b\xE1c s\u0129, ng\u01B0\u1EDDi
+    l\xEDnh v\xE0 3 nh\u1EADt k\xFD h\xE0ng x\xF3m. Nh\u1EEFng manh m\u1ED1i n\xE0y
+    s\u1EBD ch\u1EC9 \u0111\u01B0\u1EDDng \u0111\u1EBFn chung c\u01B0 \u2014 n\u01A1i
+    anh trai \u0111ang \u1EA9n n\xE1u."
+  objective: "Thu th\u1EADp \u0111\u1EE7 6 nh\u1EADt k\xFD/h\u1ED3 s\u01A1 trong
+    khu d\xE2n c\u01B0"
+  expReward: 300
+  journalReward: {fileID: 11400000, guid: fb6ac7b16fbc4eafb420365bf4e81fe3, type: 2}
+  completionNotification: "\u0110\xE3 thu th\u1EADp \u0111\u1EA7y \u0111\u1EE7 nh\u1EADt
+    k\xFD! Nh\u1EADn Nh\u1EADt k\xFD anh trai #2. M\u1EDF kh\xF3a chung c\u01B0 \u2014
+    n\u01A1i cu\u1ED1i c\xF9ng."

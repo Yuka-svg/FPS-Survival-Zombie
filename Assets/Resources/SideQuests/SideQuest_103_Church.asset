@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_103_Church
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 103
+  chapter: 4
+  title: "Nh\xE0 th\u1EDD b\u1ECB phong to\u1EA3"
+  description: "M\u1ED9t nh\xE0 th\u1EDD c\u0169 gi\u1EEFa \u0111\u01B0\u1EDDng t\u1EEB
+    c\xF4ng tr\u01B0\u1EDDng sang khu d\xE2n c\u01B0. C\u1EEDa c\xF2n nguy\xEAn,
+    b\xEAn trong c\xF3 th\u1EC3 c\xF2n ng\u01B0\u1EDDi..."
+  objective: "V\xE0o nh\xE0 th\u1EDD, thu th\u1EADp 2 nh\u1EADt k\xFD c\u1EE7a nh\u1EEFng
+    ng\u01B0\u1EDDi tr\xFA \u1EA9n cu\u1ED1i c\xF9ng"
+  expReward: 200
+  journalReward: {fileID: 11400000, guid: 5d5e3ad6677aee34b91638befbacbb6f, type: 2}
+  completionNotification: 

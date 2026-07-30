@@ -1,0 +1,40 @@
+/* ===== Dash.uss ===== */
+@import url("Shared.uss");
+
+#DashWidget {
+    position: relative;
+    left: auto;
+    translate: 0 0;
+    bottom: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    height: 24px;
+}
+
+.dash-pip {
+    width: 22px;
+    height: 22px;
+    margin-left: 5px;
+    background-image: resource("Icons/icon_dash");
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0.25);
+    -unity-background-scale-mode: scale-to-fit;
+    position: relative;
+    flex-shrink: 0;
+    transition-property: scale, -unity-background-image-tint-color;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+}
+
+.dash-pip--on {
+    -unity-background-image-tint-color: rgb(0, 220, 180);
+    scale: 1.1;
+}
+
+.dash-pip__regen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}

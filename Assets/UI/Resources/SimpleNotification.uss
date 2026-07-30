@@ -1,0 +1,34 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* SimpleNotification.uss — Runtime-loaded for notification popup (Phase B) */
+.notification-root {
+    position: absolute;
+    left: 50%;
+    bottom: 60px;
+    translate: -50%;
+    width: var(--notification-width, 800px);
+    height: var(--notification-height, 60px);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal, 0.3s) ease-out;
+}
+
+.notification-scrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: var(--color-surface-bottom);
+}
+
+.notification-label {
+    font-size: var(--fs-xl, 28px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary);
+    -unity-text-align: middle-center;
+    width: 100%;
+    height: 100%;
+}

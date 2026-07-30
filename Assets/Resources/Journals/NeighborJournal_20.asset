@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: NeighborJournal_20
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 38
+  title: "Nh\u1EADt k\xFD h\xE0ng x\xF3m #20 \u2014 \u0110\xEAm cu\u1ED1i c\xF9ng"
+  category: 3
+  content: "T\xF4i l\xE0m vi\u1EC7c \u1EDF Motel n\xE0y 6 n\u0103m. \u0110\xEAm cu\u1ED1i
+    c\xF9ng, ph\xF2ng 12 g\u1ECDi l\xEAn \u2014 kh\xE1ch b\u1EA3o th\u1EA5y h\xE0ng
+    x\xF3m ph\xF2ng 11 'kh\xF4ng \u1ED5n'. T\xF4i l\xEAn ki\u1EC3m tra, anh ta \u0111ang
+    g\u1EA7m v\xE0 lao v\xE0o t\xF4i. T\xF4i ch\u1EA1y, kh\xF3a c\u1EEDa v\u0103n
+    ph\xF2ng. Su\u1ED1t \u0111\xEAm nghe ti\u1EBFng \u0111\u1EADp c\u1EEDa. Bu\u1ED5i
+    s\xE1ng, im \u1EAFng. T\xF4i m\u1EDF c\u1EEDa \u2014 h\xE0nh lang \u0111\u1EA7y
+    m\xE1u, kh\xF4ng ai c\xF2n. T\xF4i l\u1EA5y ch\xECa kh\xF3a xe kh\xE1ch, b\u1ECF
+    \u0111i. Ch\xFAc ai \u0111\u1ECDc \u0111\u01B0\u1EE3c may m\u1EAFn."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

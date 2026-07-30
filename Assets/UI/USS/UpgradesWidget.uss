@@ -1,0 +1,16 @@
+@import url("Shared.uss");
+
+#UpgradesWidget {
+    position: absolute;
+    right: var(--space-xxl, 24px);
+    top: 170px;
+    width: 320px;
+    height: 28px;
+    color: var(--color-text-gold, rgb(217, 199, 115));
+    font-size: var(--fs-l, 22px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    -unity-text-align: middle-right;
+    white-space: nowrap;
+    opacity: 0;
+    display: flex;
+}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: NeighborJournal_21
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 41
+  title: "Nh\u1EADt k\xFD h\xE0ng x\xF3m #21 \u2014 B\u1EE9c th\u01B0 cu\u1ED1i"
+  category: 3
+  content: "T\xF4i vi\u1EBFt thay cho nhi\u1EC1u ng\u01B0\u1EDDi m\u1EB9 trong chung
+    c\u01B0 n\xE0y. B\xE0 Hoa t\u1EA7ng 8 \u2014 g\u1EEDi con g\xE1i \u1EDF M\u1EF9:
+    'Con \u01A1i, m\u1EB9 y\xEAu con, \u0111\u1EEBng v\u1EC1, th\xE0nh ph\u1ED1 kh\xF4ng
+    c\xF2n an to\xE0n.' B\xE0 Lan t\u1EA7ng 12 \u2014 g\u1EEDi con trai \u1EDF \u0110\xE0
+    N\u1EB5ng: 'M\u1EB9 kh\xF4ng ti\u1EBFc g\xEC, ch\u1EC9 ti\u1EBFc kh\xF4ng \u0111\u01B0\u1EE3c
+    \xF4m con l\u1EA7n cu\u1ED1i.' B\xE0 Nguy\u1EC7t t\u1EA7ng 15 \u2014 g\u1EEDi
+    ch\u1ED3ng: 'Anh h\xE3y s\u1ED1ng v\xEC con.' Ch\xFAng t\xF4i vi\u1EBFt v\xEC
+    hy v\u1ECDng ai \u0111\u1ECDc \u0111\u01B0\u1EE3c s\u1EBD mang tin v\u1EC1 cho
+    con c\xE1i ch\xFAng t\xF4i. Xin h\xE3y n\xF3i v\u1EDBi ch\xFAng r\u1EB1ng m\u1EB9
+    ch\xFAng \u0111\xE3 ngh\u0129 v\u1EC1 ch\xFAng \u0111\u1EBFn gi\xE2y cu\u1ED1i
+    c\xF9ng."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

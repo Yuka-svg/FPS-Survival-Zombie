@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bbd3c30e8fc9a4c87fc19617c74484, type: 3}
+  m_Name: SideQuest_107_HighRiseBase
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 107
+  chapter: 5
+  title: "C\u0103n c\u1EE9 qu\xE2n \u0111\u1ED9i cu\u1ED1i c\xF9ng"
+  description: "To\xE0 nh\xE0 cao t\u1EA7ng b\xEAn c\u1EA1nh c\u1EA7u \u2014 qu\xE2n
+    \u0111\u1ED9i t\u1EEBng d\xF9ng l\xE0m c\u0103n c\u1EE9 t\u1EA1m. L\u1EC7nh r\xFAt
+    lui v\xE0 nh\u1EADt k\xFD k\xEDp c\xF4ng binh c\xF3 th\u1EC3 v\u1EABn c\xF2n..."
+  objective: "V\xE0o to\xE0 nh\xE0 cao t\u1EA7ng, ti\xEAu di\u1EC7t zombie, thu th\u1EADp
+    2 h\u1ED3 s\u01A1 qu\xE2n \u0111\u1ED9i cu\u1ED1i c\xF9ng"
+  expReward: 300
+  journalReward: {fileID: 11400000, guid: 55140bb79076e804ca00283c260ffb75, type: 2}
+  completionNotification: 

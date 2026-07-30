@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: ExperimentReport_03
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 15
+  title: "B\xE1o c\xE1o th\xED nghi\u1EC7m #3"
+  category: 4
+  content: "\u0110\u1ED1i t\u01B0\u1EE3ng th\u1EED nghi\u1EC7m \u0111\xE3 m\u1EA5t
+    kh\u1EA3 n\u0103ng giao ti\u1EBFp, \xFD th\u1EE9c m\u01A1 h\u1ED3, thu\u1ED1c
+    th\u1EED kh\xF4ng c\xF2n t\xE1c \u0111\u1ED9ng \u0111\u1EBFn \u0111\u1ED1i t\u01B0\u1EE3ng
+    th\u1EED nghi\u1EC7m \u0111\u01B0\u1EE3c n\u1EEFa. Th\xED nghi\u1EC7m \u0111\u01B0\u1EE3c
+    ghi nh\u1EADn th\u1EA5t b\u1EA1i v\xEC khi\u1EBFn ng\u01B0\u1EDDi d\xF9ng m\u1EA5t
+    nh\u1EADn th\u1EE9c, g\xE2y ph\xE1t tri\u1EC3n c\u01A1 b\u1EAFp m\u1EA5t ki\u1EC3m
+    so\xE1t, g\xE2y h\u1EA1i cho con ng\u01B0\u1EDDi. Ch\xFAng ta c\xF3 ph\u1EA3i
+    \u0111ang t\u1EA1o ra m\u1ED9t th\u1EE9 thu\u1ED1c c\xF3 th\u1EC3 h\u1EE7y di\u1EC7t
+    n\u1EC1n v\u0103n minh lo\xE0i ng\u01B0\u1EDDi kh\xF4ng ?"
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

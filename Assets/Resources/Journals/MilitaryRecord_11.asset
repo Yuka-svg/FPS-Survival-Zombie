@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_11
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 47
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #11 \u2014 Thi\u1EBFt b\u1ECB k\xEDch
+    n\u1ED5 th\u1EA5t l\u1EA1c"
+  category: 5
+  content: "B\xC1O C\xC1O THI\u1EBET B\u1ECA. Ng\xE0y 20/3. Sau khi r\xFAt qu\xE2n,
+    ki\u1EC3m k\xEA thi\u1EBFt b\u1ECB ph\xE1t hi\u1EC7n thi\u1EBFu: 1 b\u1ED9 k\xEDch
+    n\u1ED5 t\u1EEB xa (lo\u1EA1i M-32), 2 kh\u1EA9u bazooka, 4 th\xF9ng \u0111\u1EA1n
+    50mm. V\u1ECB tr\xED th\u1EA5t l\u1EA1c cu\u1ED1i c\xF9ng: khu chung c\u01B0
+    ph\xEDa b\u1EAFc, t\xF2a nh\xE0 cao t\u1EA7ng g\u1EA7n c\u1EA7u v\u01B0\u1EE3t.
+    Kh\u1EA3 n\u0103ng cao: d\xE2n th\u01B0\u1EDDng \u0111\xE3 nh\u1EB7t \u0111\u01B0\u1EE3c
+    v\u0169 kh\xED n\xE0y khi qu\xE2n \u0111\u1ED9i r\xFAt lui trong h\u1ED7n lo\u1EA1n.
+    C\u1EA3nh b\xE1o: b\u1ED9 k\xEDch n\u1ED5 M-32 c\xF3 th\u1EC3 k\xEDch ho\u1EA1t
+    charges \u0111\xE3 g\u1EAFn \u1EDF c\u1EA7u. N\u1EBFu r\u01A1i v\xE0o tay sai
+    ng\u01B0\u1EDDi, h\u1EADu qu\u1EA3 kh\xF4n l\u01B0\u1EDDng. Y\xEAu c\u1EA7u thu
+    h\u1ED3i g\u1EA5p. K\xFD: Trung \xFAy Park."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

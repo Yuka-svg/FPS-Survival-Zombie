@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: DoctorJournal_04
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 41
+  title: "Nh\u1EADt k\xFD b\xE1c s\u0129 #4 \u2014 Ng\xE0y \u0111\u1EA7u th\u1EED
+    nghi\u1EC7m"
+  category: 0
+  content: "H\xF4m nay l\xE0 ng\xE0y tr\u1ECDng \u0111\u1EA1i. \u0110\u1ED1i t\u01B0\u1EE3ng
+    th\u1EED nghi\u1EC7m \u2014 Ethan, 28 tu\u1ED5i, kh\u1ECFe m\u1EA1nh, t\u1EF1
+    nguy\u1EC7n \u2014 \u0111\xE3 nh\u1EADn li\u1EC1u XC-1 \u0111\u1EA7u ti\xEAn
+    l\xFAc 9 gi\u1EDD s\xE1ng. Sau 2 gi\u1EDD, Ethan cho bi\u1EBFt c\u1EA3m th\u1EA5y
+    c\u01A1 b\u1EAFp n\xF3ng v\xE0 m\u1EA1nh h\u01A1n. Nh\u1ECBp tim t\u0103ng nh\u1EB9
+    nh\u01B0ng trong ng\u01B0\u1EE1ng an to\xE0n. T\xF4i \u0111\xE3 ghi nh\u1EADn
+    m\u1ECDi ch\u1EC9 s\u1ED1. N\u1EBFu th\xED nghi\u1EC7m th\xE0nh c\xF4ng, \u0111\xE2y
+    s\u1EBD l\xE0 b\u01B0\u1EDBc \u0111\u1ED9t ph\xE1 c\u1EE7a y h\u1ECDc. Ethan
+    n\xF3i anh \u1EA5y c\u1EA7n ti\u1EC1n cho em trai \u0111i h\u1ECDc \u2014 t\xF4i
+    tr\u1EA3 30,000$. M\u1ED9t th\u1ECFa thu\u1EADn c\xF4ng b\u1EB1ng. B\xE1c s\u0129
+    Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

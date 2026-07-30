@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: ExperimentReport_00
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 40
+  title: "B\xE1o c\xE1o th\xED nghi\u1EC7m #0 \u2014 Giai \u0111o\u1EA1n ti\u1EC1n
+    l\xE2m s\xE0ng"
+  category: 4
+  content: "T\xEAn thu\u1ED1c: XC-1 (b\u1EA3n th\u1EED nghi\u1EC7m giai \u0111o\u1EA1n
+    0). C\xF4ng d\u1EE5ng d\u1EF1 ki\u1EBFn: K\xEDch th\xEDch t\u0103ng tr\u01B0\u1EDFng
+    c\u01A1 b\u1EAFp v\xE0 ph\u1EA3n x\u1EA1 th\u1EA7n kinh. B\xE1o c\xE1o ti\u1EC1n
+    l\xE2m s\xE0ng: \u0110\xE3 th\u1EED nghi\u1EC7m tr\xEAn 12 con chu\u1ED9t th\xED
+    tr\u1EAFng. K\u1EBFt qu\u1EA3: 8/12 con t\u0103ng c\u01A1 b\u1EAFp 40% sau 48
+    gi\u1EDD. 2/12 con c\xF3 d\u1EA5u hi\u1EC7u k\xEDch \u0111\u1ED9ng th\u1EA7n
+    kinh. 2/12 con t\u1EED vong do suy \u0111a t\u1EA1ng. Khuy\u1EBFn ngh\u1ECB:
+    Chuy\u1EC3n sang giai \u0111o\u1EA1n th\u1EED nghi\u1EC7m tr\xEAn ng\u01B0\u1EDDi
+    v\u1EDBi li\u1EC1u gi\u1EA3m 50%. Ghi ch\xFA: C\u1EA7n \u0111\u1ED1i t\u01B0\u1EE3ng
+    t\u1EF1 nguy\u1EC7n. K\xFD: BS. Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

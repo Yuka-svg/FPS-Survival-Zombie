@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: DoctorJournal_05
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 48
+  title: "Nh\u1EADt k\xFD b\xE1c s\u0129 #5 \u2014 Tr\u1ED1n l\xEAn helipad"
+  category: 0
+  content: "T\xF4i \u0111\xE3 leo l\xEAn helipad tr\xEAn t\u1EA7ng th\u01B0\u1EE3ng
+    b\u1EC7nh vi\u1EC7n. T\u1EEB \u0111\xE2y t\xF4i nh\xECn xu\u1ED1ng th\xE0nh ph\u1ED1
+    \u2014 kh\xF3i v\xE0 l\u1EEDa kh\u1EAFp n\u01A1i. \u0110\xE1m zombie l\xF9ng
+    s\u1EE5c d\u01B0\u1EDBi s\xE2n b\u1EC7nh vi\u1EC7n, ch\xFAng kh\xF4ng leo c\u1EA7u
+    thang \u0111\u01B0\u1EE3c n\xEAn t\u1EA1m th\u1EDDi an to\xE0n. T\xF4i mang theo
+    2 l\u1ECD thu\u1ED1c gi\u1EA3i th\u1EED nghi\u1EC7m \u2014 li\u1EC1u cu\u1ED1i
+    c\xF9ng. N\u1EBFu c\xF3 tr\u1EF1c th\u0103ng \u0111\u1EBFn c\u1EE9u, t\xF4i s\u1EBD
+    mang theo. N\u1EBFu kh\xF4ng... t\xF4i s\u1EBD \u0111\u1EC3 l\u1EA1i 2 l\u1ECD
+    n\xE0y \u1EDF \u0111\xE2y, ph\xF2ng khi c\xF3 ai t\xECm th\u1EA5y. Thu\u1ED1c
+    gi\u1EA3i c\xF3 th\u1EC3 \u0111\u1EA3o ng\u01B0\u1EE3c t\xE1c d\u1EE5ng XC-1
+    n\u1EBFu d\xF9ng trong 24 gi\u1EDD \u0111\u1EA7u sau khi b\u1ECB c\u1EAFn. Sau
+    24 gi\u1EDD th\xEC v\xF4 d\u1EE5ng. B\xE1c s\u0129 Edward."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

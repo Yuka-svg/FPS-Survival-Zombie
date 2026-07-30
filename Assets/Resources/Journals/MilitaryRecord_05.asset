@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7203cf67233ef0a4b81f63e4fdc64c45, type: 3}
+  m_Name: MilitaryRecord_05
+  m_EditorClassIdentifier: Assembly-CSharp::JournalData
+  id: 37
+  title: "B\xE1o c\xE1o qu\xE2n \u0111\u1ED9i #5 \u2014 K\xEDp c\xF4ng binh"
+  category: 5
+  content: "Nh\u1EADt k\xFD k\xEDp c\xF4ng binh. Ch\xFAng t\xF4i g\u1EAFn 8 charges
+    \u1EDF tr\u1EE5 c\u1EA7u. Nh\u01B0ng khi chu\u1EA9n b\u1ECB r\xFAt, m\u1ED9t
+    th\xE0nh vi\xEAn b\u1ECB c\u1EAFn. Anh ta bi\u1EBFn ngay trong xe. Xe \u0111\xE2m
+    v\xE0o r\xE0o, 2 ng\u01B0\u1EDDi ch\u1EBFt. T\xF4i l\xE0 ng\u01B0\u1EDDi s\u1ED1ng
+    s\xF3t duy nh\u1EA5t. Charges \u0111\xE3 g\u1EAFn nh\u01B0ng t\xF4i ch\u01B0a
+    k\xEDch n\u1ED5 \u2014 t\xF4i c\u1EA7n l\u1EC7nh. Nh\u01B0ng radio kh\xF4ng li\xEAn
+    l\u1EA1c \u0111\u01B0\u1EE3c. T\xF4i \u0111ang \u1EA9n trong t\xF2a nh\xE0 b\xEAn
+    c\u1EA7u. N\u1EBFu ai \u0111\u1ECDc \u0111\u01B0\u1EE3c: bom \u0111\xE3 g\u1EAFn
+    nh\u01B0ng ch\u01B0a k\xEDch. C\u1EA7n b\u1ED9 k\xEDch n\u1ED5. T\xECm trong
+    t\xF2a cao t\u1EA7ng g\u1EA7n \u0111\xF3."
+  image: {fileID: 0}
+  voiceLog: {fileID: 0}

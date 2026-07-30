@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f9a881c9cc2f42419867bf0e135ca71, type: 3}
+  m_Name: UITheme
+  m_EditorClassIdentifier: Assembly-CSharp::UITheme
+  healthFull: {r: 0.85, g: 0.78, b: 0.45, a: 1}
+  healthLow: {r: 0.72, g: 0.12, b: 0.12, a: 1}
+  shield: {r: 0.45, g: 0.78, b: 0.95, a: 1}
+  ammoNormal: {r: 0.92, g: 0.88, b: 0.78, a: 1}
+  ammoLow: {r: 0.85, g: 0.35, b: 0.15, a: 1}
+  dangerTop: {r: 0.95, g: 0.32, b: 0.27, a: 1}
+  dangerBottom: {r: 0.66, g: 0.09, b: 0.13, a: 1}
+  successTop: {r: 0.31, g: 0.878, b: 0.541, a: 1}
+  successBottom: {r: 0.094, g: 0.639, b: 0.31, a: 1}
+  surfaceTop: {r: 0.137, g: 0.165, b: 0.2, a: 0.94}
+  surfaceBottom: {r: 0.078, g: 0.094, b: 0.118, a: 0.94}
+  cardTop: {r: 0.122, g: 0.149, b: 0.18, a: 1}
+  cardBottom: {r: 0.075, g: 0.09, b: 0.11, a: 1}
+  scrimTop: {r: 0.04, g: 0.05, b: 0.07, a: 0.9}
+  scrimBottom: {r: 0, g: 0, b: 0, a: 0.93}
+  textPrimary: {r: 0.96, g: 0.96, b: 0.96, a: 1}
+  textMuted: {r: 0.62, g: 0.66, b: 0.72, a: 1}
+  accent: {r: 0.85, g: 0.78, b: 0.45, a: 1}
+  spaceXS: 4
+  spaceS: 8
+  spaceM: 16
+  spaceL: 24
+  spaceXL: 40
+  radiusS: 8
+  radiusM: 16
+  radiusL: 22
+  displayFont: {fileID: 11400000, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
+  headerFont: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
+  bodyFont: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
+  hoverScale: 1.06
+  pressScale: 0.95
+  panelInDuration: 0.22
+  panelStartScale: 0.9
+  ammoPunchScale: 1.14

@@ -1,0 +1,62 @@
+@import url("Shared.uss");
+
+/* ===== BossHealthBar.uss — Tactical Boss Health Gauge ===== */
+
+.boss-root {
+    position: absolute;
+    width: var(--boss-bar-width, 680px);
+    height: var(--boss-bar-height, 36px);
+    left: 50%;
+    top: 28px;
+    translate: -50% 0;
+    flex-direction: column;
+    background-color: var(--color-bg-root, rgba(9, 13, 19, 0.85));
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.25);
+    border-radius: var(--radius-s, 8px);
+    padding: 3px;
+}
+
+.boss-bg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: var(--color-surface-top, rgba(20, 24, 29, 0.95));
+    border-radius: var(--radius-s, 8px);
+}
+
+.boss-fill-area {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+    overflow: hidden;
+    border-radius: var(--radius-xs, 4px);
+}
+
+.boss-fill {
+    height: 100%;
+    background-color: var(--color-accent-red, rgb(229, 72, 60));
+    border-radius: var(--radius-xs, 4px);
+    transition: width var(--transition-normal, 0.15s) ease-out;
+}
+
+.boss-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    -unity-font-definition: var(--font-display-sdf, resource("Fonts/BlackOpsOne-Regular SDF"));
+    letter-spacing: 3px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.95);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+}

@@ -1,0 +1,55 @@
+@import url("Shared.uss");
+
+#WaveAnnouncer {
+    position: absolute;
+    left: 50%;
+    top: 200px;
+    translate: -50% 0;
+    width: 760px;
+    height: 150px;
+    opacity: 0;
+    scale: 0.85;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top-width: 1.5px;
+    border-top-color: rgba(217, 199, 115, 0.35);
+    border-bottom-width: 1.5px;
+    border-bottom-color: rgba(217, 199, 115, 0.35);
+    padding: 10px 40px;
+    background-color: rgba(9, 13, 19, 0.45);
+    transition: opacity var(--transition-normal, 0.3s) ease-out, scale var(--transition-normal, 0.3s) ease-out;
+}
+
+#WaveAnnouncer.wave-visible {
+    display: flex;
+    opacity: 1;
+    scale: 1;
+}
+
+.wave-title {
+    -unity-font-definition: var(--font-display-sdf, resource("Fonts/BlackOpsOne-Regular SDF"));
+    font-size: 52px;
+    -unity-text-align: middle-center;
+    color: var(--color-text-gold, rgb(217, 199, 115));
+    margin-bottom: var(--space-xs);
+    width: 100%;
+    letter-spacing: 4px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.95);
+    -unity-text-outline-width: 1.5px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.95);
+}
+
+.wave-sub {
+    -unity-font-definition: var(--font-body-sdf, resource("Fonts/Outfit-SemiBold SDF"));
+    font-size: var(--fs-xl, 28px);
+    -unity-text-align: middle-center;
+    color: var(--color-text-primary, rgb(245, 245, 245));
+    width: 100%;
+    white-space: normal;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.95);
+    -unity-text-outline-width: 1.0px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.95);
+}

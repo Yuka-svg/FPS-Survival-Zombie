@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/UI/USS/Theme.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/Shared.uss" />
+    <ui:Style src="project://database/Assets/UI/Resources/CreditsSequence.uss" />
+
+    <ui:VisualElement name="CreditsRoot" class="credits-root" picking-mode="Ignore" style="opacity: 0;">
+        <ui:VisualElement name="Background" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0;" />
+        <ui:VisualElement name="ScrollContent" style="position: absolute; left: 50%; width: 1000px; translate: -50% 0;" />
+    </ui:VisualElement>
+</ui:UXML>
