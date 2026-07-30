@@ -11,7 +11,7 @@
     top: 0;
     bottom: 0;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: rgba(0, 0, 0, 0);
 }
 
@@ -38,9 +38,9 @@
     width: 33%;
     min-width: 500px;
     max-width: 660px;
-    position: relative;
-    margin-left: 6%;
-    height: auto;
+    position: absolute;
+    left: 6%;
+    top: 6%;
     padding: 0 0 0 36px;
     border-left-width: 2px;
     border-left-color: rgba(230, 80, 40, 0.22);
