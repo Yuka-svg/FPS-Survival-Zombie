@@ -485,14 +485,14 @@ public class Spawm : MonoBehaviour
                 return hit.position;
         }
 
-        // Spiral outward: try several positions at increasing distances.
-        for (float r = 2f; r <= searchRadius; r += 2f)
+        // Spiral outward: try candidate positions at larger step intervals to prevent pathfinding micro-spikes.
+        for (float r = 4f; r <= searchRadius; r += 4f)
         {
-            for (int a = 0; a < 8; a++)
+            for (int a = 0; a < 4; a++)
             {
-                float angle = a * (Mathf.PI * 2f / 8f);
+                float angle = a * (Mathf.PI * 2f / 4f);
                 Vector3 candidate = requested + new Vector3(Mathf.Cos(angle) * r, 0f, Mathf.Sin(angle) * r);
-                if (NavMesh.SamplePosition(candidate, out hit, 2f, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(candidate, out hit, 3f, NavMesh.AllAreas))
                 {
                     if (hit.position.y >= requestY - maxBelowY &&
                         (!hasPlayerNavMesh || HasPathToPlayer(hit.position, playerNavMeshPos)))

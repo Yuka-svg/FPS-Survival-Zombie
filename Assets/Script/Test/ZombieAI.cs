@@ -602,6 +602,7 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
     }
 
     private float pathTimer = 0f;
+    private float _stuckCheckTimer = 0f;
     private Vector3 _lastSetDestination = Vector3.zero;
     private NavMeshPath _chasePath;
 
@@ -619,7 +620,8 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
             return;
         }
 
-        Debug.Log($"[ZombieAI] {name} ChasePlayer: dist={distance:F1} target.name={target.name} target.pos={target.position}");
+        // Debug.Log disabled for performance (was causing 1800+ GC allocations/sec)
+        // Debug.Log($"[ZombieAI] {name} ChasePlayer: dist={distance:F1} target.name={target.name} target.pos={target.position}");
 
         if (!hasDetectedPlayer)
         {
@@ -787,11 +789,13 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
                 pathTimer = 0f;
             }
 
-            // --- Stuck detection: if the zombie isn't making progress toward
-            // the player while it should be chasing, try to recover by finding
-            // a nearby valid NavMesh position and re-pathing. Handles cases
-            // where the zombie is wedged against a wall, furniture, or door.
-            HandleStuckDetection(distance);
+            // --- Stuck detection (throttled to every 0.15s for CPU efficiency) ---
+            _stuckCheckTimer += Time.deltaTime;
+            if (_stuckCheckTimer >= 0.15f)
+            {
+                HandleStuckDetection(distance);
+                _stuckCheckTimer = 0f;
+            }
 
             // Face movement direction (NavMesh path velocity) while chasing.
             FaceMovementDirection();
