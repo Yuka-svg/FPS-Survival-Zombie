@@ -42,7 +42,7 @@
     left: 6%;
     top: 50%;
     translate: 0 -50%;
-    min-height: 600px;
+    min-height: 630px;
     justify-content: flex-start;
     padding: 0 0 0 36px;
     border-left-width: 2px;
