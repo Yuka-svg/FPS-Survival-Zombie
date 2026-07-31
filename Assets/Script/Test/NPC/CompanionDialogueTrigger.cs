@@ -38,6 +38,27 @@ public class CompanionDialogueTrigger : Interactable
     public string stage3InteractText = "Nói chuyện";
     public string stage4InteractText = "Nói chuyện";
 
+    [Header("Small Talk (after following)")]
+    [Tooltip("Casual dialogue lines spoken when there is no active story stage. One is picked randomly each interaction.")]
+    [TextArea(2, 4)]
+    public string[] smallTalkLines = new string[]
+    {
+        "Anh có khỏe không? Trông anh như vừa lăn lộn với đám zombie.",
+        "Cẩn thận đấy. Quanh đây zombie nhiều lắm.",
+        "Tôi còn nhớ hồi thị trấn chưa loạn... Giờ chỉ còn tro tàn.",
+        "Đạn có hết không? Tôi có thể chia ít cho anh."
+    };
+
+    [Tooltip("Thank-you + check-up line spoken the first time the player talks to the companion after rescuing it, then falls back to smallTalkLines.")]
+    [TextArea(2, 4)]
+    public string[] rescuedThankLines = new string[]
+    {
+        "Cảm ơn anh đã cứu tôi lúc nãy. Anh có bị thương gì không?",
+        "Nhờ anh mà tôi còn đứng được đây. Cảm ơn nhiều. Anh ổn chứ?"
+    };
+
+    public string smallTalkInteractText = "Nói chuyện";
+
     [Header("Proximity Fallback")]
     [Tooltip("If the player is within this distance and presses E, the dialogue triggers even without aiming at the NPC.")]
     public float proximityDistance = 2.5f;
@@ -45,12 +66,15 @@ public class CompanionDialogueTrigger : Interactable
     [Tooltip("Key to press for proximity interaction.")]
     public KeyCode proximityKey = KeyCode.E;
 
-    /// <summary>0 = no dialogue available, 1..4 = active stage.</summary>
+    /// <summary>0 = no dialogue available, 1..4 = active stage. 5+ reserved; 0 also means small-talk mode when enabled.</summary>
     public int ActiveStage { get; set; } = 1;
 
     private DialogueBubble _bubble;
     private bool _consumed;
     private bool _permanentlyDisabled;
+    private bool _smallTalkEnabled;   // When true and ActiveStage <= 0, E shows a random casual line.
+    private bool _thanksPending;      // Set when the player rescues the companion; consumed by next small talk.
+    private string _lastSmallTalkLine; // Avoid repeating the same line twice in a row.
     private Transform _player;
     private cowsins.InputManager _playerInput;
     private bool _proximityHintShown;
@@ -61,6 +85,20 @@ public class CompanionDialogueTrigger : Interactable
         var field = typeof(Interactable).GetField("instantInteraction",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (field != null) field.SetValue(this, true);
+        var ai = GetComponent<CompanionAI>();
+        if (ai != null) ai.OnRescuedByPlayer += HandleRescuedByPlayer;
+    }
+
+    private void OnDestroy()
+    {
+        var ai = GetComponent<CompanionAI>();
+        if (ai != null) ai.OnRescuedByPlayer -= HandleRescuedByPlayer;
+    }
+
+    private void HandleRescuedByPlayer()
+    {
+        _thanksPending = true;
+        Debug.Log("[CompanionDialogueTrigger] Companion rescued by player — next small talk will thank the player.");
     }
 
     private void OnDisable()
@@ -89,7 +127,7 @@ public class CompanionDialogueTrigger : Interactable
 
         // Proximity fallback: check E key press when near the NPC.
         if (_consumed || _bubble == null || _bubble.IsChoiceActive) return;
-        if (ActiveStage <= 0) return;
+        if (ActiveStage <= 0 && !_smallTalkEnabled) return;
 
         if (_player == null) FindPlayer();
         if (_player == null) return;
@@ -145,7 +183,7 @@ public class CompanionDialogueTrigger : Interactable
         base.Interact(player);
         if (_consumed || _permanentlyDisabled) return;
         if (_bubble == null || _bubble.IsChoiceActive) return;
-        if (ActiveStage <= 0) return;
+        if (ActiveStage <= 0 && !_smallTalkEnabled) return;
         // Disable dialogue while the companion is Downed — E is used for rescue.
         var ai = GetComponent<CompanionAI>();
         if (ai != null && ai.CurrentState == CompanionAI.State.Downed) return;
@@ -169,7 +207,13 @@ public class CompanionDialogueTrigger : Interactable
     private void TriggerDialogue()
     {
         if (_consumed || _permanentlyDisabled || _bubble == null || _bubble.IsChoiceActive) return;
-        if (ActiveStage <= 0) return;
+
+        // No active story stage — show casual small talk instead.
+        if (ActiveStage <= 0)
+        {
+            if (_smallTalkEnabled) ShowSmallTalk();
+            return;
+        }
 
         // Stage 4 is a 5-question interrogation handled by CompanionManager,
         // not a single ShowChoice call here.
@@ -186,6 +230,46 @@ public class CompanionDialogueTrigger : Interactable
         _bubble.ShowChoice(line, OnChoiceMade);
     }
 
+    /// <summary>
+    /// Shows a random casual dialogue line (small talk). If the player just
+    /// rescued the companion, a thank-you + check-up line is shown first.
+    /// Small talk never consumes the interaction — the player can chat as
+    /// often as they like.
+    /// </summary>
+    private void ShowSmallTalk()
+    {
+        if (_bubble == null) return;
+
+        // First interaction after a rescue — thank the player and ask how
+        // they're doing, then fall back to the casual pool.
+        if (_thanksPending)
+        {
+            _thanksPending = false;
+            if (rescuedThankLines != null && rescuedThankLines.Length > 0)
+            {
+                string thanks = rescuedThankLines[Random.Range(0, rescuedThankLines.Length)];
+                _lastSmallTalkLine = thanks;
+                _bubble.ShowSpeech(thanks);
+                return;
+            }
+        }
+
+        if (smallTalkLines == null || smallTalkLines.Length == 0)
+        {
+            _bubble.ShowSpeech(stage1Line);
+            return;
+        }
+
+        string line = smallTalkLines[Random.Range(0, smallTalkLines.Length)];
+        if (smallTalkLines.Length > 1 && line == _lastSmallTalkLine)
+        {
+            // Avoid repeating the same line twice in a row.
+            line = smallTalkLines[Random.Range(0, smallTalkLines.Length)];
+        }
+        _lastSmallTalkLine = line;
+        _bubble.ShowSpeech(line);
+    }
+
     private string GetDialogueLineForStage(int stage)
     {
         switch (stage)
@@ -199,6 +283,7 @@ public class CompanionDialogueTrigger : Interactable
 
     private string GetInteractTextForStage(int stage)
     {
+        if (stage <= 0) return _smallTalkEnabled ? smallTalkInteractText : stage1InteractText;
         switch (stage)
         {
             case 2: return stage2InteractText;
@@ -255,12 +340,33 @@ public class CompanionDialogueTrigger : Interactable
         interactable = true;
     }
 
-    /// <summary>Permanently disables interaction (called after stage 4 skip).</summary>
+    /// <summary>
+    /// Permanently disables interaction (called after stage 4 skip).
+    /// Kept for API compatibility — use EnableSmallTalkOnly instead so the
+    /// follower stays talkable after the recruitment arc ends.
+    /// </summary>
     public void DisableInteraction()
     {
         _permanentlyDisabled = true;
         _consumed = true;
         interactable = false;
         if (_bubble != null) _bubble.ForceHide();
+    }
+
+    /// <summary>
+    /// Switches the trigger to "small talk only" mode: no story stage is armed,
+    /// but the player can still interact (E) to hear a random casual line.
+    /// Used after the follower recruitment arc ends (e.g. after the Ch4 skip),
+    /// so the companion remains talkable for the rest of the game.
+    /// </summary>
+    public void EnableSmallTalkOnly()
+    {
+        _permanentlyDisabled = false;
+        _consumed = false;
+        ActiveStage = 0;
+        _smallTalkEnabled = true;
+        interactable = true;
+        if (_bubble != null) _bubble.ForceHide();
+        Debug.Log("[CompanionDialogueTrigger] Small-talk only mode enabled — companion stays talkable.");
     }
 }

@@ -127,6 +127,11 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     public event System.Action<State> OnStateChanged;
     /// <summary>Raised with normalized 0..1 progress while the player holds E to rescue. 0 = stopped, 1 = complete.</summary>
     public event System.Action<float> OnRescueProgressChanged;
+    /// <summary>Raised the first time the player rescues the companion by holding E. Lets dialogue triggers switch to "thanks" small talk.</summary>
+    public event System.Action OnRescuedByPlayer;
+
+    /// <summary>True once the player has rescued this companion at least once (hold E while Downed).</summary>
+    public bool RescuedByPlayer { get; private set; }
 
     public State CurrentState
     {
@@ -815,6 +820,12 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     private void Revive(float healthFraction, bool byPlayer = false)
     {
         _rescueProgress = 0f;
+        if (byPlayer)
+        {
+            bool firstRescue = !RescuedByPlayer;
+            RescuedByPlayer = true;
+            if (firstRescue) OnRescuedByPlayer?.Invoke();
+        }
         currentHealth = Mathf.RoundToInt(maxHealth * Mathf.Clamp01(healthFraction));
         OnHealthChanged?.Invoke(HealthFraction);
         CurrentState = State.Following;

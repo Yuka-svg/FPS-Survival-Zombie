@@ -335,7 +335,9 @@ public class CompanionManager : MonoBehaviour
         {
             if (AcceptedStage3)
             {
-                DialogueTrigger.DisableInteraction();
+                // Follower already joined — keep them talkable (small talk).
+                // Stage 4 arming (ResetForStage(4)) can still take over on Ch4 entry.
+                DialogueTrigger.EnableSmallTalkOnly();
             }
             else if (_siegeCompleted)
             {
@@ -852,9 +854,10 @@ public class CompanionManager : MonoBehaviour
         // Re-enable chapter-transition cutscenes for future chapters.
         sm.playChapterTransitionCutscene = prevChapterCutsceneFlag;
 
-        // 11) Disable the dialogue trigger so the player cannot re-interact
-        //     with the follower and trigger another skip.
-        if (DialogueTrigger != null) DialogueTrigger.DisableInteraction();
+        // 11) Switch the follower to small-talk only so the player can keep
+        //     chatting with the companion for the rest of the game (instead of
+        //     permanently disabling interaction after the skip).
+        if (DialogueTrigger != null) DialogueTrigger.EnableSmallTalkOnly();
 
         Debug.Log($"[CompanionManager] Skip logic complete. Player teleported to SaveRoom_Ch5 ({ch5Checkpoint}), checkpoint set to same, should now fight Tank boss with reduced HP ({skippedTankMaxHealth}).");
     }

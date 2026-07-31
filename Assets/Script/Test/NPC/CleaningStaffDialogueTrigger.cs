@@ -29,6 +29,27 @@ public class CleaningStaffDialogueTrigger : Interactable
     [Header("Interact Text")]
     public string defaultInteractText = "Hỏi chuyện";
 
+    [Header("Small Talk (after joining)")]
+    [Tooltip("Casual dialogue lines spoken when the quiz is done and the staff member is following. One is picked randomly each interaction.")]
+    [TextArea(2, 4)]
+    public string[] smallTalkLines = new string[]
+    {
+        "Anh có bị thương ở đâu không? Tôi có thể băng bó cho anh.",
+        "Hôm nay còn sống là một ngày tốt rồi, đúng không?",
+        "Tôi vẫn nhớ mùi cồn trong bệnh viện... Giờ chỉ còn mùi khói.",
+        "Đừng lo, tôi sẽ chú ý phía sau lưng anh."
+    };
+
+    [Tooltip("Thank-you + check-up line spoken the first time the player talks to the staff member after rescuing them, then falls back to smallTalkLines.")]
+    [TextArea(2, 4)]
+    public string[] rescuedThankLines = new string[]
+    {
+        "Cảm ơn anh đã cứu tôi lúc nãy. Anh có sao không?",
+        "Nhờ anh kéo tôi dậy kịp lúc. Cảm ơn anh nhiều lắm."
+    };
+
+    public string smallTalkInteractText = "Hỏi chuyện";
+
     [Header("Proximity Fallback")]
     public float proximityDistance = 2.5f;
     public KeyCode proximityKey = KeyCode.E;
@@ -36,6 +57,9 @@ public class CleaningStaffDialogueTrigger : Interactable
     private DialogueBubble _bubble;
     private CompanionAI _ai;
     private bool _consumed;
+    private bool _smallTalkEnabled;  // True once the quiz is done — casual chat mode.
+    private bool _thanksPending;     // Set when the player rescues the staff; consumed by next small talk.
+    private string _lastSmallTalkLine; // Avoid repeating the same line twice in a row.
     private Transform _player;
     private cowsins.InputManager _playerInput;
     private int _currentQuestionIndex;
@@ -50,6 +74,18 @@ public class CleaningStaffDialogueTrigger : Interactable
         var field = typeof(Interactable).GetField("instantInteraction",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (field != null) field.SetValue(this, true);
+        if (_ai != null) _ai.OnRescuedByPlayer += HandleRescuedByPlayer;
+    }
+
+    private void OnDestroy()
+    {
+        if (_ai != null) _ai.OnRescuedByPlayer -= HandleRescuedByPlayer;
+    }
+
+    private void HandleRescuedByPlayer()
+    {
+        _thanksPending = true;
+        Debug.Log("[CleaningStaff] Rescued by player — next small talk will thank the player.");
     }
 
     private void Start()
@@ -59,10 +95,12 @@ public class CleaningStaffDialogueTrigger : Interactable
 
     private void Update()
     {
-        if (interactText != defaultInteractText) interactText = defaultInteractText;
+        string target = _smallTalkEnabled ? smallTalkInteractText : defaultInteractText;
+        if (interactText != target) interactText = target;
 
         if (_consumed || _bubble == null || _bubble.IsChoiceActive) return;
-        if (_quizComplete || _ai.CurrentState == CompanionAI.State.Downed) return;
+        if (_ai.CurrentState == CompanionAI.State.Downed) return;
+        if (_quizComplete && !_smallTalkEnabled) return;
 
         if (_player == null) FindPlayer();
         if (_player == null) return;
@@ -116,17 +154,58 @@ public class CleaningStaffDialogueTrigger : Interactable
         base.Interact(player);
         if (_consumed) return;
         if (_bubble == null || _bubble.IsChoiceActive) return;
-        if (_quizComplete || _ai.CurrentState == CompanionAI.State.Downed) return;
+        if (_ai.CurrentState == CompanionAI.State.Downed) return;
+        if (_quizComplete && !_smallTalkEnabled) return;
         TriggerQuiz();
     }
 
     private void TriggerQuiz()
     {
         if (_consumed || _bubble == null || _bubble.IsChoiceActive) return;
-        if (_quizComplete) return;
+        if (_quizComplete)
+        {
+            if (_smallTalkEnabled) ShowSmallTalk();
+            return;
+        }
         _currentQuestionIndex = 0;
         _consumed = true;
         AskNextQuestion();
+    }
+
+    /// <summary>
+    /// Shows a random casual dialogue line (small talk). If the player just
+    /// rescued the staff member, a thank-you + check-up line is shown first.
+    /// Small talk never consumes the interaction.
+    /// </summary>
+    private void ShowSmallTalk()
+    {
+        if (_bubble == null) return;
+
+        if (_thanksPending)
+        {
+            _thanksPending = false;
+            if (rescuedThankLines != null && rescuedThankLines.Length > 0)
+            {
+                string thanks = rescuedThankLines[Random.Range(0, rescuedThankLines.Length)];
+                _lastSmallTalkLine = thanks;
+                _bubble.ShowSpeech(thanks);
+                return;
+            }
+        }
+
+        if (smallTalkLines == null || smallTalkLines.Length == 0)
+        {
+            _bubble.ShowSpeech(defaultInteractText);
+            return;
+        }
+
+        string line = smallTalkLines[Random.Range(0, smallTalkLines.Length)];
+        if (smallTalkLines.Length > 1 && line == _lastSmallTalkLine)
+        {
+            line = smallTalkLines[Random.Range(0, smallTalkLines.Length)];
+        }
+        _lastSmallTalkLine = line;
+        _bubble.ShowSpeech(line);
     }
 
     private void AskNextQuestion()
@@ -137,8 +216,11 @@ public class CleaningStaffDialogueTrigger : Interactable
             _quizComplete = true;
             _ai.StartFollowing();
             SimpleNotification.Show("Nhân viên vệ sinh đã đồng hành cùng bạn!");
-            interactable = false;
-            Debug.Log("[CleaningStaff] All 3 questions answered correctly. Companion now follows.");
+            // Switch to small-talk mode so the staff member stays talkable.
+            _smallTalkEnabled = true;
+            _consumed = false;
+            interactable = true;
+            Debug.Log("[CleaningStaff] All 3 questions answered correctly. Companion now follows (small talk enabled).");
             return;
         }
 
