@@ -710,7 +710,7 @@ public class QuestTrackerWidget : MonoBehaviour
             {
                 text = $"• {q.title}"
             };
-            label.AddToClassList("side-quest-line");
+            label.AddToClassList("side-line");
             _sideLinesContainer.Add(label);
             _sideLines.Add(label);
         }
