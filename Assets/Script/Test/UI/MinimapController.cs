@@ -14,6 +14,7 @@ public class MinimapController : MonoBehaviour
     private Transform _playerTransform;
 
     public RenderTexture MinimapTexture => _minimapTexture;
+    public float OrthographicSize => _minimapCamera != null ? _minimapCamera.orthographicSize : orthographicSize;
 
     public float CameraYawRotation
     {

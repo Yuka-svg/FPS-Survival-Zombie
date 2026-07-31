@@ -43,6 +43,30 @@ public class QuestTrigger : MonoBehaviour
         if (c != null) c.isTrigger = true;
     }
 
+    public static readonly System.Collections.Generic.List<QuestTrigger> ActiveTriggers = new System.Collections.Generic.List<QuestTrigger>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        ActiveTriggers.Clear();
+    }
+
+    private void OnEnable()
+    {
+        if (!ActiveTriggers.Contains(this))
+            ActiveTriggers.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        ActiveTriggers.Remove(this);
+    }
+
+    private void OnDestroy()
+    {
+        ActiveTriggers.Remove(this);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (mode != Mode.OnPlayerEnter) return;

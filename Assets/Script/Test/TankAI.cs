@@ -9,6 +9,16 @@ public class TankBossAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealt
     public float HealthFraction => Mathf.Clamp01((float)currentHealth / maxHealth);
     public EnemyType EnemyType => EnemyType.Boss;
 
+    private void OnEnable()
+    {
+        EnemyRegistry.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        EnemyRegistry.Unregister(this);
+    }
+
     [Header("Player")]
     public Transform target;
 
@@ -831,6 +841,7 @@ public class TankBossAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealt
 
     private void OnDisable()
     {
+        EnemyRegistry.Unregister(this);
         lootTrailSettings = new LootTrailSettings();
     }
 

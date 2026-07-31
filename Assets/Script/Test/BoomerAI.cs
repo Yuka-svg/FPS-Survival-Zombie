@@ -168,12 +168,20 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
     private void OnDisable()
     {
+        EnemyRegistry.Unregister(this);
         CancelInvoke();
         lootTrailSettings = new LootTrailSettings();
     }
 
+    private void OnDestroy()
+    {
+        EnemyRegistry.Unregister(this);
+    }
+
     private void Awake()
     {
+        _originalMoveSpeed = moveSpeed;
+
         if (GetComponent<EnemyHealthBar>() == null)
         {
             gameObject.AddComponent<EnemyHealthBar>();

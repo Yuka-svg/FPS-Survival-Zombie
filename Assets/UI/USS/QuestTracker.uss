@@ -132,3 +132,60 @@
     transform-origin: 50% 50%;
 }
 
+#MinimapMarkerLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 292px;
+    height: 292px;
+    overflow: hidden;
+}
+
+.minimap-blip-zombie {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #ff3333;
+    border-width: 1px;
+    border-color: #990000;
+}
+
+.minimap-blip-journal {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #ffcc00;
+    border-width: 1px;
+    border-color: #998800;
+}
+
+.minimap-blip-sidequest {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #00ff66;
+    border-width: 1px;
+    border-color: #ffffff;
+}
+
+#MinimapQuestMarker {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: #00e5ff;
+    border-width: 1.5px;
+    border-color: #ffffff;
+    transform-origin: 50% 50%;
+}
+
+#MinimapEdgeArrow {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    transform-origin: 50% 50%;
+}
+

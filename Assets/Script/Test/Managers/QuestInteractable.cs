@@ -43,6 +43,30 @@ public class QuestInteractable : Interactable
 
     private bool _used;
 
+    public static readonly System.Collections.Generic.List<QuestInteractable> ActiveInteractables = new System.Collections.Generic.List<QuestInteractable>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        ActiveInteractables.Clear();
+    }
+
+    private void OnEnable()
+    {
+        if (!ActiveInteractables.Contains(this))
+            ActiveInteractables.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        ActiveInteractables.Remove(this);
+    }
+
+    private void OnDestroy()
+    {
+        ActiveInteractables.Remove(this);
+    }
+
     /// <summary>
     /// Called by InteractManager when the player presses the interact key.
     /// Completes the quest, optionally spawns prefabs, and cleans up.

@@ -147,8 +147,21 @@ public class QuestBeacon : MonoBehaviour
     // Cached base materials loaded once from Resources/Assets.
     private static Material _baseRingParticleMat;
 
+    public static readonly System.Collections.Generic.List<QuestBeacon> ActiveBeacons = new System.Collections.Generic.List<QuestBeacon>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        ActiveBeacons.Clear();
+    }
+
+    public bool IsActive => _active;
+
     private void OnEnable()
     {
+        if (!ActiveBeacons.Contains(this))
+            ActiveBeacons.Add(this);
+
         if (StoryManager.Instance != null)
         {
             StoryManager.Instance.OnActiveQuestChanged += HandleQuestChanged;
@@ -165,6 +178,7 @@ public class QuestBeacon : MonoBehaviour
 
     private void OnDisable()
     {
+        ActiveBeacons.Remove(this);
         if (StoryManager.Instance != null)
         {
             StoryManager.Instance.OnActiveQuestChanged -= HandleQuestChanged;
@@ -179,6 +193,7 @@ public class QuestBeacon : MonoBehaviour
 
     private void OnDestroy()
     {
+        ActiveBeacons.Remove(this);
         if (_ringMat != null) Destroy(_ringMat);
         if (_arrowMat != null) Destroy(_arrowMat);
         if (_iconMat != null) Destroy(_iconMat);

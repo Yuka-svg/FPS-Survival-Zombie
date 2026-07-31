@@ -27,6 +27,16 @@ public class WitchAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthRe
     public EnemyType EnemyType { get { return EnemyType.Special; } }
     public event System.Action<float> OnHealthChanged;
 
+    private void OnEnable()
+    {
+        EnemyRegistry.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        EnemyRegistry.Unregister(this);
+    }
+
     [Header("Target")]
     public Transform target;
 
@@ -890,6 +900,7 @@ public class WitchAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthRe
 
     private void OnDisable()
     {
+        EnemyRegistry.Unregister(this);
         lootTrailSettings = new LootTrailSettings();
     }
 

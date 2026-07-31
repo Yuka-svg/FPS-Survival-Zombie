@@ -31,8 +31,19 @@ public class KillCountObjective : MonoBehaviour
     private bool _done;
     private bool _subscribed;
 
+    public static readonly System.Collections.Generic.List<KillCountObjective> ActiveObjectives = new System.Collections.Generic.List<KillCountObjective>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        ActiveObjectives.Clear();
+    }
+
     private void OnEnable()
     {
+        if (!ActiveObjectives.Contains(this))
+            ActiveObjectives.Add(this);
+
         Subscribe();
         if (startOnEnable && targetQuest == null)
             StartListening();
@@ -55,10 +66,16 @@ public class KillCountObjective : MonoBehaviour
 
     private void OnDisable()
     {
+        ActiveObjectives.Remove(this);
         if (StoryManager.Instance != null)
             StoryManager.Instance.OnActiveQuestChanged -= HandleQuestChanged;
         _subscribed = false;
         _listening = false;
+    }
+
+    private void OnDestroy()
+    {
+        ActiveObjectives.Remove(this);
     }
 
     private void HandleQuestChanged(QuestData oldQuest, QuestData newQuest)

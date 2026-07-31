@@ -172,6 +172,9 @@
         <ui:VisualElement name="QuestTracker">
             <ui:VisualElement name="MinimapContainer" style="display: none;">
                 <ui:VisualElement name="MinimapImage" />
+                <ui:VisualElement name="MinimapMarkerLayer" picking-mode="Ignore" />
+                <ui:VisualElement name="MinimapQuestMarker" picking-mode="Ignore" />
+                <ui:VisualElement name="MinimapEdgeArrow" picking-mode="Ignore" />
                 <ui:VisualElement name="MinimapPlayerArrow" />
             </ui:VisualElement>
             <ui:VisualElement name="MainPanel">

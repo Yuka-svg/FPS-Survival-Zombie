@@ -1,9 +1,30 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class CeilingZombieController : MonoBehaviour
+public class CeilingZombieController : MonoBehaviour, IEnemyHealthReadout
 {
+    public float HealthFraction => isDead ? 0f : 1f;
+    public bool IsDead => isDead;
+#pragma warning disable 0067
+    public event System.Action<float> OnHealthChanged;
+#pragma warning restore 0067
+    public EnemyType EnemyType => EnemyType.Special;
+
+    private void OnEnable()
+    {
+        EnemyRegistry.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        EnemyRegistry.Unregister(this);
+    }
+
+    private void OnDestroy()
+    {
+        EnemyRegistry.Unregister(this);
+    }
     [Header("References")]
     public Transform targetSphere; // Kéo khối Sphere vào đây
     public Transform playerVision; // Kéo khối Sphere (hoặc Main Camera) vào đây để làm hướng nhìn

@@ -58,8 +58,19 @@ public class CollectibleQuestObjective : MonoBehaviour
         }
     }
 
+    public static readonly System.Collections.Generic.List<CollectibleQuestObjective> ActiveObjectives = new System.Collections.Generic.List<CollectibleQuestObjective>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        ActiveObjectives.Clear();
+    }
+
     private void OnEnable()
     {
+        if (!ActiveObjectives.Contains(this))
+            ActiveObjectives.Add(this);
+
         Subscribe();
         if (startOnEnable && targetQuest == null)
             StartListening();
@@ -79,9 +90,15 @@ public class CollectibleQuestObjective : MonoBehaviour
 
     private void OnDisable()
     {
+        ActiveObjectives.Remove(this);
         if (StoryManager.Instance != null)
             StoryManager.Instance.OnActiveQuestChanged -= HandleQuestChanged;
         _listening = false;
+    }
+
+    private void OnDestroy()
+    {
+        ActiveObjectives.Remove(this);
     }
 
     private void Subscribe()

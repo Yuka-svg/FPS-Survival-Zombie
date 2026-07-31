@@ -285,6 +285,7 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
 
     void OnEnable()
     {
+        EnemyRegistry.Register(this);
         if (_chasePath == null)
             _chasePath = new NavMeshPath();
 
@@ -472,6 +473,7 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
 
     void OnDisable()
     {
+        EnemyRegistry.Unregister(this);
         CancelInvoke();
         if (AIDirector.Instance != null)
             AIDirector.Instance.UnregisterZombie(this);

@@ -28,6 +28,16 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
     public EnemyType EnemyType { get { return EnemyType.Special; } }
     public event System.Action<float> OnHealthChanged;
 
+    private void OnEnable()
+    {
+        EnemyRegistry.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        EnemyRegistry.Unregister(this);
+    }
+
     [Header("Target")]
     public Transform target;
 
@@ -785,6 +795,7 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
     private void OnDisable()
     {
+        EnemyRegistry.Unregister(this);
         lootTrailSettings = new LootTrailSettings();
     }
 
