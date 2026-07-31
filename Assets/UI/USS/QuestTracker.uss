@@ -99,7 +99,8 @@
     color: var(--color-text-secondary, rgb(210, 215, 225));
 }
 
-.side-line {
+.side-line,
+.side-quest-line {
     color: var(--color-text-secondary, rgb(210, 215, 225));
     font-size: 12px;
     -unity-font-definition: var(--font-body-sdf);
