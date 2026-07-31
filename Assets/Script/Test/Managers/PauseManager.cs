@@ -346,7 +346,6 @@ public class PauseManager : MonoBehaviour
             var kb = Keyboard.current;
             if (kb != null && kb.escapeKey.wasPressedThisFrame)
             {
-                Debug.Log("[PauseManager Debug] Escape key pressed (detected in Update fallback)");
                 HandleEscapeInput();
             }
         }
@@ -366,8 +365,6 @@ public class PauseManager : MonoBehaviour
     {
         if (Time.frameCount == _lastEscapeFrame) return;
         _lastEscapeFrame = Time.frameCount;
-
-        Debug.Log($"[PauseManager Debug] HandleEscapeInput called. IsPaused={IsPaused}, IsTransitioning={IsTransitioning}");
 
         if (PanelManager.Instance != null)
         {
@@ -397,7 +394,6 @@ public class PauseManager : MonoBehaviour
             {
                 if (skillTree.IsOpen && !skillTree.IsTransitioning)
                 {
-                    Debug.Log("[PauseManager Debug] Escape -> closing SkillTree");
                     skillTree.Close();
                 }
                 return;
@@ -406,14 +402,12 @@ public class PauseManager : MonoBehaviour
             {
                 if (JournalUI.Instance.IsOpen && !JournalUI.Instance.IsTransitioning)
                 {
-                    Debug.Log("[PauseManager Debug] Escape -> closing Journal");
                     JournalUI.Instance.Close();
                 }
                 return;
             }
             if (statsActive)
             {
-                Debug.Log("[PauseManager Debug] Escape -> closing StatsPanel");
                 statsPanel.Toggle();
                 return;
             }
@@ -422,7 +416,6 @@ public class PauseManager : MonoBehaviour
         // Check if Settings Card is open
         if (IsPaused && _settingsCard != null && _settingsCard.ClassListContains("active"))
         {
-            Debug.Log("[PauseManager Debug] Escape -> closing Settings screen");
             CloseSettings();
             return;
         }
@@ -439,7 +432,6 @@ public class PauseManager : MonoBehaviour
     public void Pause()
     {
         if (!_uiReady || IsTransitioning) return;
-        Debug.Log("[PauseManager Debug] Pause() called. Setting IsPaused=true");
         IsPaused = true;
         _transitionEndTime = Time.realtimeSinceStartup + PanelManager.PanelTransitionDuration;
 
@@ -454,7 +446,6 @@ public class PauseManager : MonoBehaviour
         {
             if (pm.gameObject.scene.name != null)
             {
-                Debug.Log("[PauseManager Debug] Disabling cowsins.PauseMenu in scene: " + pm.gameObject.name);
                 pm.enabled = false;
             }
         }
@@ -463,7 +454,6 @@ public class PauseManager : MonoBehaviour
     public void Resume()
     {
         if (!_uiReady || IsTransitioning) return;
-        Debug.Log("[PauseManager Debug] Resume() called. Setting IsPaused=false");
         IsPaused = false;
         _transitionEndTime = Time.realtimeSinceStartup + PanelManager.PanelTransitionDuration;
 
@@ -473,7 +463,6 @@ public class PauseManager : MonoBehaviour
         {
             if (pm.gameObject.scene.name != null)
             {
-                Debug.Log("[PauseManager Debug] Disabling cowsins.PauseMenu in scene during Resume: " + pm.gameObject.name);
                 pm.enabled = false;
             }
         }

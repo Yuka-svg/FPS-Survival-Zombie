@@ -51,8 +51,6 @@ public class GiftBox : Pickeable
     {
         base.Interact(player);
 
-        Debug.Log("[GiftBox] Interact called. AdRewardManager.Instance = " + (AdRewardManager.Instance != null ? "NOT NULL" : "NULL"));
-
         if (AdRewardManager.Instance != null)
             AdRewardManager.Instance.ShowAd(player);
 

@@ -134,13 +134,8 @@ public class CeilingZombieController : MonoBehaviour, IEnemyHealthReadout
         // Trả Zombie về trạng thái Idle để nhường chỗ cho UI
         animator.SetFloat("Speed", 0f);
 
-        Debug.Log("--- BẮT ĐẦU SNAP ---");
-        Debug.Log("SOUND PLAY: RẮC!!!");
-
         yield return new WaitForSeconds(0.15f);
 
         if (vignetteImage != null) vignetteImage.color = Color.black;
-
-        Debug.Log("GAME OVER: BỊ VẶN CỔ!");
     }
 }

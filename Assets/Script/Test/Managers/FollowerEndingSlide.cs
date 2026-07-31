@@ -61,7 +61,6 @@ public class FollowerEndingSlide : MonoBehaviour
     {
         int followerCount = CountFollowingCompanions();
         int index = Mathf.Clamp(followerCount, 0, 2);
-        Debug.Log($"[FollowerEndingSlide] Following companions: {followerCount} → showing variant {index}");
 
         Build(index);
 

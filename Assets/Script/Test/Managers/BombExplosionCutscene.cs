@@ -171,7 +171,6 @@ public class BombExplosionCutscene : MonoBehaviour
         Destroy(_fadeDocGO);
         _playing = false;
         if (CutscenePlayer._playingCount > 0) CutscenePlayer._playingCount--;
-        Debug.Log("[BombExplosionCutscene] Sequence complete.");
         onComplete?.Invoke();
     }
 

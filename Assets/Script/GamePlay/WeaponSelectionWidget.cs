@@ -106,8 +106,6 @@ public class WeaponSelectionWidget : MonoBehaviour
 
     private void OnWeaponSelected(Weapon_SO selected)
     {
-        Debug.Log("[WeaponSelection] Selected: " + selected._name);
-
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {

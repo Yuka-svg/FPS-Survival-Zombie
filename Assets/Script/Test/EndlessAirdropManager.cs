@@ -60,7 +60,6 @@ public class EndlessAirdropManager : MonoBehaviour
             }
             airdropMarkers = list.ToArray();
         }
-        Debug.Log($"[Airdrop] Found {airdropMarkers.Length} airdrop markers in scene.");
     }
 
     private void ResetTimer()
@@ -128,8 +127,6 @@ public class EndlessAirdropManager : MonoBehaviour
         var lb = lootbox.GetComponent<Lootbox>();
         if (lb != null)
             lb.Price = 0;
-
-        Debug.Log($"[Airdrop] Dropped {selectedPrefab.name} at {markerPos}");
 
         _dropPending = false;
     }

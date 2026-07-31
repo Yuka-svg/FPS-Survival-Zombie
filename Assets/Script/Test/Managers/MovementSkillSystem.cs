@@ -145,14 +145,6 @@ namespace cowsins
                     movement.playerSettings.maxJumps = 2;
                 }
             }
-
-#if UNITY_EDITOR
-            Debug.Log(
-                $"MOVEMENT LVL {movementLevel} | Walk:{walkSpeedMultiplier:F2}x | Run:{runSpeedMultiplier:F2}x | " +
-                $"Air:{airControlMultiplier:F2}x | Grapple:{grappleForceMultiplier:F2}x | " +
-                $"Dash:{dashUnlocked} | WallRun:{wallRunUnlocked} | DoubleJump:{doubleJumpUnlocked}"
-            );
-#endif
         }
     }
 }

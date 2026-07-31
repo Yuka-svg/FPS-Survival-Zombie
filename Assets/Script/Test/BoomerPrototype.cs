@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class BoomerPrototypeController : MonoBehaviour
@@ -277,12 +277,6 @@ public class BoomerPrototypeController : MonoBehaviour
 
         health -= damage;
 
-
-        Debug.Log(
-            "BOOMER HIT - HP: " + health
-        );
-
-
         animator.SetTrigger(
             "Hit"
         );
@@ -300,11 +294,6 @@ public class BoomerPrototypeController : MonoBehaviour
             dead = true;
 
             canMove = false;
-
-
-            Debug.Log(
-                "BOOMER DEAD -> EXPLOSION SEQUENCE"
-            );
 
 
             StartExplosionDeath();
@@ -345,12 +334,6 @@ public class BoomerPrototypeController : MonoBehaviour
                 Quaternion.identity
             );
         }
-
-
-
-        Debug.Log(
-            "BOOMER DETONATED"
-        );
 
 
 

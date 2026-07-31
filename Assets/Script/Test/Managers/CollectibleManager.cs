@@ -65,8 +65,6 @@ public class CollectibleManager : MonoBehaviour
             JournalUI.Instance.Show(journal);
         else
             Debug.LogWarning("[CollectibleManager] No JournalUI in scene; collected without display.");
-
-        Debug.Log($"Collected {Count}/{Total}");
     }
 
     /// <summary>Number of collected journals in a given category.</summary>
