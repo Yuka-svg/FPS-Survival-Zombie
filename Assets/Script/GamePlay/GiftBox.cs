@@ -3,6 +3,10 @@ using cowsins;
 
 public class GiftBox : Pickeable
 {
+    [Header("Random Model")]
+    [Tooltip("Danh sách model Present Box, mỗi lần spawn sẽ chọn ngẫu nhiên 1 model.")]
+    [SerializeField] private GameObject[] randomModels;
+
     public override void Awake()
     {
         base.Awake();
@@ -17,6 +21,25 @@ public class GiftBox : Pickeable
             System.Reflection.BindingFlags.NonPublic |
             System.Reflection.BindingFlags.Instance)
             ?.SetValue(this, true);
+
+        ApplyRandomModel();
+    }
+
+    private void ApplyRandomModel()
+    {
+        if (randomModels == null || randomModels.Length == 0) return;
+        if (graphics == null) return;
+
+        GameObject selected = randomModels[Random.Range(0, randomModels.Length)];
+        if (selected == null) return;
+
+        for (int i = graphics.childCount - 1; i >= 0; i--)
+            Destroy(graphics.GetChild(i).gameObject);
+
+        GameObject model = Instantiate(selected, graphics);
+        model.transform.localPosition = Vector3.zero;
+        model.transform.localRotation = Quaternion.identity;
+        model.transform.localScale = Vector3.one * 1.5f;
     }
 
     private void Start()

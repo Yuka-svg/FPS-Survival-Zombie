@@ -114,7 +114,18 @@ MonoBehaviour:
   image: {fileID: 0}
   graphics: {fileID: 819300990003841837}
   dropped: 0
-  giftIcon: {fileID: 21300000, guid: 9359d289ae98f594d98cd3b618a0f38a, type: 3}
+  randomModels:
+  - {fileID: 154594, guid: 555a450a413ce924ea367d43a02f44b5, type: 3}
+  - {fileID: 194340, guid: aa48dc4ca40a6ec469f5fc74afada3fa, type: 3}
+  - {fileID: 181736, guid: b354ea2d6b513d645a88782b72bc7785, type: 3}
+  - {fileID: 156138, guid: 70c5432535f63da449237048e8a3ba7d, type: 3}
+  - {fileID: 191454, guid: 757b8bbebf28235479ad9b3d09adcf98, type: 3}
+  - {fileID: 162604, guid: 1b805f1f22c0b1c42b29feff2b2c1279, type: 3}
+  - {fileID: 144516, guid: 9b4f7c48a6d12844fab6c27a026fa295, type: 3}
+  - {fileID: 183256, guid: 0cc994154bc1be74c831fbc76cbf222f, type: 3}
+  - {fileID: 192886, guid: ff8425c20040d494cb13f372bf50908a, type: 3}
+  - {fileID: 123266, guid: 261868f3859344243b0d74ff1baa5702, type: 3}
+  - {fileID: 134140, guid: e1aebb0d52474084fb407ec31a0bed21, type: 3}
 --- !u!1 &5872432038712630155
 GameObject:
   m_ObjectHideFlags: 0
