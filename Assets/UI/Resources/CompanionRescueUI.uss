@@ -1,0 +1,35 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* CompanionRescueUI.uss — Runtime-loaded styles for the world-space
+   "Giữ E để cứu" rescue prompt + progress bar. Themed to match the game
+   UI: gold text + dark bar with gold fill. Loaded by CompanionRescueUI.cs. */
+
+.rescue-prompt {
+    font-size: var(--fs-xs, 14px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    -unity-font-style: bold;
+    color: var(--color-text-gold, rgb(217, 199, 115));
+    white-space: normal;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: var(--shadow-text-sm, 1px);
+    -unity-text-outline-color: var(--shadow-color-dark, rgba(0, 0, 0, 0.8));
+}
+
+.rescue-bar-bg {
+    background-color: var(--color-surface-bottom, rgba(19, 23, 28, 0.9));
+    border-width: 1px;
+    border-color: var(--color-border-gold, rgba(217, 199, 115, 0.25));
+    border-top-left-radius: var(--radius-xs, 4px);
+    border-top-right-radius: var(--radius-xs, 4px);
+    border-bottom-left-radius: var(--radius-xs, 4px);
+    border-bottom-right-radius: var(--radius-xs, 4px);
+}
+
+.rescue-bar-fill {
+    background-color: var(--color-accent-gold, rgb(217, 199, 115));
+    border-top-left-radius: var(--radius-xs, 4px);
+    border-top-right-radius: var(--radius-xs, 4px);
+    border-bottom-left-radius: var(--radius-xs, 4px);
+    border-bottom-right-radius: var(--radius-xs, 4px);
+}

@@ -1,0 +1,47 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* DialogueBubble.uss — Runtime-loaded styles for NPC dialogue overlay.
+   Themed to match the game UI: dark surface panel + gold border,
+   Outfit SDF font for all dialogue text. Loaded by DialogueBubble.cs. */
+
+.dialogue-scrim {
+    background-color: var(--color-panel-bg, rgba(14, 17, 21, 0.92));
+    border-width: 1px;
+    border-color: var(--color-border-gold, rgba(217, 199, 115, 0.3));
+    border-top-left-radius: var(--radius-m, 16px);
+    border-top-right-radius: var(--radius-m, 16px);
+    border-bottom-left-radius: var(--radius-m, 16px);
+    border-bottom-right-radius: var(--radius-m, 16px);
+}
+
+.dialogue-line {
+    font-size: var(--fs-l, 22px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    -unity-font-style: bold;
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    white-space: normal;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: var(--shadow-text-md, 2px);
+    -unity-text-outline-color: var(--shadow-color-default, rgba(0, 0, 0, 0.5));
+}
+
+.dialogue-choice {
+    font-size: var(--fs-s, 16px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-gold, rgb(217, 199, 115));
+    white-space: normal;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: var(--shadow-text-sm, 1px);
+    -unity-text-outline-color: var(--shadow-color-dark, rgba(0, 0, 0, 0.8));
+}
+
+.dialogue-hint {
+    font-size: var(--fs-xs, 14px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-accent-cyan, rgb(78, 205, 196));
+    white-space: normal;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: var(--shadow-text-sm, 1px);
+    -unity-text-outline-color: var(--shadow-color-dark, rgba(0, 0, 0, 0.8));
+}

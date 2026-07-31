@@ -21,9 +21,9 @@ public class CompanionRescueUI : MonoBehaviour
     public float heightOffset = 2.6f;       // Slightly above the health bar.
     public Vector2 panelSize = new Vector2(180f, 40f);
     public float worldScale = 0.0075f;
-    public Color promptColor = new Color(0.95f, 0.92f, 0.8f, 1f);
-    public Color barBgColor = new Color(0f, 0f, 0f, 0.6f);
-    public Color barFillColor = new Color(0.3f, 0.85f, 1f, 1f); // Cyan
+    public Color promptColor = new Color(0.851f, 0.78f, 0.451f, 1f);
+    public Color barBgColor = new Color(0.075f, 0.09f, 0.11f, 0.9f);
+    public Color barFillColor = new Color(0.851f, 0.78f, 0.451f, 1f); // Theme gold
     public float promptFontSize = 14f;
 
     private CompanionAI _companion;
@@ -37,6 +37,7 @@ public class CompanionRescueUI : MonoBehaviour
     private bool _uiAttached;    // True once the visual tree has been attached to rootVisualElement.
     private bool _visible;       // Desired visibility (opacity-based, not SetActive).
     private float _currentProgress; // 0..1
+    private bool _themed;        // True when the CompanionRescueUI.uss stylesheet was applied.
 
     private void Awake()
     {
@@ -93,12 +94,21 @@ public class CompanionRescueUI : MonoBehaviour
         _root.style.alignItems = Align.Center;
         _root.style.justifyContent = Justify.FlexStart;
 
+        // Theme the prompt with the shared game UI stylesheet (Outfit SDF font,
+        // gold text + dark bar). Inline styles below act as a fallback when the
+        // stylesheet is missing so the widget never renders unreadable.
+        var sheet = Resources.Load<StyleSheet>("CompanionRescueUI");
+        _themed = sheet != null;
+        if (sheet != null)
+            _root.styleSheets.Add(sheet);
+
         _promptLabel = new Label();
         _promptLabel.name = "RescuePrompt";
         _promptLabel.text = "Giữ [E] để cứu";
-        _promptLabel.style.color = promptColor;
-        _promptLabel.style.fontSize = promptFontSize;
-        _promptLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        _promptLabel.AddToClassList("rescue-prompt");
+        if (!_themed) _promptLabel.style.color = promptColor;
+        if (!_themed) _promptLabel.style.fontSize = promptFontSize;
+        if (!_themed) _promptLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         _promptLabel.style.marginBottom = 4f;
         _promptLabel.style.whiteSpace = WhiteSpace.Normal;
         _promptLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -106,9 +116,10 @@ public class CompanionRescueUI : MonoBehaviour
 
         _barBg = new VisualElement();
         _barBg.name = "RescueBarBg";
+        _barBg.AddToClassList("rescue-bar-bg");
         _barBg.style.width = panelSize.x;
         _barBg.style.height = 8f;
-        _barBg.style.backgroundColor = barBgColor;
+        if (!_themed) _barBg.style.backgroundColor = barBgColor;
         _barBg.style.borderTopLeftRadius = 4f;
         _barBg.style.borderTopRightRadius = 4f;
         _barBg.style.borderBottomLeftRadius = 4f;
@@ -118,9 +129,10 @@ public class CompanionRescueUI : MonoBehaviour
 
         _barFill = new VisualElement();
         _barFill.name = "RescueBarFill";
+        _barFill.AddToClassList("rescue-bar-fill");
         _barFill.style.width = 0f; // Fills with progress.
         _barFill.style.height = 8f;
-        _barFill.style.backgroundColor = barFillColor;
+        if (!_themed) _barFill.style.backgroundColor = barFillColor;
         _barFill.style.borderTopLeftRadius = 4f;
         _barFill.style.borderTopRightRadius = 4f;
         _barFill.style.borderBottomLeftRadius = 4f;

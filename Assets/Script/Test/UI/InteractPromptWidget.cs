@@ -11,6 +11,7 @@ public class InteractPromptWidget : MonoBehaviour
     private VisualElement _progressBar;
     private VisualElement _progressFill;
     private float _forbidTimer;
+    private UITheme _theme;
 
     private static readonly Color PanelColor = new(0.137f, 0.165f, 0.2f, 0.94f);
     private static readonly Color ForbiddenColor = new(0.66f, 0.09f, 0.13f, 0.95f);
@@ -19,6 +20,7 @@ public class InteractPromptWidget : MonoBehaviour
 
     private void OnEnable()
     {
+        _theme = UITheme.Active;
         var doc = GetComponent<UIDocument>();
         if (doc == null) return;
         _root = doc.rootVisualElement.Q("InteractPrompt");
@@ -171,9 +173,15 @@ public class InteractPromptWidget : MonoBehaviour
         var painter = ctx.painter2D;
         float chamferSize = 10f;
 
+        // Theme tokens (fall back to the widget's legacy colors if the asset is missing).
+        Color accentGold = _theme != null ? _theme.accent : new Color(217f / 255f, 199f / 255f, 115f / 255f, 1f);
+        Color danger = _theme != null ? _theme.dangerBottom : new Color(229f / 255f, 72f / 255f, 60f / 255f, 1f);
+        Color surfaceTop = _theme != null ? _theme.surfaceTop : new Color(9f / 255f, 13f / 255f, 19f / 255f, 1f);
+        Color textShadow = _theme != null ? _theme.scrimBottom : new Color(16f / 255f, 14f / 255f, 14f / 255f, 1f);
+
         // 1. Draw solid dark background shape (translucent dark red if forbidden, dark blue-gray if normal)
-        Color fillCol = _isForbidden ? new Color(65f / 255f, 15f / 255f, 15f / 255f, 0.9f)
-                                     : new Color(9f / 255f, 13f / 255f, 19f / 255f, 0.85f);
+        Color fillCol = _isForbidden ? new Color(danger.r * 0.3f, danger.g * 0.1f, danger.b * 0.1f, 0.9f)
+                                     : new Color(surfaceTop.r * 0.85f, surfaceTop.g * 0.8f, surfaceTop.b * 0.85f, 0.85f);
         painter.fillColor = fillCol;
         painter.BeginPath();
         painter.MoveTo(new Vector2(chamferSize, 0));
@@ -189,18 +197,18 @@ public class InteractPromptWidget : MonoBehaviour
         float stripeW = 20f;
         float stripeH = rect.height - chamferSize;
         painter.lineWidth = 1.0f;
+        Color stripeColor = _isForbidden ? danger : accentGold;
         for (float offset = 0; offset < stripeW; offset += 5f)
         {
             float startY = offset < chamferSize ? (chamferSize - offset) : 0f;
-            painter.strokeColor = _isForbidden ? new Color(229f / 255f, 72f / 255f, 60f / 255f, 0.85f)
-                                               : new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.8f);
+            painter.strokeColor = new Color(stripeColor.r, stripeColor.g, stripeColor.b, 0.8f);
             painter.BeginPath();
             painter.MoveTo(new Vector2(offset, startY));
             painter.LineTo(new Vector2(offset + 4f, rect.height));
             painter.Stroke();
 
             float startYBlack = (offset + 2f) < chamferSize ? (chamferSize - (offset + 2f)) : 0f;
-            painter.strokeColor = new Color(16f / 255f, 14f / 255f, 14f / 255f, 0.9f);
+            painter.strokeColor = new Color(textShadow.r, textShadow.g, textShadow.b, 0.9f);
             painter.BeginPath();
             painter.MoveTo(new Vector2(offset + 2f, startYBlack));
             painter.LineTo(new Vector2(offset + 6f, rect.height));
@@ -208,8 +216,8 @@ public class InteractPromptWidget : MonoBehaviour
         }
 
         // 3. Draw outer border (gold if normal, red if forbidden)
-        Color strokeCol = _isForbidden ? new Color(229f / 255f, 72f / 255f, 60f / 255f, 0.65f)
-                                       : new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.25f);
+        Color strokeCol = _isForbidden ? new Color(danger.r, danger.g, danger.b, 0.65f)
+                                       : new Color(accentGold.r, accentGold.g, accentGold.b, 0.25f);
         painter.strokeColor = strokeCol;
         painter.lineWidth = 1.2f;
         painter.BeginPath();
@@ -225,12 +233,12 @@ public class InteractPromptWidget : MonoBehaviour
         // 4. Draw 4 3D metallic rivets
         System.Action<Vector2> drawRivet = center =>
         {
-            painter.fillColor = new Color(16f / 255f, 14f / 255f, 14f / 255f, 0.6f);
+            painter.fillColor = new Color(textShadow.r, textShadow.g, textShadow.b, 0.6f);
             painter.BeginPath();
             painter.Arc(center + new Vector2(0.4f, 0.4f), 2.2f, 0f, 360f);
             painter.Fill();
 
-            painter.fillColor = new Color(175f / 255f, 150f / 255f, 90f / 255f, 1.0f);
+            painter.fillColor = new Color(accentGold.r * 0.8f, accentGold.g * 0.75f, accentGold.b * 0.6f, 1.0f);
             painter.BeginPath();
             painter.Arc(center, 1.8f, 0f, 360f);
             painter.Fill();

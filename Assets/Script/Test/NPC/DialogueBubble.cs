@@ -21,13 +21,13 @@ public class DialogueBubble : MonoBehaviour
     public float fadeOut = 0.8f;
 
     [Header("Visuals")]
-    public Color textColor = new Color(0.95f, 0.92f, 0.8f, 1f);
-    public Color choiceColor = new Color(1f, 0.85f, 0.3f, 1f);
-    public Color scrimColor = new Color(0f, 0f, 0f, 0.6f);
-    public float lineFontSize = 26f;
-    public float choiceFontSize = 22f;
-    public Color hintColor = new Color(0.5f, 0.85f, 0.6f, 1f);
-    public float hintFontSize = 20f;
+    public Color textColor = new Color(0.96f, 0.96f, 0.96f, 1f);
+    public Color choiceColor = new Color(0.851f, 0.78f, 0.451f, 1f);
+    public Color scrimColor = new Color(0.055f, 0.067f, 0.082f, 0.92f);
+    public float lineFontSize = 22f;
+    public float choiceFontSize = 16f;
+    public Color hintColor = new Color(0.306f, 0.804f, 0.769f, 1f);
+    public float hintFontSize = 14f;
 
     private GameObject _panelGO;
     private UIDocument _doc;
@@ -40,6 +40,7 @@ public class DialogueBubble : MonoBehaviour
     private bool _choiceActive;
     private System.Action<bool> _choiceCallback;
     private float _prevTimeScale = 1f;
+    private bool _themed; // True when the DialogueBubble.uss stylesheet was applied.
 
     public bool IsVisible => _panelGO != null && _root != null && _root.resolvedStyle.opacity > 0f;
     public bool IsChoiceActive => _choiceActive;
@@ -95,14 +96,26 @@ public class DialogueBubble : MonoBehaviour
         // still picks input and blocks clicks on lower-sortingOrder UIs.
         _root.pickingMode = PickingMode.Ignore;
 
+        // Theme the bubble with the shared game UI stylesheet (Outfit SDF font,
+        // dark panel + gold border). Inline styles below act as a fallback when
+        // the stylesheet is missing so the widget never renders unreadable.
+        var sheet = Resources.Load<StyleSheet>("DialogueBubble");
+        _themed = sheet != null;
+        if (sheet != null)
+            _root.styleSheets.Add(sheet);
+
         // Semi-transparent scrim behind the text.
         _scrim = new VisualElement();
         _scrim.name = "DialogueScrim";
-        _scrim.style.backgroundColor = scrimColor;
-        _scrim.style.borderTopLeftRadius = 12f;
-        _scrim.style.borderTopRightRadius = 12f;
-        _scrim.style.borderBottomLeftRadius = 12f;
-        _scrim.style.borderBottomRightRadius = 12f;
+        _scrim.AddToClassList("dialogue-scrim");
+        if (!_themed) _scrim.style.backgroundColor = scrimColor;
+        if (!_themed)
+        {
+            _scrim.style.borderTopLeftRadius = 12f;
+            _scrim.style.borderTopRightRadius = 12f;
+            _scrim.style.borderBottomLeftRadius = 12f;
+            _scrim.style.borderBottomRightRadius = 12f;
+        }
         _scrim.style.paddingTop = 20f;
         _scrim.style.paddingBottom = 20f;
         _scrim.style.paddingLeft = 30f;
@@ -114,8 +127,9 @@ public class DialogueBubble : MonoBehaviour
         // Main dialogue line.
         _lineLabel = new Label();
         _lineLabel.name = "DialogueLine";
-        _lineLabel.style.color = textColor;
-        _lineLabel.style.fontSize = lineFontSize;
+        _lineLabel.AddToClassList("dialogue-line");
+        if (!_themed) _lineLabel.style.color = textColor;
+        if (!_themed) _lineLabel.style.fontSize = lineFontSize;
         _lineLabel.style.whiteSpace = WhiteSpace.Normal;
         _lineLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         _lineLabel.style.marginBottom = 12f;
@@ -124,8 +138,9 @@ public class DialogueBubble : MonoBehaviour
         // Y/N choice prompt.
         _choiceLabel = new Label();
         _choiceLabel.name = "DialogueChoice";
-        _choiceLabel.style.color = choiceColor;
-        _choiceLabel.style.fontSize = choiceFontSize;
+        _choiceLabel.AddToClassList("dialogue-choice");
+        if (!_themed) _choiceLabel.style.color = choiceColor;
+        if (!_themed) _choiceLabel.style.fontSize = choiceFontSize;
         _choiceLabel.style.whiteSpace = WhiteSpace.Normal;
         _choiceLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         _choiceLabel.style.display = DisplayStyle.None;
@@ -134,8 +149,9 @@ public class DialogueBubble : MonoBehaviour
         // Optional hint shown under the choice (helps answer NPC questions).
         _hintLabel = new Label();
         _hintLabel.name = "DialogueHint";
-        _hintLabel.style.color = hintColor;
-        _hintLabel.style.fontSize = hintFontSize;
+        _hintLabel.AddToClassList("dialogue-hint");
+        if (!_themed) _hintLabel.style.color = hintColor;
+        if (!_themed) _hintLabel.style.fontSize = hintFontSize;
         _hintLabel.style.whiteSpace = WhiteSpace.Normal;
         _hintLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         _hintLabel.style.marginTop = 14f;
