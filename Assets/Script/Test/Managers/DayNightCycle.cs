@@ -1,29 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 /// <summary>
 /// Day/night lighting system for story mode.
-///
-/// Combines two behaviors:
-/// - Per-chapter time-of-day anchor: when StoryManager.OnChapterChanged fires,
-///   the cycle jumps to a configurable start hour for that chapter (e.g. Ch1
-///   starts at dawn, Ch4 starts at night). This gives each chapter a distinct
-///   narrative mood.
-/// - Continuous cycle: after the chapter anchor is set, time advances at
-///   `cycleSpeed` game-hours per real second, so lighting keeps drifting while
-///   the player is in the chapter. Set `cycleSpeed = 0` to freeze time.
-///
-/// Lighting is driven by an array of `DayNightKeyframe`s sorted by hour. The
-/// system linearly interpolates between the two surrounding keyframes every
-/// frame and applies the result to:
-/// - The sun DirectionalLight (rotation, color, intensity, shadows)
-/// - An optional fill DirectionalLight (color, intensity)
-/// - RenderSettings (fog enabled/color/density, ambient color/intensity)
-/// - The SyntyStudios/SkyGradient skydome material (_ColorTop, _ColorBottom)
-/// - Two PostProcess volumes (day/night weight)
-///
-/// All visual state is driven from a single source of truth (this component)
-/// so designers can tune the entire day/night look from one Inspector.
 /// </summary>
 public class DayNightCycle : MonoBehaviour
 {
@@ -130,94 +113,7 @@ public class DayNightCycle : MonoBehaviour
 
     [Header("Keyframes")]
     [Tooltip("Day/night keyframes sorted ascending by hour. The cycle wraps from the last back to the first.")]
-    public DayNightKeyframe[] keyframes = new DayNightKeyframe[]
-    {
-        new DayNightKeyframe // Dawn
-        {
-            hour = 6f,
-            sunEulerX = 10f,
-            sunColor = new Color(0.95f, 0.75f, 0.48f, 1f),
-            sunIntensity = 0.75f,
-            fillColor = new Color(0.6f, 0.6f, 0.8f, 1f),
-            fillIntensity = 0.15f,
-            fogEnabled = true,
-            fogColor = new Color(0.46f, 0.3f, 0.26f, 1f),
-            fogDensity = 0.01f,
-            ambientColor = new Color(0.35f, 0.32f, 0.28f, 1f),
-            ambientIntensity = 1f,
-            skyTopColor = new Color(0.73f, 0.38f, 0.38f, 1f),
-            skyBottomColor = new Color(0.88f, 0.71f, 0.51f, 1f),
-            dayVolumeWeight = 0.7f
-        },
-        new DayNightKeyframe // Noon
-        {
-            hour = 12f,
-            sunEulerX = 90f,
-            sunColor = new Color(0.92f, 0.90f, 0.84f, 1f),
-            sunIntensity = 0.85f,
-            fillColor = new Color(0.7f, 0.75f, 0.85f, 1f),
-            fillIntensity = 0.2f,
-            fogEnabled = true,
-            fogColor = new Color(0.6f, 0.65f, 0.7f, 1f),
-            fogDensity = 0.005f,
-            ambientColor = new Color(0.5f, 0.5f, 0.5f, 1f),
-            ambientIntensity = 1.1f,
-            skyTopColor = new Color(0.35f, 0.55f, 0.85f, 1f),
-            skyBottomColor = new Color(0.75f, 0.85f, 0.95f, 1f),
-            dayVolumeWeight = 1f
-        },
-        new DayNightKeyframe // Dusk
-        {
-            hour = 18f,
-            sunEulerX = 170f,
-            sunColor = new Color(0.90f, 0.52f, 0.28f, 1f),
-            sunIntensity = 0.70f,
-            fillColor = new Color(0.5f, 0.4f, 0.6f, 1f),
-            fillIntensity = 0.25f,
-            fogEnabled = true,
-            fogColor = new Color(0.5f, 0.28f, 0.2f, 1f),
-            fogDensity = 0.012f,
-            ambientColor = new Color(0.3f, 0.22f, 0.2f, 1f),
-            ambientIntensity = 0.9f,
-            skyTopColor = new Color(0.6f, 0.25f, 0.3f, 1f),
-            skyBottomColor = new Color(0.9f, 0.5f, 0.25f, 1f),
-            dayVolumeWeight = 0.4f
-        },
-        new DayNightKeyframe // Night
-        {
-            hour = 22f,
-            sunEulerX = 220f,
-            sunColor = new Color(0.25f, 0.3f, 0.45f, 1f),
-            sunIntensity = 0.15f,
-            fillColor = new Color(0.3f, 0.35f, 0.55f, 1f),
-            fillIntensity = 0.3f,
-            fogEnabled = true,
-            fogColor = new Color(0.08f, 0.09f, 0.12f, 1f),
-            fogDensity = 0.02f,
-            ambientColor = new Color(0.1f, 0.12f, 0.18f, 1f),
-            ambientIntensity = 0.5f,
-            skyTopColor = new Color(0.03f, 0.04f, 0.08f, 1f),
-            skyBottomColor = new Color(0.1f, 0.12f, 0.2f, 1f),
-            dayVolumeWeight = 0f
-        },
-        new DayNightKeyframe // Deep night wrap point
-        {
-            hour = 24f,
-            sunEulerX = 350f,
-            sunColor = new Color(0.2f, 0.25f, 0.4f, 1f),
-            sunIntensity = 0.1f,
-            fillColor = new Color(0.25f, 0.3f, 0.5f, 1f),
-            fillIntensity = 0.25f,
-            fogEnabled = true,
-            fogColor = new Color(0.06f, 0.07f, 0.1f, 1f),
-            fogDensity = 0.022f,
-            ambientColor = new Color(0.08f, 0.1f, 0.16f, 1f),
-            ambientIntensity = 0.45f,
-            skyTopColor = new Color(0.02f, 0.03f, 0.06f, 1f),
-            skyBottomColor = new Color(0.08f, 0.1f, 0.18f, 1f),
-            dayVolumeWeight = 0f
-        }
-    };
+    public DayNightKeyframe[] keyframes;
 
     [Header("Post Processing")]
     [Tooltip("Day PostProcess volume (global). Weight is driven by keyframes.")]
@@ -232,138 +128,73 @@ public class DayNightCycle : MonoBehaviour
     [Header("Post Processing Support")]
     public PostProcessResources postProcessResources;
 
-    // ---- Blend state for smooth chapter transitions ----
     private bool _blending;
     private float _blendFromTime;
     private float _blendToTime;
     private float _blendElapsed;
 
-    // ---- Cached skydome material instance (MaterialPropertyBlock avoids touching the shared asset) ----
     private MaterialPropertyBlock _skyBlock;
-
-    // ---- Cached sun base yaw (azimuth) captured at Awake so we can drive pitch
-    // (X) without inheriting the unstable Y/Z euler representation that flips
-    // when X crosses 90°/180° (gimbal lock). Setting localRotation via
-    // Quaternion.Euler(x, yaw, 0) every frame keeps the sun direction stable. ----
     private float _sunBaseYaw;
+    [System.NonSerialized] private bool _hasCapturedSunYaw;
 
     private PostProcessProfile _runtimeDayProfile;
     private PostProcessProfile _runtimeNightProfile;
-    private Camera _cachedMainCam;
-    private bool _isCameraPpInitialized = false;
+    [System.NonSerialized] private Camera _lastConfiguredCam;
+    [System.NonSerialized] private bool _isCameraPpInitialized;
 
-    private void OnDestroy()
+    private void Reset()
     {
-        if (_runtimeDayProfile != null)
-        {
-            if (Application.isPlaying) Destroy(_runtimeDayProfile);
-            else DestroyImmediate(_runtimeDayProfile);
-            _runtimeDayProfile = null;
-        }
-        if (_runtimeNightProfile != null)
-        {
-            if (Application.isPlaying) Destroy(_runtimeNightProfile);
-            else DestroyImmediate(_runtimeNightProfile);
-            _runtimeNightProfile = null;
-        }
+        keyframes = GetDefaultKeyframes();
     }
 
-    private void ConfigureVolumeProfile(PostProcessVolume volume, ref PostProcessProfile runtimeProfile, float postExposureVal)
+    [ContextMenu("Reset to Default Keyframes")]
+    public void ResetDefaultKeyframes()
     {
-        if (volume == null) return;
-
-        if (runtimeProfile != null)
-        {
-            if (Application.isPlaying) Destroy(runtimeProfile);
-            else DestroyImmediate(runtimeProfile);
-            runtimeProfile = null;
-        }
-
-        if (volume.sharedProfile != null)
-            runtimeProfile = Instantiate(volume.sharedProfile);
-        else
-            runtimeProfile = ScriptableObject.CreateInstance<PostProcessProfile>();
-
-        Bloom bloom = runtimeProfile.GetSetting<Bloom>();
-        if (bloom == null) bloom = runtimeProfile.AddSettings<Bloom>();
-        bloom.enabled.Override(true);
-        bloom.threshold.Override(1.20f); // 1.20f threshold in FP16 HDR space (0% diffuse bloom haze)
-        bloom.intensity.Override(0.04f); // Ultra-soft 4% ambient glow
-        bloom.clamp.Override(2.0f);      // Tight 2.0f specular bloom ceiling
-
-        ColorGrading colorGrading = runtimeProfile.GetSetting<ColorGrading>();
-        if (colorGrading == null) colorGrading = runtimeProfile.AddSettings<ColorGrading>();
-        colorGrading.enabled.Override(true);
-        colorGrading.gradingMode.Override(GradingMode.HighDefinitionRange); // Mandatory for ACES Tonemapping!
-        colorGrading.tonemapper.Override(Tonemapper.ACES);                   // Filmic ACES Tonemapping compresses HDR highlights cleanly!
-        colorGrading.postExposure.Override(postExposureVal);                 // Day: -0.40 EV, Night: -0.70 EV
-
-        volume.profile = runtimeProfile; // Isolated runtime profile instance
-        volume.isGlobal = true;
-        volume.priority = 100f;          // Equal priority 100f for zero-cost weight blending
-        volume.gameObject.SetActive(true); // Active 24/7 for zero-flicker weight blending
+#if UNITY_EDITOR
+        Undo.RecordObject(this, "Reset Default Keyframes");
+#endif
+        keyframes = GetDefaultKeyframes();
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
 
-    private void EnsurePostProcessResourcesLoaded()
+    [ContextMenu("Upgrade Keyframes to 9-Grid (Fix Dark Scene)")]
+    public void UpgradeKeyframesTo9Grid()
     {
-        if (postProcessResources == null)
-        {
-            postProcessResources = Resources.Load<PostProcessResources>("PostProcessResources");
-        }
-        if (postProcessResources == null)
-        {
-            var loadedRes = Resources.FindObjectsOfTypeAll<PostProcessResources>();
-            if (loadedRes != null && loadedRes.Length > 0)
-                postProcessResources = loadedRes[0];
-        }
+#if UNITY_EDITOR
+        Undo.RecordObject(this, "Upgrade Keyframes to 9-Grid");
+#endif
+        keyframes = GetDefaultKeyframes();
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
 
-    private void EnsureMainCameraConfigured()
+    private DayNightKeyframe[] GetDefaultKeyframes()
     {
-        Camera cam = Camera.main;
-        if (cam == null || cam.orthographic) return;
-
-        if (cam.name.Contains("Minimap") || cam.name.Contains("UI")) return;
-
-        if (_cachedMainCam == cam && _isCameraPpInitialized) return;
-
-        cam.allowHDR = true; // Mandatory FP16 HDR Target allocation for ACES Tonemapping!
-
-        var ppLayer = cam.GetComponent<PostProcessLayer>();
-        if (ppLayer == null)
+        return new DayNightKeyframe[]
         {
-            ppLayer = cam.gameObject.AddComponent<PostProcessLayer>();
-            ppLayer.volumeTrigger = cam.transform;
-        }
-
-        if (ppLayer != null)
-        {
-            ppLayer.enabled = true;
-            if (ppLayer.volumeTrigger == null) ppLayer.volumeTrigger = cam.transform;
-
-            int mask = 0;
-            if (dayVolume != null) mask |= (1 << dayVolume.gameObject.layer);
-            if (nightVolume != null) mask |= (1 << nightVolume.gameObject.layer);
-            if (mask == 0) mask = 1 << gameObject.layer;
-            ppLayer.volumeLayer = mask; // Pure Volume Layer Mask (excludes Layer 0 Default)
-
-            EnsurePostProcessResourcesLoaded();
-            if (postProcessResources != null)
-            {
-                ppLayer.Init(postProcessResources);
-                _cachedMainCam = cam;
-                _isCameraPpInitialized = true; // Atomic Init Guard: ONLY set cache once Init succeeds!
-            }
-        }
-
-        var flareLayer = cam.GetComponent<FlareLayer>();
-        if (flareLayer != null && flareLayer.enabled)
-            flareLayer.enabled = false;
+            new DayNightKeyframe { hour = 0f, sunEulerX = 300f, sunColor = new Color(0.20f, 0.25f, 0.40f, 1f), sunIntensity = 0.00f, fillColor = new Color(0.35f, 0.45f, 0.65f, 1f), fillIntensity = 0.25f, fogEnabled = true, fogColor = new Color(0.06f, 0.07f, 0.10f, 1f), fogDensity = 0.022f, ambientColor = new Color(0.35f, 0.40f, 0.58f, 1f), ambientIntensity = 0.85f, skyTopColor = new Color(0.03f, 0.04f, 0.10f, 1f), skyBottomColor = new Color(0.08f, 0.10f, 0.18f, 1f), dayVolumeWeight = 0.0f },
+            new DayNightKeyframe { hour = 5f, sunEulerX = 350f, sunColor = new Color(0.95f, 0.75f, 0.48f, 1f), sunIntensity = 0.00f, fillColor = new Color(0.40f, 0.50f, 0.70f, 1f), fillIntensity = 0.28f, fogEnabled = true, fogColor = new Color(0.15f, 0.15f, 0.20f, 1f), fogDensity = 0.015f, ambientColor = new Color(0.38f, 0.45f, 0.60f, 1f), ambientIntensity = 0.90f, skyTopColor = new Color(0.10f, 0.12f, 0.20f, 1f), skyBottomColor = new Color(0.20f, 0.25f, 0.35f, 1f), dayVolumeWeight = 0.0f },
+            new DayNightKeyframe { hour = 6f, sunEulerX = 10f, sunColor = new Color(0.95f, 0.78f, 0.52f, 1f), sunIntensity = 1.20f, fillColor = new Color(0.6f, 0.6f, 0.8f, 1f), fillIntensity = 0.00f, fogEnabled = true, fogColor = new Color(0.46f, 0.3f, 0.26f, 1f), fogDensity = 0.01f, ambientColor = new Color(0.55f, 0.50f, 0.45f, 1f), ambientIntensity = 1.15f, skyTopColor = new Color(0.73f, 0.38f, 0.38f, 1f), skyBottomColor = new Color(0.88f, 0.71f, 0.51f, 1f), dayVolumeWeight = 0.5f },
+            new DayNightKeyframe { hour = 12f, sunEulerX = 90f, sunColor = new Color(0.95f, 0.93f, 0.88f, 1f), sunIntensity = 1.40f, fillColor = new Color(0.7f, 0.75f, 0.85f, 1f), fillIntensity = 0.00f, fogEnabled = true, fogColor = new Color(0.6f, 0.65f, 0.7f, 1f), fogDensity = 0.005f, ambientColor = new Color(0.65f, 0.65f, 0.65f, 1f), ambientIntensity = 1.25f, skyTopColor = new Color(0.35f, 0.55f, 0.85f, 1f), skyBottomColor = new Color(0.75f, 0.85f, 0.95f, 1f), dayVolumeWeight = 1.0f },
+            new DayNightKeyframe { hour = 16f, sunEulerX = 140f, sunColor = new Color(0.95f, 0.75f, 0.45f, 1f), sunIntensity = 0.85f, fillColor = new Color(0.6f, 0.55f, 0.75f, 1f), fillIntensity = 0.00f, fogEnabled = true, fogColor = new Color(0.52f, 0.35f, 0.28f, 1f), fogDensity = 0.008f, ambientColor = new Color(0.58f, 0.48f, 0.40f, 1f), ambientIntensity = 1.10f, skyTopColor = new Color(0.55f, 0.35f, 0.55f, 1f), skyBottomColor = new Color(0.85f, 0.60f, 0.40f, 1f), dayVolumeWeight = 0.75f },
+            new DayNightKeyframe { hour = 18f, sunEulerX = 170f, sunColor = new Color(0.90f, 0.52f, 0.28f, 1f), sunIntensity = 0.35f, fillColor = new Color(0.5f, 0.4f, 0.6f, 1f), fillIntensity = 0.00f, fogEnabled = true, fogColor = new Color(0.5f, 0.28f, 0.2f, 1f), fogDensity = 0.012f, ambientColor = new Color(0.48f, 0.38f, 0.35f, 1f), ambientIntensity = 0.85f, skyTopColor = new Color(0.6f, 0.25f, 0.3f, 1f), skyBottomColor = new Color(0.9f, 0.5f, 0.25f, 1f), dayVolumeWeight = 0.35f },
+            new DayNightKeyframe { hour = 19f, sunEulerX = 185f, sunColor = new Color(0.80f, 0.40f, 0.25f, 1f), sunIntensity = 0.05f, fillColor = new Color(0.40f, 0.45f, 0.65f, 1f), fillIntensity = 0.25f, fogEnabled = true, fogColor = new Color(0.12f, 0.12f, 0.15f, 1f), fogDensity = 0.016f, ambientColor = new Color(0.38f, 0.42f, 0.58f, 1f), ambientIntensity = 0.90f, skyTopColor = new Color(0.08f, 0.08f, 0.16f, 1f), skyBottomColor = new Color(0.20f, 0.20f, 0.30f, 1f), dayVolumeWeight = 0.10f },
+            new DayNightKeyframe { hour = 20f, sunEulerX = 210f, sunColor = new Color(0.30f, 0.32f, 0.50f, 1f), sunIntensity = 0.00f, fillColor = new Color(0.35f, 0.45f, 0.65f, 1f), fillIntensity = 0.25f, fogEnabled = true, fogColor = new Color(0.08f, 0.09f, 0.12f, 1f), fogDensity = 0.018f, ambientColor = new Color(0.35f, 0.40f, 0.58f, 1f), ambientIntensity = 0.85f, skyTopColor = new Color(0.04f, 0.05f, 0.12f, 1f), skyBottomColor = new Color(0.12f, 0.15f, 0.25f, 1f), dayVolumeWeight = 0.0f },
+            new DayNightKeyframe { hour = 22f, sunEulerX = 240f, sunColor = new Color(0.25f, 0.28f, 0.45f, 1f), sunIntensity = 0.00f, fillColor = new Color(0.35f, 0.45f, 0.65f, 1f), fillIntensity = 0.25f, fogEnabled = true, fogColor = new Color(0.07f, 0.08f, 0.11f, 1f), fogDensity = 0.020f, ambientColor = new Color(0.35f, 0.40f, 0.58f, 1f), ambientIntensity = 0.85f, skyTopColor = new Color(0.035f, 0.045f, 0.11f, 1f), skyBottomColor = new Color(0.10f, 0.12f, 0.20f, 1f), dayVolumeWeight = 0.0f }
+        };
     }
 
     private void Awake()
     {
         Instance = this;
+
+        if (keyframes == null || keyframes.Length < 9)
+        {
+            keyframes = GetDefaultKeyframes();
+        }
 
         if (sunLight == null)
         {
@@ -382,10 +213,123 @@ public class DayNightCycle : MonoBehaviour
         {
             sunLight.type = LightType.Directional;
             sunLight.renderMode = LightRenderMode.ForcePixel;
-            _sunBaseYaw = sunLight.transform.localEulerAngles.y;
+            if (!_hasCapturedSunYaw)
+            {
+                _sunBaseYaw = sunLight.transform.localEulerAngles.y;
+                _hasCapturedSunYaw = true;
+            }
         }
 
         _skyBlock = new MaterialPropertyBlock();
+    }
+
+    private void OnDestroy()
+    {
+        if (dayVolume != null && dayVolume.profile == _runtimeDayProfile) dayVolume.profile = null;
+        if (nightVolume != null && nightVolume.profile == _runtimeNightProfile) nightVolume.profile = null;
+
+        if (_runtimeDayProfile != null)
+        {
+            if (Application.isPlaying) Destroy(_runtimeDayProfile);
+            else DestroyImmediate(_runtimeDayProfile);
+            _runtimeDayProfile = null;
+        }
+        if (_runtimeNightProfile != null)
+        {
+            if (Application.isPlaying) Destroy(_runtimeNightProfile);
+            else DestroyImmediate(_runtimeNightProfile);
+            _runtimeNightProfile = null;
+        }
+    }
+
+    private void ConfigureVolumeProfile(PostProcessVolume volume, ref PostProcessProfile runtimeProfile, float postExposureValue, float priorityValue)
+    {
+        if (volume == null) return;
+
+        volume.isGlobal = true;
+        volume.priority = priorityValue;
+
+        if (runtimeProfile != null)
+        {
+            if (Application.isPlaying) Destroy(runtimeProfile);
+            else DestroyImmediate(runtimeProfile);
+            runtimeProfile = null;
+        }
+
+        if (volume.sharedProfile != null)
+        {
+            runtimeProfile = Instantiate(volume.sharedProfile);
+        }
+        else
+        {
+            runtimeProfile = ScriptableObject.CreateInstance<PostProcessProfile>();
+        }
+        runtimeProfile.name = volume.name + "_RuntimeProfile";
+
+        ColorGrading colorGrading = runtimeProfile.GetSetting<ColorGrading>();
+        if (colorGrading == null)
+        {
+            colorGrading = runtimeProfile.AddSettings<ColorGrading>();
+        }
+        colorGrading.enabled.Override(true);
+        colorGrading.gradingMode.Override(GradingMode.HighDefinitionRange);
+        colorGrading.tonemapper.Override(Tonemapper.ACES);
+        colorGrading.postExposure.Override(postExposureValue);
+
+        Bloom bloom = runtimeProfile.GetSetting<Bloom>();
+        if (bloom == null)
+        {
+            bloom = runtimeProfile.AddSettings<Bloom>();
+        }
+        bloom.enabled.Override(true);
+        bloom.intensity.Override(0.20f);
+        bloom.threshold.Override(1.20f);
+        bloom.clamp.Override(2.5f);
+
+        volume.profile = runtimeProfile;
+    }
+
+    public void EnsureMainCameraConfigured()
+    {
+        Camera mainCam = Camera.main;
+        if (mainCam == null) return;
+        _lastConfiguredCam = mainCam;
+        if (mainCam.name.Contains("Minimap") || mainCam.name.Contains("UI")) return;
+
+        mainCam.allowHDR = true;
+
+        PostProcessLayer layer = mainCam.GetComponent<PostProcessLayer>();
+        if (layer == null)
+        {
+            layer = mainCam.gameObject.AddComponent<PostProcessLayer>();
+        }
+
+        layer.volumeTrigger = mainCam.transform;
+
+        int dayLayer = dayVolume != null ? dayVolume.gameObject.layer : -1;
+        int nightLayer = nightVolume != null ? nightVolume.gameObject.layer : -1;
+
+        int mask = 0;
+        if (dayLayer >= 0 && dayLayer < 32) mask |= (1 << dayLayer);
+        if (nightLayer >= 0 && nightLayer < 32) mask |= (1 << nightLayer);
+
+        int ppLayerIndex = LayerMask.NameToLayer("PostProcessing");
+        if (ppLayerIndex >= 0 && ppLayerIndex < 32) mask |= (1 << ppLayerIndex);
+
+        layer.volumeLayer = mask != 0 ? mask : ~0;
+
+        PostProcessResources res = postProcessResources;
+        if (res == null) res = Resources.Load<PostProcessResources>("PostProcessResources");
+        if (res == null)
+        {
+            var allRes = Resources.FindObjectsOfTypeAll<PostProcessResources>();
+            if (allRes != null && allRes.Length > 0) res = allRes[0];
+        }
+        if (res != null)
+        {
+            layer.Init(res);
+            _isCameraPpInitialized = true;
+        }
     }
 
     private void OnEnable()
@@ -402,8 +346,8 @@ public class DayNightCycle : MonoBehaviour
     private void Start()
     {
         Subscribe();
-        ConfigureVolumeProfile(dayVolume, ref _runtimeDayProfile, -0.40f);
-        ConfigureVolumeProfile(nightVolume, ref _runtimeNightProfile, -0.70f);
+        ConfigureVolumeProfile(dayVolume, ref _runtimeDayProfile, +0.20f, 100f);
+        ConfigureVolumeProfile(nightVolume, ref _runtimeNightProfile, 0.00f, 100f);
         EnsureMainCameraConfigured();
         ApplyEvaluatedState(Evaluate(timeOfDay));
     }
@@ -465,52 +409,62 @@ public class DayNightCycle : MonoBehaviour
         ApplyEvaluatedState(state);
     }
 
-    private DayNightKeyframe Evaluate(float hour)
+    public DayNightKeyframe Evaluate(float hour)
     {
         if (keyframes == null || keyframes.Length == 0)
-            return default;
+            return default(DayNightKeyframe);
 
-        if (keyframes.Length == 1)
-            return keyframes[0];
-
+        hour = Mathf.Repeat(hour, 24f);
         int n = keyframes.Length;
-        int i0 = -1, i1 = -1;
+        if (n == 1) return keyframes[0];
+
+        int i0 = n - 1;
+        int i1 = 0;
+
         for (int i = 0; i < n; i++)
         {
             int next = (i + 1) % n;
             float h0 = keyframes[i].hour;
             float h1 = keyframes[next].hour;
-            if (h1 <= h0)
+            float h1Norm = h1 <= h0 ? h1 + 24f : h1;
+            float hourNorm = (hour < h0 && h1 <= h0) ? hour + 24f : hour;
+
+            if (hourNorm >= h0 && hourNorm < h1Norm)
             {
-                if (hour >= h0 || hour < h1) { i0 = i; i1 = next; break; }
-            }
-            else if (hour >= h0 && hour < h1)
-            {
-                i0 = i; i1 = next; break;
+                i0 = i;
+                i1 = next;
+                break;
             }
         }
 
-        if (i0 < 0)
-            return keyframes[n - 1];
+        DayNightKeyframe k0 = keyframes[i0];
+        DayNightKeyframe k1 = keyframes[i1];
 
-        var k0 = keyframes[i0];
-        var k1 = keyframes[i1];
+        float k0H = k0.hour;
+        float k1H = k1.hour;
+        if (k1H <= k0H) k1H += 24f;
 
-        float span = k1.hour - k0.hour;
-        if (span <= 0f) span += 24f;
-        float t = (hour - k0.hour);
-        if (t < 0f) t += 24f;
-        t = Mathf.Clamp01(t / span);
+        float evalHour = hour;
+        if (evalHour < k0H) evalHour += 24f;
+
+        float span = k1H - k0H;
+        float t = span > 0.0001f ? (evalHour - k0H) / span : 0f;
+        t = Mathf.Clamp01(t);
 
         return Lerp(k0, k1, t);
     }
 
     private static DayNightKeyframe Lerp(DayNightKeyframe a, DayNightKeyframe b, float t)
     {
+        float h0 = a.hour;
+        float h1 = b.hour;
+        if (h1 < h0) h1 += 24f;
+        float h = Mathf.Repeat(Mathf.Lerp(h0, h1, t), 24f);
+
         return new DayNightKeyframe
         {
-            hour = Mathf.Lerp(a.hour, b.hour, t),
-            sunEulerX = Mathf.Lerp(a.sunEulerX, b.sunEulerX, t),
+            hour = h,
+            sunEulerX = Mathf.LerpAngle(a.sunEulerX, b.sunEulerX, t),
             sunColor = Color.Lerp(a.sunColor, b.sunColor, t),
             sunIntensity = Mathf.Lerp(a.sunIntensity, b.sunIntensity, t),
             fillColor = Color.Lerp(a.fillColor, b.fillColor, t),
@@ -528,8 +482,6 @@ public class DayNightCycle : MonoBehaviour
 
     private void ApplyEvaluatedState(DayNightKeyframe s)
     {
-        EnsureMainCameraConfigured();
-
         if (dayVolume != null)
         {
             dayVolume.gameObject.SetActive(true);
@@ -541,44 +493,46 @@ public class DayNightCycle : MonoBehaviour
             nightVolume.weight = 1f - s.dayVolumeWeight;
         }
 
-        float sunScale = 0.65f;
-        float ambScale = 0.70f;
+        if (!_hasCapturedSunYaw && sunLight != null)
+        {
+            _sunBaseYaw = sunLight.transform.localEulerAngles.y;
+            _hasCapturedSunYaw = true;
+        }
+
+        float sunPitch = s.sunEulerX;
+        float sunYaw = _sunBaseYaw;
+        bool isSunActive = s.sunIntensity > 0.001f;
 
         if (sunLight != null)
         {
-            float rad = (s.sunEulerX - 90f) * Mathf.Deg2Rad;
-            Vector3 sunDir = new Vector3(0f, -Mathf.Cos(rad), Mathf.Sin(rad));
-            if (_sunBaseYaw != 0f)
-                sunDir = Quaternion.AngleAxis(_sunBaseYaw, Vector3.up) * sunDir;
-            Vector3 upRef = Mathf.Abs(Vector3.Dot(sunDir, Vector3.up)) > 0.99f
-                ? Vector3.forward
-                : Vector3.up;
-            sunLight.transform.localRotation = Quaternion.LookRotation(sunDir, upRef);
+            sunLight.transform.localRotation = Quaternion.Euler(sunPitch, sunYaw, 0f);
             sunLight.color = s.sunColor;
-            sunLight.intensity = s.sunIntensity * sunScale;
+            sunLight.intensity = isSunActive ? s.sunIntensity : 0f;
             sunLight.flare = null;
-            sunLight.shadows = (s.sunIntensity * sunScale) <= 0.05f ? LightShadows.None : LightShadows.Hard;
+            sunLight.shadows = LightShadows.Soft;
+            sunLight.enabled = isSunActive;
         }
+
+        float dayFactor = s.dayVolumeWeight;
 
         if (fillLight != null)
         {
+            bool isFillActive = s.fillIntensity > 0.001f && !isSunActive;
+            fillLight.transform.localRotation = Quaternion.Euler(50f, sunYaw + 180f, 0f);
             fillLight.color = s.fillColor;
-            fillLight.intensity = s.fillIntensity * sunScale;
+            fillLight.intensity = isFillActive ? s.fillIntensity : 0f;
             fillLight.flare = null;
+            fillLight.shadows = LightShadows.None;
+            fillLight.enabled = isFillActive;
         }
 
-        if (RenderSettings.ambientMode != UnityEngine.Rendering.AmbientMode.Trilight)
-        {
-            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-        }
+        Color skyAmb = s.ambientColor * s.ambientIntensity;
 
-        float amb = s.ambientIntensity * ambScale;
-        Color skyAmb = s.ambientColor * amb;
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
         RenderSettings.ambientSkyColor = skyAmb;
-        RenderSettings.ambientEquatorColor = skyAmb * 0.75f;
-        RenderSettings.ambientGroundColor = skyAmb * 0.50f;
-        RenderSettings.ambientIntensity = 1.0f;
-        RenderSettings.reflectionIntensity = Mathf.Clamp(amb * 0.25f, 0.03f, 0.12f);
+        RenderSettings.ambientEquatorColor = Color.Lerp(skyAmb * 0.80f, skyAmb * 0.90f, dayFactor);
+        RenderSettings.ambientGroundColor = Color.Lerp(skyAmb * 0.70f, skyAmb * 0.88f, dayFactor);
+        RenderSettings.reflectionIntensity = Mathf.Lerp(0.40f, 0.85f, dayFactor);
 
         RenderSettings.fog = s.fogEnabled;
         RenderSettings.fogColor = s.fogColor;
@@ -588,9 +542,19 @@ public class DayNightCycle : MonoBehaviour
         {
             if (_skyBlock == null) _skyBlock = new MaterialPropertyBlock();
             skydomeRenderer.GetPropertyBlock(_skyBlock);
-            _skyBlock.SetColor(skyTopColorProp, s.skyTopColor * 0.75f);
-            _skyBlock.SetColor(skyBottomColorProp, s.skyBottomColor * 0.75f);
+            _skyBlock.SetColor(skyTopColorProp, s.skyTopColor);
+            _skyBlock.SetColor(skyBottomColorProp, s.skyBottomColor);
             skydomeRenderer.SetPropertyBlock(_skyBlock);
+        }
+
+        if (Application.isPlaying)
+        {
+            Camera currentMain = Camera.main;
+            if (currentMain != null && (currentMain != _lastConfiguredCam || !_isCameraPpInitialized))
+            {
+                EnsureMainCameraConfigured();
+            }
         }
     }
 }
+
