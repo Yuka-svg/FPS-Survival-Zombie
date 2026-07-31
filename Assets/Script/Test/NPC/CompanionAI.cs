@@ -460,6 +460,8 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
         int enemyLayerMask = 1 << LayerMask.NameToLayer("Enemy");
         int count = Physics.OverlapSphereNonAlloc(
             transform.position, detectRange, _enemyBuffer, enemyLayerMask, QueryTriggerInteraction.Ignore);
+        int shootMask = GetShootMask();
+        Vector3 origin = GetMuzzleOrigin();
         Transform best = null;
         float bestSqr = float.MaxValue;
         for (int i = 0; i < count; i++)
@@ -470,6 +472,26 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
             // Skip dead enemies.
             var dmg = col.GetComponent<IDamageable>();
             if (dmg is IEnemyHealthReadout readout && readout.IsDead) continue;
+            // Line-of-sight check: only consider enemies the companion can
+            // actually hit. Without this the companion wastes ammo firing at
+            // enemies behind walls.
+            Vector3 losDir = (col.bounds.center - origin).normalized;
+            bool clearLos;
+            if (Physics.Raycast(origin, losDir, out var losHit, shotgunRange, shootMask, QueryTriggerInteraction.Ignore))
+            {
+                clearLos = losHit.collider == col ||
+                           losHit.collider.transform.IsChildOf(col.transform) ||
+                           col.transform.IsChildOf(losHit.collider.transform);
+            }
+            else
+            {
+                // Raycast missed entirely — either nothing solid is between
+                // the muzzle and the target, or the muzzle is inside the
+                // enemy's collider at point-blank range. Both count as clear
+                // line of sight.
+                clearLos = col.bounds.Contains(origin);
+            }
+            if (!clearLos) continue;
             float sqr = (col.transform.position - transform.position).sqrMagnitude;
             if (sqr < bestSqr) { bestSqr = sqr; best = col.transform; }
         }
@@ -534,7 +556,31 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
         hasHit = false;
         hitPoint = origin + dir * shotgunRange;
 
-        if (targetCollider != null && targetCollider.Raycast(new Ray(origin, dir), out var targetHit, shotgunRange))
+        // Line-of-sight check toward the target's center using the full shoot
+        // mask (includes walls/environment). If something solid sits between
+        // the muzzle and the target, the shot is blocked — even though the
+        // spread-compensating collider.Raycast below would otherwise hit it.
+        // This prevents the companion from shooting through walls.
+        bool lineOfSight = false;
+        if (targetCollider != null)
+        {
+            Vector3 losDir = (targetCollider.bounds.center - origin).normalized;
+            if (Physics.Raycast(origin, losDir, out var losHit, shotgunRange, shootMask, QueryTriggerInteraction.Ignore))
+            {
+                lineOfSight = losHit.collider == targetCollider ||
+                              losHit.collider.transform.IsChildOf(targetCollider.transform) ||
+                              targetCollider.transform.IsChildOf(losHit.collider.transform);
+            }
+            else
+            {
+                // Raycast missed entirely — nothing solid between the muzzle
+                // and the target (e.g. muzzle is inside the target's collider
+                // at point-blank range). Treat as clear line of sight.
+                lineOfSight = true;
+            }
+        }
+
+        if (lineOfSight && targetCollider != null && targetCollider.Raycast(new Ray(origin, dir), out var targetHit, shotgunRange))
         {
             hasHit = true;
             hitPoint = targetHit.point;
