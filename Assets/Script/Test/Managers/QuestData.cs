@@ -25,6 +25,11 @@ public class QuestData : ScriptableObject
     [Tooltip("Short objective text shown in the quest tracker (e.g. 'Tiêu diệt zombie').")]
     public string objective;
 
+    [TextArea(3, 10)]
+    [Tooltip("Step-by-step gameplay instructions (hướng dẫn chơi) for this quest. " +
+             "Shown in the quest tracker and the tutorial overlay (H).")]
+    public string instructions;
+
     [Header("Rewards")]
     [Tooltip("EXP granted when the quest is completed. 0 = no reward.")]
     public float expReward = 0f;

@@ -22,6 +22,9 @@ MonoBehaviour:
     v\xE0 ng\u01B0\u1EDDi anh trai."
   objective: "Thu th\u1EADp \u0111\u1EE7 4 t\xE0i li\u1EC7u/journal trong khu chung
     c\u01B0"
+  instructions: "1. L\u1EE5c so\xE1t chung c\u01B0 cao t\u1EA7ng.\n2. Thu th\u1EADp
+    \u0111\u1EE7 4 t\xE0i li\u1EC7u/nh\u1EADt k\xFD.\n3. Leo l\xEAn c\xE1c t\u1EA7ng
+    v\xE0 ki\u1EC3m tra t\u1EEBng c\u0103n h\u1ED9."
   expReward: 300
   journalReward: {fileID: 11400000, guid: a8f3382f1d39436095a86bdd4fa6c9fc, type: 2}
   completionNotification: "\u0110\xE3 thu th\u1EADp \u0111\u1EE7 t\xE0i li\u1EC7u!

@@ -8,8 +8,9 @@ namespace CowsinsTesting
     /// Temporary test helper to deal damage or heal the player using keyboard inputs.
     /// This is an isolated testing script and can be safely deleted.
     /// Default keys:
-    /// - [H]: Deal 10 damage to player
+    /// - [J]: Deal 10 damage to player
     /// - [G]: Heal player by 10 points
+    /// NOTE: [H] is reserved for the Tutorial help overlay.
     /// </summary>
     public class PlayerDamageTestHelper : MonoBehaviour
     {
@@ -18,7 +19,7 @@ namespace CowsinsTesting
         public float damageAmount = 10f;
 
         [Tooltip("Key to press to apply damage")]
-        public Key damageKey = Key.H;
+        public Key damageKey = Key.J;
 
         [Tooltip("Key to press to heal player")]
         public Key healKey = Key.G;

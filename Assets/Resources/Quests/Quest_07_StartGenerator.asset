@@ -21,6 +21,9 @@ MonoBehaviour:
     b\u1EAFt \u0111\u1EA7u!"
   objective: "Kh\u1EDFi \u0111\u1ED9ng m\xE1y ph\xE1t \u0111i\u1EC7n v\xE0 s\u1ED1ng
     s\xF3t qua 2 wave (35 zombie)"
+  instructions: "1. T\xECm m\xE1y ph\xE1t \u0111i\u1EC7n tr\xEAn c\xF4ng tr\u01B0\u1EDDng.\n2.
+    Nh\u1EA5n [E] \u0111\u1EC3 kh\u1EDFi \u0111\u1ED9ng m\xE1y ph\xE1t.\n3. S\u1ED1ng
+    s\xF3t qua c\xE1c \u0111\u1EE3t zombie t\u1EA5n c\xF4ng sau khi kh\u1EDFi \u0111\u1ED9ng."
   expReward: 500
   journalReward: {fileID: 11400000, guid: 2832b39f3d12467f80fe94c68121ec3e, type: 2}
   completionNotification: "M\xE1y ph\xE1t \u0111i\u1EC7n \u0111\xE3 kh\u1EDFi \u0111\u1ED9ng!

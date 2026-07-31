@@ -41,6 +41,7 @@ public class MainMenuManager : MonoBehaviour
             var playBtn = root.Q("MainMenuModule_Play");
             var endlessBtn = root.Q("MainMenuModule_Endless");
             var quitBtn = root.Q("TacticalQuitButton");
+            var helpBtn = root.Q("MainMenuModule_Help");
             _bestLabel = root.Q<Label>("BestText");
             _bestEndlessLabel = root.Q<Label>("BestEndlessText");
 
@@ -50,6 +51,12 @@ public class MainMenuManager : MonoBehaviour
                 endlessBtn.RegisterCallback<ClickEvent>(_ => PlayEndless());
             if (quitBtn != null)
                 quitBtn.RegisterCallback<ClickEvent>(_ => QuitGame());
+            if (helpBtn != null)
+                helpBtn.RegisterCallback<ClickEvent>(_ => ToggleHelpPanel(true));
+
+            var helpCloseBtn = root.Q<Button>("HelpCloseButton");
+            if (helpCloseBtn != null)
+                helpCloseBtn.clicked += () => ToggleHelpPanel(false);
         }
 
         RefreshBestScore();
@@ -113,6 +120,16 @@ public class MainMenuManager : MonoBehaviour
                 ? ("Best  " + bestEndlessScore + "    Wave " + bestEndlessWave)
                 : "No record yet";
         }
+    }
+
+    private void ToggleHelpPanel(bool show)
+    {
+        if (_doc == null) return;
+        var root = _doc.rootVisualElement;
+        var panel = root.Q("HelpPanel");
+        if (panel == null) return;
+
+        panel.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     public void PlayGame()

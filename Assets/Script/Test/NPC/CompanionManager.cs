@@ -55,6 +55,17 @@ public class CompanionManager : MonoBehaviour
     [Tooltip("Minimum number of YES answers required for the follower to trust the player and help skip Chapter 4.")]
     public int honestThreshold = 3;
 
+    [Tooltip("Gợi ý hiển thị bên dưới mỗi câu hỏi (song song với stage4Questions) để người chơi biết cách trả lời. Để trống một ô nếu không muốn gợi ý cho câu đó.")]
+    [TextArea(1, 3)]
+    public string[] stage4Hints = new string[]
+    {
+        "Gợi ý: Bạn đến thành phố này để tìm em trai của mình.",
+        "Gợi ý: Hãy nhớ về bức ảnh gia đình trong ba lô của bạn.",
+        "Gợi ý: Kỹ năng cầm súng của bạn nói lên điều đó.",
+        "Gợi ý: Bạn đã đọc nhiều nhật ký về vụ bùng phát dịch.",
+        "Gợi ý: Bạn đang đi tìm kíp nổ để kết thúc mọi thứ.",
+    };
+
     [Tooltip("Root transform of the Ch4_Residential zone, used by the skip path to find and collect all Ch4 collectibles. Assign in the inspector.")]
     public Transform ch4ResidentialRoot;
 
@@ -535,7 +546,10 @@ public class CompanionManager : MonoBehaviour
 
         string question = stage4Questions[_stage4QuestionIndex];
         Debug.Log($"[CompanionManager] Stage 4 interrogation: Q{_stage4QuestionIndex + 1}/{stage4Questions.Length}: \"{question}\"");
-        bubble.ShowChoice($"({_stage4QuestionIndex + 1}/{stage4Questions.Length}) {question}", OnStage4Answer);
+        string hint = stage4Hints != null && _stage4QuestionIndex < stage4Hints.Length
+            ? stage4Hints[_stage4QuestionIndex]
+            : null;
+        bubble.ShowChoice($"({_stage4QuestionIndex + 1}/{stage4Questions.Length}) {question}", hint, OnStage4Answer);
     }
 
     private void OnStage4Answer(bool yes)

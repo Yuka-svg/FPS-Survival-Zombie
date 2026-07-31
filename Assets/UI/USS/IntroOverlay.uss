@@ -1,0 +1,84 @@
+@import url("Shared.uss");
+
+/* ============================================================
+   IntroOverlay.uss — Story intro panel (shown after black fade)
+   ============================================================ */
+
+.intro-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 760px;
+    max-height: 640px;
+    flex-direction: column;
+    padding: 0;
+}
+
+.intro-title {
+    -unity-font-definition: var(--font-display-sdf);
+    font-size: 40px;
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-align: middle-center;
+    padding-top: 30px;
+    padding-bottom: 10px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 12px rgba(217, 199, 115, 0.35), 1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.intro-scroll {
+    flex-grow: 1;
+    min-height: 300px;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.intro-body {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 16px;
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    white-space: normal;
+    line-height: 1.7;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.intro-start-button {
+    width: 280px;
+    height: 58px;
+    flex-shrink: 0;
+    margin: 6px auto 10px auto;
+    font-size: var(--fs-l, 22px);
+    -unity-font-definition: var(--font-body, resource("Fonts/Outfit-SemiBold SDF"));
+    -unity-font-style: bold;
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    -unity-text-align: middle-center;
+    background-color: var(--color-accent-gold-dark, rgb(176, 156, 70));
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    letter-spacing: 2px;
+}
+
+.intro-start-button:hover {
+    scale: 1.04;
+    background-color: var(--color-accent-gold, rgb(217, 199, 115));
+}
+
+.intro-start-button:active {
+    scale: 0.96;
+}
+
+.intro-hint {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 11px;
+    color: var(--color-text-muted, rgb(158, 168, 184));
+    -unity-text-align: middle-center;
+    padding-bottom: 14px;
+    letter-spacing: 1px;
+}

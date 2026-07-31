@@ -22,6 +22,9 @@ MonoBehaviour:
     anh trai \u0111ang \u1EA9n n\xE1u."
   objective: "Thu th\u1EADp \u0111\u1EE7 6 nh\u1EADt k\xFD/h\u1ED3 s\u01A1 trong
     khu d\xE2n c\u01B0"
+  instructions: "1. L\u1EE5c so\xE1t c\xE1c c\u0103n nh\xE0 trong khu d\xE2n c\u01B0.\n2.
+    Thu th\u1EADp \u0111\u1EE7 6 nh\u1EADt k\xFD/h\u1ED3 s\u01A1 ph\xE1t s\xE1ng.\n3.
+    Ki\u1EC3m tra t\u1EA7ng tr\u1EC7t, l\u1EA7u tr\xEAn v\xE0 s\xE2n sau."
   expReward: 300
   journalReward: {fileID: 11400000, guid: fb6ac7b16fbc4eafb420365bf4e81fe3, type: 2}
   completionNotification: "\u0110\xE3 thu th\u1EADp \u0111\u1EA7y \u0111\u1EE7 nh\u1EADt

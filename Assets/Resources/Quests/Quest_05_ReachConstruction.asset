@@ -20,6 +20,9 @@ MonoBehaviour:
     \u0111\u1ED5 n\u1EA1t. \u0110i s\xE2u v\xE0o c\xF4ng tr\u01B0\u1EDDng \u0111\u1EC3
     t\xECm manh m\u1ED1i ti\u1EBFp theo."
   objective: "\u0110i \u0111\u1EBFn c\xF4ng tr\u01B0\u1EDDng"
+  instructions: "1. R\u1EDDi kh\u1ECFi b\u1EC7nh vi\u1EC7n.\n2. \u0110i theo m\u0169i
+    t\xEAn ch\u1EC9 \u0111\u01B0\u1EDDng (Quest Beacon).\n3. \u0110\u1EBFn khu c\xF4ng
+    tr\u01B0\u1EDDng x\xE2y d\u1EF1ng."
   expReward: 150
   journalReward: {fileID: 11400000, guid: 37dc87b30c37447a99652c12ff28a4fe, type: 2}
   completionNotification: "\u0110\xE3 \u0111\u1EBFn c\xF4ng tr\u01B0\u1EDDng! Nh\u1EADn

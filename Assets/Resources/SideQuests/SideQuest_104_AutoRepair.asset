@@ -21,6 +21,8 @@ MonoBehaviour:
     l\u1EBD cu\u1ED1n nh\u1EADt k\xFD c\u1EE7a \xF4ng ta v\u1EABn c\xF2n..."
   objective: "Kh\xE1m ph\xE1 tr\u1EA1m s\u1EEDa xe, ti\xEAu di\u1EC7t zombie, t\xECm
     nh\u1EADt k\xFD c\u1EE7a th\u1EE3 xe Jack"
+  instructions: "1. Kh\xE1m ph\xE1 tr\u1EA1m s\u1EEDa xe.\n2. Ti\xEAu di\u1EC7t zombie
+    quanh tr\u1EA1m.\n3. T\xECm v\u1EADt t\u01B0 c\u1EA7n thi\u1EBFt b\xEAn trong."
   expReward: 200
   journalReward: {fileID: 11400000, guid: 8a158710c97634d459942e8e9c58c1d0, type: 2}
   completionNotification: 

@@ -1,0 +1,78 @@
+@import url("Shared.uss");
+
+/* ============================================================
+   TutorialOverlay.uss — [H] Help / Instructions panel
+   ============================================================ */
+
+.tutorial-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 720px;
+    max-height: 640px;
+    flex-direction: column;
+    padding: 0;
+}
+
+.tutorial-title {
+    -unity-font-definition: var(--font-display-sdf);
+    font-size: 34px;
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-align: middle-center;
+    padding-top: 28px;
+    padding-bottom: 10px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 12px rgba(217, 199, 115, 0.35), 1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.tutorial-scroll {
+    flex-grow: 1;
+    min-height: 300px;
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 8px;
+    padding-bottom: 12px;
+}
+
+.tutorial-scroll .unity-scroll-view__content-container {
+    padding-bottom: 16px;
+}
+
+.tutorial-section-header {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: var(--color-accent-cyan, rgb(78, 205, 196));
+    letter-spacing: 2px;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(78, 205, 196, 0.25);
+    padding-bottom: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.tutorial-body {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 15px;
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    white-space: normal;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.tutorial-quest-body {
+    color: var(--color-text-gold, rgb(217, 199, 115));
+}
+
+.tutorial-hint {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 12px;
+    color: var(--color-text-muted, rgb(158, 168, 184));
+    -unity-text-align: middle-center;
+    padding-top: 10px;
+    padding-bottom: 16px;
+    letter-spacing: 1px;
+}

@@ -21,6 +21,9 @@ MonoBehaviour:
     ng\u01B0\u1EDDi gi\xE0 \u2014 c\u1EA7n \u0111\u01B0\u1EE3c ghi nh\u1EDB..."
   objective: "Kh\xE1m ph\xE1 3 to\xE0 nh\xE0 chung c\u01B0, thu th\u1EADp 4 nh\u1EADt
     k\xFD c\u1EE7a c\u01B0 d\xE2n cu\u1ED1i c\xF9ng"
+  instructions: "1. Kh\xE1m ph\xE1 3 t\xF2a nh\xE0 chung c\u01B0.\n2. Thu th\u1EADp
+    4 nh\u1EADt k\xFD.\n3. Gh\xE9p l\u1EA1i c\xE2u chuy\u1EC7n c\u1EE7a nh\u1EEFng
+    ng\u01B0\u1EDDi m\u1EB9."
   expReward: 300
   journalReward: {fileID: 11400000, guid: 81a58bf14cad48e4ebe5af07131a45d6, type: 2}
   completionNotification: 

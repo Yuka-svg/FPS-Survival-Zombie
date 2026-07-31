@@ -22,6 +22,9 @@ MonoBehaviour:
   objective: "\u0110i \u0111\u1EBFn ng\u1ECDn h\u1EA3i \u0111\u0103ng cu\u1ED1i c\xF9ng
     c\u1EE7a th\xE0nh ph\u1ED1, t\xECm ghi ch\xE9p thu\u1ED1c gi\u1EA3i cu\u1ED1i
     c\xF9ng"
+  instructions: "1. \u0110i \u0111\u1EBFn ng\u1ECDn h\u1EA3i \u0111\u0103ng cu\u1ED1i
+    c\xF9ng.\n2. L\u1EE5c so\xE1t khu v\u1EF1c xung quanh.\n3. Thu th\u1EADp v\u1EADt
+    ph\u1EA9m b\xED \u1EA9n b\xEAn trong."
   expReward: 400
   journalReward: {fileID: 11400000, guid: a7601b8485e7b174c959ab4cd2e704ca, type: 2}
   completionNotification: 

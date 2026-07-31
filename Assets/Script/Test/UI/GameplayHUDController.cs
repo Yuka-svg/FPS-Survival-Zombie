@@ -81,8 +81,14 @@ public class GameplayHUDController : MonoBehaviour
             overlay.pickingMode = PickingMode.Ignore; // Allow clicks to pass through after fade-out completes
         }
 
-        // Unfreeze timescale to resume gameplay
-        Time.timeScale = 1f;
+        // Unfreeze timescale to resume gameplay — but only if no panel has
+        // opened during the fade (e.g. the Story intro appears right after the
+        // black overlay; PanelManager already froze time for it). Clobbering
+        // timeScale here would let the game run while a panel is on screen.
+        if (PanelManager.Instance == null || !PanelManager.Instance.IsAnyPanelActive())
+        {
+            Time.timeScale = 1f;
+        }
     }
 
     private void OnEnable()

@@ -21,6 +21,10 @@ MonoBehaviour:
     \u0111\u1EC3 ho\xE0n t\u1EA5t. KH\xD4NG TH\u1EC2 THO\xC1T khi \u0111\xE3 b\u1EAFt
     \u0111\u1EA7u!"
   objective: "Ti\xEAu di\u1EC7t Tank v\xE0 k\xEDch ho\u1EA1t l\u1EA1i qu\u1EA3 bom"
+  instructions: "1. Boss Tank xu\u1EA5t hi\u1EC7n \u2014 gi\u1EEF kho\u1EA3ng c\xE1ch
+    v\xE0 nh\u1EAFm \u0111i\u1EC3m y\u1EBFu.\n2. Li\xEAn t\u1EE5c di chuy\u1EC3n
+    \u0111\u1EC3 n\xE9 \u0111\xF2n t\u1EA5n c\xF4ng.\n3. Sau khi Tank b\u1ECB ti\xEAu
+    di\u1EC7t, nh\u1EA5n [E] \u0111\u1EC3 k\xEDch ho\u1EA1t l\u1EA1i qu\u1EA3 bom."
   expReward: 1000
   journalReward: {fileID: 11400000, guid: 0bbe99901c95c5c46a6498b1a2d9e3e8, type: 2}
   completionNotification: "Nh\u1EADn \u0111\u01B0\u1EE3c: Nh\u1EADt k\xFD anh trai

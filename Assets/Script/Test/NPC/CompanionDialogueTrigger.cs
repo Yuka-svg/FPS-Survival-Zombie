@@ -53,6 +53,7 @@ public class CompanionDialogueTrigger : Interactable
     private bool _permanentlyDisabled;
     private Transform _player;
     private cowsins.InputManager _playerInput;
+    private bool _proximityHintShown;
 
     private void Awake()
     {
@@ -101,6 +102,12 @@ public class CompanionDialogueTrigger : Interactable
             : Input.GetKeyDown(proximityKey);
 
         float dist = Vector3.Distance(transform.position, _player.position);
+        if (!_proximityHintShown && dist <= proximityDistance * 1.4f)
+        {
+            _proximityHintShown = true;
+            SimpleNotification.Show("Trò chuyện với nhân vật bằng phím [E] để nhận thông tin.");
+        }
+
         if (dist <= proximityDistance && ePressed)
         {
             // Facing check: only trigger if the player is roughly looking

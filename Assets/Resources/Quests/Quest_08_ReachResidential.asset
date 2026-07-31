@@ -20,6 +20,9 @@ MonoBehaviour:
     nh\u01B0ng kh\xF4ng c\xF3 ngh\u0129a l\xE0 an to\xE0n. T\xECm ph\xF2ng an to\xE0n
     \u0111\u1EC3 ngh\u1EC9 ng\u01A1i tr\u01B0\u1EDBc khi kh\xE1m ph\xE1 khu v\u1EF1c."
   objective: "\u0110i \u0111\u1EBFn khu d\xE2n c\u01B0 v\xE0 t\xECm ph\xF2ng an to\xE0n"
+  instructions: "1. \u0110i theo m\u0169i t\xEAn ch\u1EC9 \u0111\u01B0\u1EDDng t\u1EDBi
+    khu d\xE2n c\u01B0.\n2. T\xECm ph\xF2ng an to\xE0n (Save Room) trong khu d\xE2n
+    c\u01B0.\n3. C\u1EA9n th\u1EADn k\u1EBB \u0111\u1ECBch khi b\u0103ng qua \u0111\u01B0\u1EDDng."
   expReward: 150
   journalReward: {fileID: 11400000, guid: 140d24c9d83244c9a2b9d81ea8043f00, type: 2}
   completionNotification: "\u0110\xE3 \u0111\u1EBFn khu d\xE2n c\u01B0! Nh\u1EADn

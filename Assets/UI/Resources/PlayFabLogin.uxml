@@ -160,6 +160,25 @@
                 <ui:Label class="module-decals" text="[DATABASE_LINK]" />
             </ui:VisualElement>
 
+            <!-- Module 8: How to Play (Menu Only) -->
+            <ui:VisualElement name="MainMenuModule_Help" class="hud-module play-module menu-only">
+                <ui:VisualElement class="module-connector" />
+                <ui:VisualElement class="hud-bracket bracket-tl" />
+                <ui:VisualElement class="hud-bracket bracket-bl" />
+                
+                <!-- Status LED -->
+                <ui:VisualElement class="led-row">
+                    <ui:VisualElement class="led-dot led-orange" />
+                    <ui:Label class="led-label" text="OP_STATUS: BRIEFING" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="input-container-inner button-trigger">
+                    <ui:Label class="field-label" text="OPERATIONS MANUAL" />
+                    <ui:Label name="HelpButton_Label" class="menu-btn-main-text" text="CÁCH CHƠI" />
+                </ui:VisualElement>
+                <ui:Label class="module-decals" text="[CONTROLS_BRIEFING]" />
+            </ui:VisualElement>
+
         </ui:VisualElement>
         
         <!-- Bottom-Right Corner Control Group (Quit always visible, Logout menu-only) -->

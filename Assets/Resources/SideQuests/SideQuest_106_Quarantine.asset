@@ -20,6 +20,9 @@ MonoBehaviour:
     th\u1EC3 c\xF2n trong l\u1EC1u ch\u1EC9 huy..."
   objective: "Kh\xE1m ph\xE1 khu l\u1EC1u quarantine, s\u1ED1ng s\xF3t qua 3 wave
     zombie, t\xECm h\u1ED3 s\u01A1 y t\u1EBF \u0111\u1EA7u ti\xEAn"
+  instructions: "1. Kh\xE1m ph\xE1 khu l\u1EC1u quarantine.\n2. S\u1ED1ng s\xF3t
+    qua 3 \u0111\u1EE3t zombie.\n3. Chu\u1EA9n b\u1ECB \u0111\u1EA7y \u0111\u1EE7
+    \u0111\u1EA1n d\u01B0\u1EE3c tr\u01B0\u1EDBc khi v\xE0o."
   expReward: 350
   journalReward: {fileID: 11400000, guid: a522deb1b716eeb4b806d8343cd177b6, type: 2}
   completionNotification: 

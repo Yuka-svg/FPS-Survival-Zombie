@@ -13,6 +13,7 @@ public class QuestTrackerWidget : MonoBehaviour
     private Label _chapter;
     private Label _title;
     private Label _objective;
+    private Label _instructions;
     private Label _collectibles;
     private VisualElement _divider;
     private VisualElement _sidePanel;
@@ -36,6 +37,7 @@ public class QuestTrackerWidget : MonoBehaviour
         _chapter = root.Q<Label>("Chapter");
         _title = root.Q<Label>("Title");
         _objective = root.Q<Label>("Objective");
+        _instructions = root.Q<Label>("Instructions");
         _collectibles = root.Q<Label>("Collectibles");
         _divider = root.Q("QuestDivider");
         _sidePanel = root.Q("SidePanel");
@@ -287,7 +289,7 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void UpdateDisplay()
     {
-        if (_chapter == null || _title == null || _objective == null) return;
+        if (_chapter == null || _title == null || _objective == null || _instructions == null) return;
 
         // Endless mode check
         bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
@@ -329,6 +331,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _chapter.text = "";
             _title.text = "";
             _objective.text = "";
+            _instructions.text = "";
             _collectibles.text = "";
             RebuildSideBlock();
             if (_container != null) _container.MarkDirtyRepaint();
@@ -340,6 +343,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _chapter.text = "STORY COMPLETE";
             _title.text = "";
             _objective.text = "";
+            _instructions.text = "";
         }
         else
         {
@@ -349,6 +353,7 @@ public class QuestTrackerWidget : MonoBehaviour
             {
                 _title.text = q.title;
                 _objective.text = q.objective;
+                _instructions.text = string.IsNullOrEmpty(q.instructions) ? "" : q.instructions;
             }
             else
             {
@@ -357,6 +362,7 @@ public class QuestTrackerWidget : MonoBehaviour
                     ? "— Discover side quests —"
                     : "—";
                 _objective.text = "";
+                _instructions.text = "";
             }
         }
         UpdateCollectibleDisplay();

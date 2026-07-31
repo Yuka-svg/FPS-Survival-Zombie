@@ -22,6 +22,10 @@ MonoBehaviour:
     ghi trong khi zombie k\xE9o \u0111\u1EBFn."
   objective: "B\u1EA3o v\u1EC7 \u0111\xE0i radio 60 gi\xE2y \u0111\u1EC3 nghe b\u1EA3n
     ghi cu\u1ED1i c\xF9ng"
+  instructions: "1. \u0110\u1EE9ng g\u1EA7n \u0111\xE0i radio v\xE0 b\u1EA3o v\u1EC7
+    n\xF3.\n2. Ti\xEAu di\u1EC7t zombie c\u1ED1 g\u1EAFng ti\u1EBFp c\u1EADn.\n3.
+    Gi\u1EEF \u0111\xE0i an to\xE0n trong 60 gi\xE2y \u0111\u1EC3 nghe b\u1EA3n ghi
+    cu\u1ED1i c\xF9ng."
   expReward: 250
   journalReward: {fileID: 11400000, guid: ef05cac5a0d724e498c528a30b78f0e0, type: 2}
   completionNotification: "B\u1EA3n ghi \u0111\xE3 ph\xE1t xong! Nh\u1EADn B\xE1o

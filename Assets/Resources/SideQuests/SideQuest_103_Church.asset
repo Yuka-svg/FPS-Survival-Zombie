@@ -20,6 +20,9 @@ MonoBehaviour:
     b\xEAn trong c\xF3 th\u1EC3 c\xF2n ng\u01B0\u1EDDi..."
   objective: "V\xE0o nh\xE0 th\u1EDD, thu th\u1EADp 2 nh\u1EADt k\xFD c\u1EE7a nh\u1EEFng
     ng\u01B0\u1EDDi tr\xFA \u1EA9n cu\u1ED1i c\xF9ng"
+  instructions: "1. V\xE0o b\xEAn trong nh\xE0 th\u1EDD.\n2. Thu th\u1EADp 2 nh\u1EADt
+    k\xFD c\u1EE7a nh\u1EEFng ng\u01B0\u1EDDi tr\xFA \u1EA9n.\n3. C\u1EA9n th\u1EADn
+    zombie \u1EA9n n\u1EA5p trong b\xF3ng t\u1ED1i."
   expReward: 200
   journalReward: {fileID: 11400000, guid: 5d5e3ad6677aee34b91638befbacbb6f, type: 2}
   completionNotification: 

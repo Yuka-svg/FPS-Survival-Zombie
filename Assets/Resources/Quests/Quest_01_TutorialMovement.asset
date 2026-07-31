@@ -19,6 +19,11 @@ MonoBehaviour:
     c\u01A1 b\u1EA3n: di chuy\u1EC3n, nh\u1EA3y, double jump v\xE0 nh\u1EB7t s\xFAng."
   objective: "Di chuy\u1EC3n \u0111\u1EBFn l\u1EC1u v\xE0 nh\u1EB7t kh\u1EA9u s\xFAng
     l\u1EE5c"
+  instructions: "1. D\xF9ng WASD \u0111\u1EC3 di chuy\u1EC3n, xoay chu\u1ED9t \u0111\u1EC3
+    nh\xECn.\n2. Nh\u1EA5n Space \u0111\u1EC3 nh\u1EA3y (b\u1EA5m 2 l\u1EA7n \u0111\u1EC3
+    nh\u1EA3y \u0111\xFAp).\n3. Gi\u1EEF Left Shift \u0111\u1EC3 ch\u1EA1y nhanh.\n4.
+    \u0110i t\u1EDBi l\u1EC1u v\xE0 nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t kh\u1EA9u
+    s\xFAng l\u1EE5c."
   expReward: 50
   journalReward: {fileID: 0}
   completionNotification: "\u0110\xE3 nh\u1EB7t s\xFAng l\u1EE5c! M\u1ED9t con zombie

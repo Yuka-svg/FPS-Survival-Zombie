@@ -10,15 +10,20 @@ public class CleaningStaffDialogueTrigger : Interactable
     {
         [TextArea(2, 4)]
         public string question;
+
         public bool correctAnswer;
+
+        [Tooltip("Gợi ý hiển thị bên dưới câu hỏi để người chơi biết cách trả lời đúng. Để trống nếu không muốn gợi ý.")]
+        [TextArea(1, 3)]
+        public string hint;
     }
 
     [Header("3 Questions about the Hospital")]
     public QuestionData[] questions = new QuestionData[3]
     {
-        new QuestionData { question = "Khu cách ly của bệnh viện nằm ở tầng 2, đúng không?", correctAnswer = true },
-        new QuestionData { question = "Bệnh nhân số 0 được đưa vào lúc nửa đêm?", correctAnswer = false },
-        new QuestionData { question = "Anh có thấy một bác sĩ mặc áo choàng trắng chạy về phía cầu thang thoát hiểm không?", correctAnswer = true },
+        new QuestionData { question = "Khu cách ly của bệnh viện nằm ở tầng 2, đúng không?", correctAnswer = true, hint = "Gợi ý: Tôi thấy ghi chú 'KHOA CÁCH LY - TẦNG 2' trên tường hành lang." },
+        new QuestionData { question = "Bệnh nhân số 0 được đưa vào lúc nửa đêm?", correctAnswer = false, hint = "Gợi ý: Biên bản nhập viện ghi rõ thời điểm lúc trời vừa sáng." },
+        new QuestionData { question = "Anh có thấy một bác sĩ mặc áo choàng trắng chạy về phía cầu thang thoát hiểm không?", correctAnswer = true, hint = "Gợi ý: Bạn có nhớ đã nhìn thấy ai đó chạy về phía cầu thang lúc mới vào không?" },
     };
 
     [Header("Interact Text")]
@@ -35,6 +40,7 @@ public class CleaningStaffDialogueTrigger : Interactable
     private cowsins.InputManager _playerInput;
     private int _currentQuestionIndex;
     private bool _quizComplete;
+    private bool _proximityHintShown;
 
     private void Awake()
     {
@@ -67,6 +73,12 @@ public class CleaningStaffDialogueTrigger : Interactable
             : Input.GetKeyDown(proximityKey);
 
         float dist = Vector3.Distance(transform.position, _player.position);
+        if (!_proximityHintShown && dist <= proximityDistance * 1.4f)
+        {
+            _proximityHintShown = true;
+            SimpleNotification.Show("Trò chuyện với nhân vật bằng phím [E] để nhận thông tin.");
+        }
+
         if (dist <= proximityDistance && ePressed)
         {
             // Facing check: only trigger if the player is roughly looking
@@ -131,7 +143,7 @@ public class CleaningStaffDialogueTrigger : Interactable
         }
 
         var q = questions[_currentQuestionIndex];
-        _bubble.ShowChoice($"({_currentQuestionIndex + 1}/{questions.Length}) {q.question}", OnAnswer);
+        _bubble.ShowChoice($"({_currentQuestionIndex + 1}/{questions.Length}) {q.question}", q.hint, OnAnswer);
     }
 
     private void OnAnswer(bool playerAnsweredYes)

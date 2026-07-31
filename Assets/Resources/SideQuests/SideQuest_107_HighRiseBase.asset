@@ -20,6 +20,8 @@ MonoBehaviour:
     lui v\xE0 nh\u1EADt k\xFD k\xEDp c\xF4ng binh c\xF3 th\u1EC3 v\u1EABn c\xF2n..."
   objective: "V\xE0o to\xE0 nh\xE0 cao t\u1EA7ng, ti\xEAu di\u1EC7t zombie, thu th\u1EADp
     2 h\u1ED3 s\u01A1 qu\xE2n \u0111\u1ED9i cu\u1ED1i c\xF9ng"
+  instructions: "1. V\xE0o t\xF2a nh\xE0 cao t\u1EA7ng.\n2. Ti\xEAu di\u1EC7t zombie
+    b\xEAn trong.\n3. Thu th\u1EADp v\u1EADt t\u01B0 qu\xE2n \u0111\u1ED9i."
   expReward: 300
   journalReward: {fileID: 11400000, guid: 55140bb79076e804ca00283c260ffb75, type: 2}
   completionNotification: 

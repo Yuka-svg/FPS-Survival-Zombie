@@ -113,6 +113,7 @@
             <ui:Label name="Chapter" text="" />
             <ui:Label name="Title" text="" />
             <ui:Label name="Objective" text="" />
+            <ui:Label name="Instructions" text="" />
             <ui:Label name="Collectibles" text="" />
         </ui:VisualElement>
         <ui:VisualElement name="QuestDivider" class="quest-divider" />

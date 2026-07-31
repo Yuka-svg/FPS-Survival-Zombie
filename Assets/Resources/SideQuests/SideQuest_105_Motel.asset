@@ -20,6 +20,9 @@ MonoBehaviour:
     m\u1ECDi th\u1EE9 s\u1EE5p \u0111\u1ED5..."
   objective: "Kh\xE1m ph\xE1 2 d\xE3y Motel, thu th\u1EADp 3 nh\u1EADt k\xFD c\u1EE7a
     kh\xE1ch tr\u1ECD cu\u1ED1i c\xF9ng"
+  instructions: "1. Kh\xE1m ph\xE1 2 d\xE3y Motel.\n2. Thu th\u1EADp 3 nh\u1EADt
+    k\xFD c\u1EE7a ng\u01B0\u1EDDi s\u1ED1ng s\xF3t.\n3. L\u1EE5c so\xE1t t\u1EEBng
+    ph\xF2ng v\xE0 h\xE0nh lang."
   expReward: 250
   journalReward: {fileID: 11400000, guid: d6276c17cb4b3a2458d9521af3d92e33, type: 2}
   completionNotification: 

@@ -26,6 +26,8 @@ public class DialogueBubble : MonoBehaviour
     public Color scrimColor = new Color(0f, 0f, 0f, 0.6f);
     public float lineFontSize = 26f;
     public float choiceFontSize = 22f;
+    public Color hintColor = new Color(0.5f, 0.85f, 0.6f, 1f);
+    public float hintFontSize = 20f;
 
     private GameObject _panelGO;
     private UIDocument _doc;
@@ -33,6 +35,7 @@ public class DialogueBubble : MonoBehaviour
     private VisualElement _scrim;
     private Label _lineLabel;
     private Label _choiceLabel;
+    private Label _hintLabel;
     private Coroutine _routine;
     private bool _choiceActive;
     private System.Action<bool> _choiceCallback;
@@ -128,6 +131,17 @@ public class DialogueBubble : MonoBehaviour
         _choiceLabel.style.display = DisplayStyle.None;
         _scrim.Add(_choiceLabel);
 
+        // Optional hint shown under the choice (helps answer NPC questions).
+        _hintLabel = new Label();
+        _hintLabel.name = "DialogueHint";
+        _hintLabel.style.color = hintColor;
+        _hintLabel.style.fontSize = hintFontSize;
+        _hintLabel.style.whiteSpace = WhiteSpace.Normal;
+        _hintLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        _hintLabel.style.marginTop = 14f;
+        _hintLabel.style.display = DisplayStyle.None;
+        _scrim.Add(_hintLabel);
+
         _doc.rootVisualElement.Add(_root);
     }
 
@@ -173,6 +187,7 @@ public class DialogueBubble : MonoBehaviour
     {
         if (_lineLabel != null) _lineLabel.text = line;
         if (_choiceLabel != null) _choiceLabel.style.display = DisplayStyle.None;
+        if (_hintLabel != null) _hintLabel.style.display = DisplayStyle.None;
         Show();
         if (_routine != null) StopCoroutine(_routine);
         _routine = StartCoroutine(HideAfter(fadeIn + holdDuration));
@@ -182,11 +197,33 @@ public class DialogueBubble : MonoBehaviour
 
     public void ShowChoice(string line, System.Action<bool> onChoice)
     {
+        ShowChoice(line, null, onChoice);
+    }
+
+    /// <summary>
+    /// Show a Y/N choice with an optional hint line under it. The hint helps the
+    /// player answer NPC questions correctly (e.g. "Gợi ý: ...").
+    /// </summary>
+    public void ShowChoice(string line, string hint, System.Action<bool> onChoice)
+    {
         if (_lineLabel != null) _lineLabel.text = line;
         if (_choiceLabel != null)
         {
             _choiceLabel.text = "Nhấn [Y] để đồng ý   |   Nhấn [N] để từ chối";
             _choiceLabel.style.display = DisplayStyle.Flex;
+        }
+        if (_hintLabel != null)
+        {
+            if (!string.IsNullOrEmpty(hint))
+            {
+                _hintLabel.text = hint;
+                _hintLabel.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _hintLabel.text = "";
+                _hintLabel.style.display = DisplayStyle.None;
+            }
         }
         _choiceCallback = onChoice;
         _choiceActive = true;

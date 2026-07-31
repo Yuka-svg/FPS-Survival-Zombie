@@ -22,6 +22,10 @@ MonoBehaviour:
     kh\xF4ng s\u1EB5n s\xE0ng. Ti\xEAu di\u1EC7t c\xF4 ta \u0111\u1EC3 qua h\xE0nh
     lang."
   objective: "Ti\xEAu di\u1EC7t The Witch trong h\xE0nh lang b\u1EC7nh vi\u1EC7n"
+  instructions: "1. The Witch xu\u1EA5t hi\u1EC7n trong h\xE0nh lang b\u1EC7nh vi\u1EC7n.\n2.
+    Gi\u1EEF kho\u1EA3ng c\xE1ch v\xE0 nh\u1EAFm v\xE0o \u0111\u1EA7u \u0111\u1EC3
+    g\xE2y s\xE1t th\u01B0\u01A1ng l\u1EDBn.\n3. Tr\xE1nh ti\u1EBFp c\u1EADn qu\xE1
+    g\u1EA7n \u2014 c\xF4 ta c\u1EF1c k\u1EF3 nguy hi\u1EC3m \u1EDF c\u1EF1 ly g\u1EA7n."
   expReward: 100
   journalReward: {fileID: 0}
   completionNotification: "Witch \u0111\xE3 b\u1ECB ti\xEAu di\u1EC7t. H\xE0nh lang

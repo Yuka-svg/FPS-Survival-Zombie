@@ -21,6 +21,9 @@ MonoBehaviour:
     k\xFD/h\u1ED3 s\u01A1 c\xF2n thi\u1EBFu. T\xF2a nh\xE0 2 c\xF3 Boomer v\xE0 SMG."
   objective: "Thu th\u1EADp \u0111\u1EE7 5 nh\u1EADt k\xFD/h\u1ED3 s\u01A1 trong
     b\u1EC7nh vi\u1EC7n"
+  instructions: "1. L\u1EE5c so\xE1t c\xE1c ph\xF2ng b\u1EC7nh trong b\u1EC7nh vi\u1EC7n.\n2.
+    Thu th\u1EADp \u0111\u1EE7 5 nh\u1EADt k\xFD/h\u1ED3 s\u01A1 ph\xE1t s\xE1ng.\n3.
+    Ki\u1EC3m tra b\xE0n, gi\u01B0\u1EDDng b\u1EC7nh v\xE0 c\xE1c g\xF3c khu\u1EA5t."
   expReward: 250
   journalReward: {fileID: 11400000, guid: f27725d180d14af9b85aa4fa2bd9c44b, type: 2}
   completionNotification: "\u0110\xE3 thu th\u1EADp \u0111\u1EA7y \u0111\u1EE7 h\u1ED3

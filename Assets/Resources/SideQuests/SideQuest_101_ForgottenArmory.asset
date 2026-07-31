@@ -20,6 +20,9 @@ MonoBehaviour:
     \u0111\xF3 \u0111\xE1ng gi\xE1 \u2014 nh\u01B0ng c\u0169ng kh\xF4ng an to\xE0n."
   objective: "Kh\xE1m ph\xE1 2 nh\xE0 kho, ti\xEAu di\u1EC7t zombie b\xEAn trong,
     loot v\u1EADt t\u01B0"
+  instructions: "1. Kh\xE1m ph\xE1 2 nh\xE0 kho.\n2. Ti\xEAu di\u1EC7t zombie b\xEAn
+    trong.\n3. Thu th\u1EADp v\u1EADt ph\u1EA9m gi\xE1 tr\u1ECB tr\u01B0\u1EDBc khi
+    r\u1EDDi \u0111i."
   expReward: 150
   journalReward: {fileID: 11400000, guid: df604e95af5e469ea0088963da01d65a, type: 2}
   completionNotification: 

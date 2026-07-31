@@ -22,5 +22,25 @@
         <ui:Instance template="PlayFabLogin" name="PlayFabLogin" class="fullscreen-container" />
         <ui:Instance template="PlayerProfile" name="PlayerProfile" class="fullscreen-container" />
         <ui:Instance template="Leaderboard" name="Leaderboard" class="fullscreen-container" />
+
+        <!-- Help / How-to-Play panel -->
+        <ui:VisualElement name="HelpPanel" class="help-panel">
+            <ui:VisualElement name="HelpCard" class="help-card">
+                <ui:VisualElement name="HelpTopAccent" class="help-top-accent" />
+                <ui:Label name="HelpTitle" class="help-title" text="CÁCH CHƠI" />
+                <ui:VisualElement name="HelpDivider" class="help-divider" />
+                <ui:ScrollView name="HelpScroll" class="help-scroll" mode="Vertical" show-horizontal-scroller="false">
+                    <ui:Label class="help-section" text="DI CHUYỂN" />
+                    <ui:Label class="help-body" text="WASD — Di chuyển&#10;Space — Nhảy (nhấn 2 lần để nhảy đúp)&#10;Left Shift — Chạy nhanh&#10;Left Ctrl — Ngồi / Cúi&#10;Middle Mouse — Dash (lướt nhanh)&#10;C — Grapple Hook (móc di chuyển)" />
+                    <ui:Label class="help-section" text="CHIẾN ĐẤU" />
+                    <ui:Label class="help-body" text="Chuột trái — Bắn&#10;Chuột phải — Ngắm (ADS)&#10;R — Nạp đạn&#10;F — Đánh cận chiến&#10;G — Vứt vũ khí hiện tại&#10;T — Bật/tắt đèn pin&#10;1-4 / Con lăn — Đổi vũ khí&#10;Tab — Mở cây kỹ năng" />
+                    <ui:Label class="help-section" text="GIAO TIẾP NPC" />
+                    <ui:Label class="help-body" text="E — Trò chuyện / Tương tác với NPC&#10;Y — Đồng ý | N — Từ chối (trả lời câu hỏi)&#10;Giữ E — Cứu đồng đội bị ngã" />
+                    <ui:Label class="help-section" text="MẸO" />
+                    <ui:Label class="help-body" text="Nhấn [H] trong lúc chơi để xem hướng dẫn &amp; nhiệm vụ hiện tại.&#10;Thu thập nhật ký, hoàn thành nhiệm vụ phụ để nhận thưởng và nâng cấp kỹ năng." />
+                </ui:ScrollView>
+                <ui:Button name="HelpCloseButton" class="help-close-button" text="ĐÓNG" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

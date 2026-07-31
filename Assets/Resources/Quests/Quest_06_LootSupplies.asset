@@ -20,6 +20,9 @@ MonoBehaviour:
     kh\xED m\u1EDBi. Nh\u1EA5n E \u0111\u1EC3 t\u01B0\u01A1ng t\xE1c v\u1EDBi th\xF9ng
     loot."
   objective: "T\xECm v\xE0 loot th\xF9ng v\u1EADt t\u01B0"
+  instructions: "1. T\xECm c\xE1c th\xF9ng v\u1EADt t\u01B0 trong c\xF4ng tr\u01B0\u1EDDng.\n2.
+    \u0110\u1EBFn g\u1EA7n v\xE0 nh\u1EA5n [E] \u0111\u1EC3 loot.\n3. Thu th\u1EADp
+    \u0111\u1EE7 s\u1ED1 th\xF9ng theo y\xEAu c\u1EA7u."
   expReward: 200
   journalReward: {fileID: 11400000, guid: 948e0bf6a3bb475180245bcc99fd58a1, type: 2}
   completionNotification: "\u0110\xE3 loot xong v\u1EADt t\u01B0! Nh\u1EADn B\xE1o

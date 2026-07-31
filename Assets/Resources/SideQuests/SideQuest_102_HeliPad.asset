@@ -20,6 +20,9 @@ MonoBehaviour:
     c\xF9ng \u0111\xE3 \u0111\u1EC3 l\u1EA1i g\xEC \u0111\xF3..."
   objective: "Leo l\xEAn t\u1EA7ng th\u01B0\u1EE3ng b\u1EC7nh vi\u1EC7n, \u0111\u1EBFn
     helipad, t\xECm b\u1EA3n ghi cu\u1ED1i c\u1EE7a \u0111\u1ED9i y t\u1EBF"
+  instructions: "1. Leo l\xEAn t\u1EA7ng th\u01B0\u1EE3ng b\u1EC7nh vi\u1EC7n.\n2.
+    \u0110\u1EBFn s\xE2n bay tr\u1EF1c th\u0103ng.\n3. Ti\xEAu di\u1EC7t zombie v\xE0
+    thu th\u1EADp v\u1EADt ph\u1EA9m tr\xEAn s\xE2n th\u01B0\u1EE3ng."
   expReward: 100
   journalReward: {fileID: 11400000, guid: 3807ace3eda7455ba5d95d0d1e310c90, type: 2}
   completionNotification: 

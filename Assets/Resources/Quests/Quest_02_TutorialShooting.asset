@@ -21,6 +21,10 @@ MonoBehaviour:
     \u0111i\u1EC1u khi\u1EC3n sang tr\u1EA1ng th\xE1i b\u1EAFt \u0111\u1EA7u chi\u1EBFn
     \u0111\u1EA5u th\u1EF1c s\u1EF1."
   objective: "Ti\xEAu di\u1EC7t to\xE0n b\u1ED9 zombie xung quanh khu l\u1EC1u"
+  instructions: "1. Gi\u1EEF chu\u1ED9t tr\xE1i \u0111\u1EC3 b\u1EAFn.\n2. Nh\u1EA5n
+    chu\u1ED9t ph\u1EA3i \u0111\u1EC3 ng\u1EAFm (ADS).\n3. Nh\u1EA5n [R] \u0111\u1EC3
+    n\u1EA1p \u0111\u1EA1n.\n4. Ti\xEAu di\u1EC7t to\xE0n b\u1ED9 zombie xung quanh
+    khu l\u1EC1u."
   expReward: 100
   journalReward: {fileID: 11400000, guid: 3b1106d6233e49cf9902fb8e0d48ca61, type: 2}
   completionNotification: "Zombie b\u1ECB ti\xEAu di\u1EC7t! Nh\u1EADn Nh\u1EADt

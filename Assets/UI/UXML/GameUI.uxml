@@ -27,6 +27,8 @@
     <ui:Style src="project://database/Assets/UI/USS/QuestTracker.uss" />
     <ui:Style src="project://database/Assets/UI/USS/JournalUI.uss" />
     <ui:Style src="project://database/Assets/UI/USS/StatsPanel.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/TutorialOverlay.uss" />
+    <ui:Style src="project://database/Assets/UI/USS/IntroOverlay.uss" />
     <ui:Style src="project://database/Assets/UI/USS/AdRewardPanel.uss" />
     <ui:Style src="project://database/Assets/UI/USS/WeaponSelectionPanel.uss" />
     <ui:Style src="project://database/Assets/UI/USS/HUDChips.uss" />
@@ -176,6 +178,7 @@
                 <ui:Label name="Chapter" text="" />
                 <ui:Label name="Title" text="" />
                 <ui:Label name="Objective" text="" />
+                <ui:Label name="Instructions" text="" />
                 <ui:Label name="Collectibles" text="" />
             </ui:VisualElement>
             <ui:VisualElement name="QuestDivider" class="quest-divider" />
@@ -273,6 +276,40 @@
                 <ui:Label name="StatsTitle" class="stats-title" text="STATISTICS" />
                 <ui:VisualElement name="StatsDivider" class="stats-divider" />
                 <ui:VisualElement name="StatsGrid" class="stats-grid" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== IntroPanel (story intro after black fade) ==================== -->
+        <ui:VisualElement name="IntroPanel" class="ui-panel-root" style="display: none;">
+            <ui:VisualElement name="IntroScrim" class="ui-panel-vignette" />
+            <ui:VisualElement name="IntroCard" class="ui-panel-card intro-card">
+                <ui:VisualElement name="IntroAccent" class="ui-panel-accent" />
+                <ui:Label name="IntroTitle" class="intro-title" text="NHIỆM VỤ KHỞI ĐẦU" />
+                <ui:ScrollView name="IntroScroll" class="intro-scroll" mode="Vertical" show-horizontal-scroller="false">
+                    <ui:Label name="IntroBody" class="intro-body" text="" />
+                </ui:ScrollView>
+                <ui:Button name="IntroStartButton" class="intro-start-button" text="BẮT ĐẦU" />
+                <ui:Label name="IntroHint" class="intro-hint" text="ĐỌC KỸ HƯỚNG DẪN TRƯỚC KHI BẮT ĐẦU" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ==================== TutorialPanel (inlined, toggle [H]) ==================== -->
+        <ui:VisualElement name="TutorialPanel" class="ui-panel-root" style="display: none;">
+            <ui:VisualElement name="TutorialScrim" class="ui-panel-vignette" />
+            <ui:VisualElement name="TutorialCard" class="ui-panel-card tutorial-card">
+                <ui:VisualElement name="TutorialAccent" class="ui-panel-accent" />
+                <ui:Label name="TutorialTitle" class="tutorial-title" text="HƯỚNG DẪN" />
+                <ui:ScrollView name="TutorialScroll" class="tutorial-scroll" mode="Vertical" show-horizontal-scroller="false">
+                    <ui:Label name="TutorialMovementHeader" class="tutorial-section-header" text="DI CHUYỂN" />
+                    <ui:Label name="TutorialMovementBody" class="tutorial-body" text="" />
+                    <ui:Label name="TutorialCombatHeader" class="tutorial-section-header" text="CHIẾN ĐẤU" />
+                    <ui:Label name="TutorialCombatBody" class="tutorial-body" text="" />
+                    <ui:Label name="TutorialNpcHeader" class="tutorial-section-header" text="GIAO TIẾP NPC" />
+                    <ui:Label name="TutorialNpcBody" class="tutorial-body" text="" />
+                    <ui:Label name="TutorialQuestHeader" class="tutorial-section-header" text="NHIỆM VỤ HIỆN TẠI" />
+                    <ui:Label name="TutorialQuestBody" class="tutorial-body tutorial-quest-body" text="" />
+                </ui:ScrollView>
+                <ui:Label name="TutorialHint" class="tutorial-hint" text="[H] HOẶC [ESC] ĐỂ ĐÓNG" />
             </ui:VisualElement>
         </ui:VisualElement>
 
