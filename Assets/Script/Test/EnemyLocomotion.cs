@@ -53,6 +53,7 @@ public class EnemyLocomotion : MonoBehaviour
         _noPathRetryCount = 0;
         _noPathRetryTimer = 0f;
         _stuckRecoveryCooldownTimer = 0f;
+        _pathPendingTimer = 0f;
 
         WarpIfUnderground();
     }
@@ -318,7 +319,7 @@ public class EnemyLocomotion : MonoBehaviour
         }
 
         // Reset pathPending deadlock after 1.5 seconds
-        if (Agent != null && Agent.isOnNavMesh && Agent.pathPending)
+        if (Agent != null && Agent.enabled && Agent.isOnNavMesh && Agent.pathPending)
         {
             _pathPendingTimer += Time.deltaTime;
             if (_pathPendingTimer >= 1.5f)

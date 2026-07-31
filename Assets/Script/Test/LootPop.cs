@@ -80,12 +80,16 @@ public class LootPop : MonoBehaviour
         // FixedUpdate() gọi rb.AddForce(down) + gravity kéo xuống, nếu để
         // non-kinematic thì Rigidbody sẽ fight với transform.position do
         // LootPop set, gây tunneling xuyên sàn.
+        if (rb == null) rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
             rbWasKinematic = rb.isKinematic;
+            if (!rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
             rb.isKinematic = true;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
         }
 
         // Hướng ngang ngẫu nhiên trong vòng tròn.
