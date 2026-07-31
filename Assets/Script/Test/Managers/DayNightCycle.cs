@@ -136,8 +136,8 @@ public class DayNightCycle : MonoBehaviour
         {
             hour = 6f,
             sunEulerX = 10f,
-            sunColor = new Color(1f, 0.78f, 0.44f, 1f),
-            sunIntensity = 1.2f,
+            sunColor = new Color(0.95f, 0.75f, 0.48f, 1f),
+            sunIntensity = 0.75f,
             fillColor = new Color(0.6f, 0.6f, 0.8f, 1f),
             fillIntensity = 0.15f,
             fogEnabled = true,
@@ -153,15 +153,15 @@ public class DayNightCycle : MonoBehaviour
         {
             hour = 12f,
             sunEulerX = 90f,
-            sunColor = new Color(1f, 0.96f, 0.88f, 1f),
-            sunIntensity = 1.4f,
+            sunColor = new Color(0.92f, 0.90f, 0.84f, 1f),
+            sunIntensity = 0.85f,
             fillColor = new Color(0.7f, 0.75f, 0.85f, 1f),
             fillIntensity = 0.2f,
             fogEnabled = true,
             fogColor = new Color(0.6f, 0.65f, 0.7f, 1f),
             fogDensity = 0.005f,
             ambientColor = new Color(0.5f, 0.5f, 0.5f, 1f),
-            ambientIntensity = 1.2f,
+            ambientIntensity = 1.1f,
             skyTopColor = new Color(0.35f, 0.55f, 0.85f, 1f),
             skyBottomColor = new Color(0.75f, 0.85f, 0.95f, 1f),
             dayVolumeWeight = 1f
@@ -170,8 +170,8 @@ public class DayNightCycle : MonoBehaviour
         {
             hour = 18f,
             sunEulerX = 170f,
-            sunColor = new Color(1f, 0.55f, 0.25f, 1f),
-            sunIntensity = 1.1f,
+            sunColor = new Color(0.90f, 0.52f, 0.28f, 1f),
+            sunIntensity = 0.70f,
             fillColor = new Color(0.5f, 0.4f, 0.6f, 1f),
             fillIntensity = 0.25f,
             fogEnabled = true,
@@ -229,6 +229,9 @@ public class DayNightCycle : MonoBehaviour
     [Header("Debug")]
     public bool logChapterChanges = true;
 
+    [Header("Post Processing Support")]
+    public PostProcessResources postProcessResources;
+
     // ---- Blend state for smooth chapter transitions ----
     private bool _blending;
     private float _blendFromTime;
@@ -243,6 +246,120 @@ public class DayNightCycle : MonoBehaviour
     // when X crosses 90°/180° (gimbal lock). Setting localRotation via
     // Quaternion.Euler(x, yaw, 0) every frame keeps the sun direction stable. ----
     private float _sunBaseYaw;
+
+    private PostProcessProfile _runtimeDayProfile;
+    private PostProcessProfile _runtimeNightProfile;
+    private Camera _cachedMainCam;
+    private bool _isCameraPpInitialized = false;
+
+    private void OnDestroy()
+    {
+        if (_runtimeDayProfile != null)
+        {
+            if (Application.isPlaying) Destroy(_runtimeDayProfile);
+            else DestroyImmediate(_runtimeDayProfile);
+            _runtimeDayProfile = null;
+        }
+        if (_runtimeNightProfile != null)
+        {
+            if (Application.isPlaying) Destroy(_runtimeNightProfile);
+            else DestroyImmediate(_runtimeNightProfile);
+            _runtimeNightProfile = null;
+        }
+    }
+
+    private void ConfigureVolumeProfile(PostProcessVolume volume, ref PostProcessProfile runtimeProfile, float postExposureVal)
+    {
+        if (volume == null) return;
+
+        if (runtimeProfile != null)
+        {
+            if (Application.isPlaying) Destroy(runtimeProfile);
+            else DestroyImmediate(runtimeProfile);
+            runtimeProfile = null;
+        }
+
+        if (volume.sharedProfile != null)
+            runtimeProfile = Instantiate(volume.sharedProfile);
+        else
+            runtimeProfile = ScriptableObject.CreateInstance<PostProcessProfile>();
+
+        Bloom bloom = runtimeProfile.GetSetting<Bloom>();
+        if (bloom == null) bloom = runtimeProfile.AddSettings<Bloom>();
+        bloom.enabled.Override(true);
+        bloom.threshold.Override(1.20f); // 1.20f threshold in FP16 HDR space (0% diffuse bloom haze)
+        bloom.intensity.Override(0.04f); // Ultra-soft 4% ambient glow
+        bloom.clamp.Override(2.0f);      // Tight 2.0f specular bloom ceiling
+
+        ColorGrading colorGrading = runtimeProfile.GetSetting<ColorGrading>();
+        if (colorGrading == null) colorGrading = runtimeProfile.AddSettings<ColorGrading>();
+        colorGrading.enabled.Override(true);
+        colorGrading.gradingMode.Override(GradingMode.HighDefinitionRange); // Mandatory for ACES Tonemapping!
+        colorGrading.tonemapper.Override(Tonemapper.ACES);                   // Filmic ACES Tonemapping compresses HDR highlights cleanly!
+        colorGrading.postExposure.Override(postExposureVal);                 // Day: -0.40 EV, Night: -0.70 EV
+
+        volume.profile = runtimeProfile; // Isolated runtime profile instance
+        volume.isGlobal = true;
+        volume.priority = 100f;          // Equal priority 100f for zero-cost weight blending
+        volume.gameObject.SetActive(true); // Active 24/7 for zero-flicker weight blending
+    }
+
+    private void EnsurePostProcessResourcesLoaded()
+    {
+        if (postProcessResources == null)
+        {
+            postProcessResources = Resources.Load<PostProcessResources>("PostProcessResources");
+        }
+        if (postProcessResources == null)
+        {
+            var loadedRes = Resources.FindObjectsOfTypeAll<PostProcessResources>();
+            if (loadedRes != null && loadedRes.Length > 0)
+                postProcessResources = loadedRes[0];
+        }
+    }
+
+    private void EnsureMainCameraConfigured()
+    {
+        Camera cam = Camera.main;
+        if (cam == null || cam.orthographic) return;
+
+        if (cam.name.Contains("Minimap") || cam.name.Contains("UI")) return;
+
+        if (_cachedMainCam == cam && _isCameraPpInitialized) return;
+
+        cam.allowHDR = true; // Mandatory FP16 HDR Target allocation for ACES Tonemapping!
+
+        var ppLayer = cam.GetComponent<PostProcessLayer>();
+        if (ppLayer == null)
+        {
+            ppLayer = cam.gameObject.AddComponent<PostProcessLayer>();
+            ppLayer.volumeTrigger = cam.transform;
+        }
+
+        if (ppLayer != null)
+        {
+            ppLayer.enabled = true;
+            if (ppLayer.volumeTrigger == null) ppLayer.volumeTrigger = cam.transform;
+
+            int mask = 0;
+            if (dayVolume != null) mask |= (1 << dayVolume.gameObject.layer);
+            if (nightVolume != null) mask |= (1 << nightVolume.gameObject.layer);
+            if (mask == 0) mask = 1 << gameObject.layer;
+            ppLayer.volumeLayer = mask; // Pure Volume Layer Mask (excludes Layer 0 Default)
+
+            EnsurePostProcessResourcesLoaded();
+            if (postProcessResources != null)
+            {
+                ppLayer.Init(postProcessResources);
+                _cachedMainCam = cam;
+                _isCameraPpInitialized = true; // Atomic Init Guard: ONLY set cache once Init succeeds!
+            }
+        }
+
+        var flareLayer = cam.GetComponent<FlareLayer>();
+        if (flareLayer != null && flareLayer.enabled)
+            flareLayer.enabled = false;
+    }
 
     private void Awake()
     {
@@ -264,13 +381,7 @@ public class DayNightCycle : MonoBehaviour
         if (sunLight != null)
         {
             sunLight.type = LightType.Directional;
-            // Force the sun to always be a pixel light so it can cast shadows in
-            // Forward rendering. Without this, point lights with higher priority
-            // (closer/stronger) can take the limited pixel-light slots and demote
-            // the sun to a vertex light, which cannot cast shadows.
             sunLight.renderMode = LightRenderMode.ForcePixel;
-            // Capture the sun's azimuth (Y) once so we can drive pitch (X) without
-            // the euler Y/Z representation flipping around gimbal lock.
             _sunBaseYaw = sunLight.transform.localEulerAngles.y;
         }
 
@@ -290,10 +401,10 @@ public class DayNightCycle : MonoBehaviour
 
     private void Start()
     {
-        // Fallback subscription in case OnEnable ran before StoryManager.Awake.
         Subscribe();
-
-        // Apply initial state once.
+        ConfigureVolumeProfile(dayVolume, ref _runtimeDayProfile, -0.40f);
+        ConfigureVolumeProfile(nightVolume, ref _runtimeNightProfile, -0.70f);
+        EnsureMainCameraConfigured();
         ApplyEvaluatedState(Evaluate(timeOfDay));
     }
 
@@ -306,7 +417,7 @@ public class DayNightCycle : MonoBehaviour
 
     private void HandleChapterChanged(int oldChapter, int newChapter)
     {
-        if (newChapter < 1) return; // -1 = story complete, ignore
+        if (newChapter < 1) return;
         int idx = newChapter - 1;
         if (chapterStartHours == null || idx < 0 || idx >= chapterStartHours.Length)
         {
@@ -339,7 +450,7 @@ public class DayNightCycle : MonoBehaviour
         {
             _blendElapsed += Time.deltaTime;
             float t = Mathf.Clamp01(_blendElapsed / chapterBlendDuration);
-            t = t * t * (3f - 2f * t); // smoothstep
+            t = t * t * (3f - 2f * t);
             timeOfDay = Mathf.Lerp(_blendFromTime, _blendToTime, t);
             if (t >= 1f) _blending = false;
         }
@@ -354,10 +465,6 @@ public class DayNightCycle : MonoBehaviour
         ApplyEvaluatedState(state);
     }
 
-    /// <summary>
-    /// Sample the keyframe array at the given hour, linearly interpolating
-    /// between the two surrounding keyframes. Wraps around 24h.
-    /// </summary>
     private DayNightKeyframe Evaluate(float hour)
     {
         if (keyframes == null || keyframes.Length == 0)
@@ -375,7 +482,6 @@ public class DayNightCycle : MonoBehaviour
             float h1 = keyframes[next].hour;
             if (h1 <= h0)
             {
-                // Wrap segment (e.g. 22 -> 6 across midnight).
                 if (hour >= h0 || hour < h1) { i0 = i; i1 = next; break; }
             }
             else if (hour >= h0 && hour < h1)
@@ -422,73 +528,69 @@ public class DayNightCycle : MonoBehaviour
 
     private void ApplyEvaluatedState(DayNightKeyframe s)
     {
-        // Sun light. Compute the sun direction directly from sunEulerX (treated
-        // as a pitch angle: 0 = horizon east, 90 = overhead noon, 180 = horizon
-        // west, 270 = below horizon night) and a stable azimuth (_sunBaseYaw
-        // captured at Awake). We avoid Quaternion.Euler because it suffers from
-        // gimbal-lock representation flips around X=90°/180° that make the
-        // forward vector (and thus the light direction / shadow direction)
-        // snap discontinuously — visible as flicker when the cycle crosses noon.
+        EnsureMainCameraConfigured();
+
+        if (dayVolume != null)
+        {
+            dayVolume.gameObject.SetActive(true);
+            dayVolume.weight = s.dayVolumeWeight;
+        }
+        if (nightVolume != null)
+        {
+            nightVolume.gameObject.SetActive(true);
+            nightVolume.weight = 1f - s.dayVolumeWeight;
+        }
+
+        float sunScale = 0.65f;
+        float ambScale = 0.70f;
+
         if (sunLight != null)
         {
             float rad = (s.sunEulerX - 90f) * Mathf.Deg2Rad;
             Vector3 sunDir = new Vector3(0f, -Mathf.Cos(rad), Mathf.Sin(rad));
             if (_sunBaseYaw != 0f)
                 sunDir = Quaternion.AngleAxis(_sunBaseYaw, Vector3.up) * sunDir;
-            // Pick an up vector that isn't parallel to forward so LookRotation
-            // is stable when the sun is directly overhead or below.
             Vector3 upRef = Mathf.Abs(Vector3.Dot(sunDir, Vector3.up)) > 0.99f
                 ? Vector3.forward
                 : Vector3.up;
             sunLight.transform.localRotation = Quaternion.LookRotation(sunDir, upRef);
             sunLight.color = s.sunColor;
-            sunLight.intensity = s.sunIntensity;
-            // Hard shadows (cheaper than Soft) when the sun is up; off at night.
-            sunLight.shadows = s.sunIntensity <= 0.05f ? LightShadows.None : LightShadows.Hard;
+            sunLight.intensity = s.sunIntensity * sunScale;
+            sunLight.flare = null;
+            sunLight.shadows = (s.sunIntensity * sunScale) <= 0.05f ? LightShadows.None : LightShadows.Hard;
         }
 
-        // Fill light.
         if (fillLight != null)
         {
             fillLight.color = s.fillColor;
-            fillLight.intensity = s.fillIntensity;
+            fillLight.intensity = s.fillIntensity * sunScale;
+            fillLight.flare = null;
         }
 
-        // Fog + ambient.
+        if (RenderSettings.ambientMode != UnityEngine.Rendering.AmbientMode.Trilight)
+        {
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+        }
+
+        float amb = s.ambientIntensity * ambScale;
+        Color skyAmb = s.ambientColor * amb;
+        RenderSettings.ambientSkyColor = skyAmb;
+        RenderSettings.ambientEquatorColor = skyAmb * 0.75f;
+        RenderSettings.ambientGroundColor = skyAmb * 0.50f;
+        RenderSettings.ambientIntensity = 1.0f;
+        RenderSettings.reflectionIntensity = Mathf.Clamp(amb * 0.25f, 0.03f, 0.12f);
+
         RenderSettings.fog = s.fogEnabled;
         RenderSettings.fogColor = s.fogColor;
         RenderSettings.fogDensity = s.fogDensity;
-        RenderSettings.ambientLight = s.ambientColor;
-        RenderSettings.ambientIntensity = s.ambientIntensity;
 
-        // Skydome gradient (via MaterialPropertyBlock so we don't touch the shared asset).
         if (skydomeRenderer != null)
         {
             if (_skyBlock == null) _skyBlock = new MaterialPropertyBlock();
             skydomeRenderer.GetPropertyBlock(_skyBlock);
-            _skyBlock.SetColor(skyTopColorProp, s.skyTopColor);
-            _skyBlock.SetColor(skyBottomColorProp, s.skyBottomColor);
+            _skyBlock.SetColor(skyTopColorProp, s.skyTopColor * 0.75f);
+            _skyBlock.SetColor(skyBottomColorProp, s.skyBottomColor * 0.75f);
             skydomeRenderer.SetPropertyBlock(_skyBlock);
-        }
-
-        // Post-process volumes. Disable the volume GameObject entirely when its
-        // weight is near zero so the camera doesn't pay the cost of blending an
-        // inactive profile (helps weaker machines).
-        if (dayVolume != null)
-        {
-            float w = s.dayVolumeWeight;
-            if (dayVolume.weight != w) dayVolume.weight = w;
-            bool shouldBeActive = w > 0.05f;
-            if (dayVolume.gameObject.activeSelf != shouldBeActive)
-                dayVolume.gameObject.SetActive(shouldBeActive);
-        }
-        if (nightVolume != null)
-        {
-            float w = 1f - s.dayVolumeWeight;
-            if (nightVolume.weight != w) nightVolume.weight = w;
-            bool shouldBeActive = w > 0.05f;
-            if (nightVolume.gameObject.activeSelf != shouldBeActive)
-                nightVolume.gameObject.SetActive(shouldBeActive);
         }
     }
 }
