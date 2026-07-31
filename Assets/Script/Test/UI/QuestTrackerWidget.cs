@@ -197,8 +197,9 @@ public class QuestTrackerWidget : MonoBehaviour
                 bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
                 bool panelActive = PanelManager.Instance != null && PanelManager.Instance.IsAnyPanelActive();
                 bool journalActive = JournalUI.Instance != null && JournalUI.Instance.IsOpenOrTransitioning;
+                bool skillTreeActive = false;
                 var skillTree = FindAnyObjectByType<SkillTreeWidget>();
-                bool skillTreeActive = skillTree != null && skillTree.IsOpenOrTransitioning;
+                if (skillTree != null) skillTreeActive = skillTree.IsOpenOrTransitioning;
 
                 if (!pauseActive && !gameOver && !panelActive && !journalActive && !skillTreeActive)
                 {
