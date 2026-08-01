@@ -136,6 +136,20 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     public event System.Action<State> OnStateChanged;
     /// <summary>Raised with normalized 0..1 progress while the player holds E to rescue. 0 = stopped, 1 = complete.</summary>
     public event System.Action<float> OnRescueProgressChanged;
+
+    public void CancelRescue()
+    {
+        _rescueProgress = 0f;
+        isBeingRescued = false;
+        OnRescueProgressChanged?.Invoke(0f);
+    }
+
+    public void NotifyRescueProgress(float progress)
+    {
+        isBeingRescued = progress > 0f;
+        _rescueProgress = progress * rescueHoldDuration;
+        OnRescueProgressChanged?.Invoke(Mathf.Clamp01(progress));
+    }
     /// <summary>Raised the first time the player rescues the companion by holding E. Lets dialogue triggers switch to "thanks" small talk.</summary>
     public event System.Action OnRescuedByPlayer;
 
@@ -164,7 +178,8 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     private float _shootStopTimer; // Stops movement while shooting (L4D2 style)
     private int _ammoRemaining; // Shots left before reload
     private float _reloadTimer; // Counts down during reload; companion can't shoot while > 0
-    private float _rescueProgress; // 0..rescueHoldDuration — accumulated while player holds E near downed companion
+    private float _rescueProgress;
+    private bool isBeingRescued = false; // 0..rescueHoldDuration — accumulated while player holds E near downed companion
     private DialogueBubble _bubble; // Cached for rescue thank-you dialogue
     private CompanionDialogueTrigger _dialogueTrigger;
     private Collider _interactCollider; // Trigger collider on layer Interactable — disabled while Downed so InteractManager ignores the companion
@@ -832,9 +847,20 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     /// </summary>
     /// <param name="healthFraction">Fraction of maxHealth to restore (0.5 = 50%, 1 = full).</param>
     /// <param name="byPlayer">If true, the companion thanks the player via DialogueBubble.</param>
-    private void Revive(float healthFraction, bool byPlayer = false)
+    public void Revive(float healthFraction, bool byPlayer = false)
     {
+        if (CurrentState != State.Downed) return;
         _rescueProgress = 0f;
+        isBeingRescued = false;
+        OnRescueProgressChanged?.Invoke(0f);
+
+        var capsule = GetComponent<CapsuleCollider>();
+        if (capsule != null)
+        {
+            capsule.radius = 0.4f;
+            capsule.height = 1.8f;
+            capsule.center = new Vector3(0f, 0.9f, 0f);
+        }
         if (byPlayer)
         {
             bool firstRescue = !RescuedByPlayer;

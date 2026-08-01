@@ -284,18 +284,35 @@ namespace cowsins
         {
             if (forbiddenInteractionUI != null) forbiddenInteractionUI.SetActive(false);
             if (interactUI != null) interactUI.gameObject.SetActive(false);
+            if (interactUIProgressDisplay != null)
+            {
+                interactUIProgressDisplay.gameObject.SetActive(false);
+                interactUIProgressDisplay.fillAmount = 0f;
+            }
         }
         private void InteractionProgressUpdate(float value)
         {
             if (interactUIProgressDisplay != null)
             {
-                interactUIProgressDisplay.gameObject.SetActive(true);
-                interactUIProgressDisplay.fillAmount = value;
+                if (value > 0f)
+                {
+                    interactUIProgressDisplay.gameObject.SetActive(true);
+                    interactUIProgressDisplay.fillAmount = value;
+                }
+                else
+                {
+                    interactUIProgressDisplay.gameObject.SetActive(false);
+                    interactUIProgressDisplay.fillAmount = 0f;
+                }
             }
         }
         private void FinishInteraction()
         {
-            if (interactUIProgressDisplay != null) interactUIProgressDisplay.gameObject.SetActive(false);
+            if (interactUIProgressDisplay != null)
+            {
+                interactUIProgressDisplay.gameObject.SetActive(false);
+                interactUIProgressDisplay.fillAmount = 0f;
+            }
         }
 
         // UI EVENTS /////////////////////////////////////////////////////////////////////////////////////////

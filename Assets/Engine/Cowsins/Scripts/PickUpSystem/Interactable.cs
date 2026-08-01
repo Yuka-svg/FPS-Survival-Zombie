@@ -26,7 +26,15 @@ namespace cowsins
 
         [SerializeField] private bool instantInteraction = false;
 
-        public bool InstantInteraction => instantInteraction;
+        [SerializeField] protected float customHoldDuration = 0f;
+
+        public virtual float GetHoldDuration(float defaultDuration) => customHoldDuration > 0f ? customHoldDuration : defaultDuration;
+
+        public virtual bool InstantInteraction => instantInteraction && GetHoldDuration(0f) <= 0f;
+
+        public virtual void OnHoldProgressUpdate(float progress) {}
+
+        public virtual void OnHoldCancel() {}
 
         [System.Serializable]
         public class InteractableEvents // Store your events

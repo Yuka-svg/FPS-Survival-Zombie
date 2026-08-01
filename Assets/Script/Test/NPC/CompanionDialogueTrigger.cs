@@ -79,6 +79,47 @@ public class CompanionDialogueTrigger : Interactable
     private cowsins.InputManager _playerInput;
     private bool _proximityHintShown;
 
+    private void OnEnable()
+    {
+        if (_ai == null) _ai = GetComponent<CompanionAI>();
+        if (_ai != null) _ai.OnStateChanged += HandleStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (_ai != null) _ai.OnStateChanged -= HandleStateChanged;
+    }
+
+    private void HandleStateChanged(CompanionAI.State newState)
+    {
+        if (newState == CompanionAI.State.Downed)
+        {
+            interactText = "Giải cứu đồng đội";
+        }
+        else
+        {
+            interactText = GetInteractTextForStage(ActiveStage);
+        }
+    }
+
+    public override float GetHoldDuration(float defaultDuration)
+    {
+        if (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) return _ai.rescueHoldDuration;
+        return 0f;
+    }
+
+    public override bool InstantInteraction => (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) ? false : instantInteraction;
+
+    public override void OnHoldProgressUpdate(float progress)
+    {
+        if (_ai != null) _ai.NotifyRescueProgress(progress);
+    }
+
+    public override void OnHoldCancel()
+    {
+        if (_ai != null) _ai.CancelRescue();
+    }
+
     private void Awake()
     {
         _bubble = GetComponent<DialogueBubble>();
@@ -114,6 +155,11 @@ public class CompanionDialogueTrigger : Interactable
 
     private void Update()
     {
+        if (_ai != null && _ai.CurrentState == CompanionAI.State.Downed)
+        {
+            if (interactText != "Giải cứu đồng đội") interactText = "Giải cứu đồng đội";
+            return;
+        }
         string target = GetInteractTextForStage(ActiveStage);
         if (interactText != target) interactText = target;
 
@@ -200,8 +246,7 @@ public class CompanionDialogueTrigger : Interactable
     public override bool IsForbiddenInteraction(IWeaponReferenceProvider weaponController)
     {
         if (_permanentlyDisabled) return true;
-        var ai = GetComponent<CompanionAI>();
-        if (ai != null && ai.CurrentState == CompanionAI.State.Downed) return true;
+        if (_ai != null && (_ai.CurrentState == CompanionAI.State.Dead || _ai.CurrentState == CompanionAI.State.WalkingAway)) return true;
         return base.IsForbiddenInteraction(weaponController);
     }
 

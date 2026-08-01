@@ -55,6 +55,10 @@ namespace cowsins
         private bool isForbiddenInteraction = false;
         private float progressElapsed;
         private bool alreadyInteracted = false;
+        private Interactable _currentHoldTarget;
+        private float _lockedHoldDuration;
+        private bool _lockedInstantInteraction;
+        private bool _requireRePress = false;
         private bool inspecting = false;
 
         public float ProgressElapsed => progressElapsed;
@@ -123,27 +127,38 @@ namespace cowsins
 
         private void Update()
         {
-            // If we already interacted, or the player is not controllable, return!
-            if (alreadyInteracted || !playerControl.IsControllable) return;
+            if (!playerControl.IsControllable)
+            {
+                if (_currentHoldTarget != null) CancelActiveHold();
+                return;
+            }
 
             DetectInteractable();
             DetectInput();
         }
         private void DetectInteractable()
         {
-            if(mainCamera == null) return;
+            if (mainCamera == null) return;
 
-            // If we got a hit from the raycast:
-            if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit interactableHit, detectInteractionDistance, mask))
+            if (_currentHoldTarget != null && progressElapsed > 0f)
             {
-                if (highlightedInteractable?.transform != interactableHit.transform)
+                return;
+            }
+
+            Interactable interactableTarget = FindDownedCompanionProximity();
+
+            if (interactableTarget == null && Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit interactableHit, detectInteractionDistance, mask))
+            {
+                if (!interactableHit.collider.TryGetComponent(out interactableTarget))
                 {
-                    if (!interactableHit.collider.TryGetComponent(out Interactable interactableTarget) || highlightedInteractable != null)
-                    {
-                        DisableInteractionUI();
-                        return;
-                    }
-                    // Check if the interaction is forbidden
+                    interactableTarget = interactableHit.collider.GetComponentInParent<Interactable>();
+                }
+            }
+
+            if (interactableTarget != null)
+            {
+                if (highlightedInteractable != interactableTarget)
+                {
                     if (interactableTarget.IsForbiddenInteraction(weaponReferences))
                     {
                         isForbiddenInteraction = true;
@@ -151,17 +166,27 @@ namespace cowsins
                     }
                     else
                     {
-                        // If its not, enable interaction UI to display an interaction
                         EnableInteractionUI(interactableTarget);
                         isForbiddenInteraction = false;
                     }
                     highlightedInteractable = interactableTarget;
                 }
             }
-            else if(highlightedInteractable != null) 
+            else if (highlightedInteractable != null)
             {
-                // If we dont find any interactable, disable interactions UI
                 DisableInteractionUI();
+            }
+        }
+
+        public void ForceRefreshUI(Interactable interactable)
+        {
+            highlightedInteractable = interactable;
+            if (interactable != null)
+            {
+                interactable.interactable = true;
+                interactable.Highlight();
+                Events.OnInteractionProgressChanged?.Invoke(-1f);
+                Events.OnAllowedInteraction?.Invoke(interactable.interactText);
             }
         }
 
@@ -173,11 +198,39 @@ namespace cowsins
                 return;
             }
             interactable.interactable = true;
-            // Current interactable is equal to the passed interactable value
             if (highlightedInteractable == interactable) return;
             highlightedInteractable = interactable;
             interactable.Highlight();
             Events.OnAllowedInteraction?.Invoke(interactable.interactText);
+        }
+
+        public void CancelActiveHold()
+        {
+            if (inputManager != null && inputManager.Interacting) _requireRePress = true;
+            if (_currentHoldTarget != null && _currentHoldTarget.gameObject != null)
+            {
+                _currentHoldTarget.OnHoldCancel();
+            }
+            _currentHoldTarget = null;
+            ResetInteractionProgress();
+            if (highlightedInteractable != null) ForceRefreshUI(highlightedInteractable); else DisableInteractionUI();
+        }
+
+        private Interactable FindDownedCompanionProximity()
+        {
+            if (mainCamera == null) return null;
+            Collider[] hits = Physics.OverlapSphere(mainCamera.transform.position, detectInteractionDistance, mask);
+            foreach (var col in hits)
+            {
+                var trigger = col.GetComponentInParent<Interactable>();
+                if (trigger != null && !trigger.IsForbiddenInteraction(weaponReferences) && !trigger.InstantInteraction)
+                {
+                    Vector3 dirToTarget = (col.bounds.center - mainCamera.transform.position).normalized;
+                    if (Vector3.Dot(mainCamera.transform.forward, dirToTarget) > 0.3f)
+                        return trigger;
+                }
+            }
+            return null;
         }
 
         private void DisableInteractionUI()
@@ -193,48 +246,92 @@ namespace cowsins
 
         private void DetectInput()
         {
-            if (highlightedInteractable == null || isForbiddenInteraction)
+            if (inputManager != null && !inputManager.Interacting)
             {
-                ResetInteractionProgress();
+                _requireRePress = false;
+            }
+
+            if (_requireRePress || alreadyInteracted)
+            {
+                if (_currentHoldTarget != null) CancelActiveHold();
                 return;
             }
-            // If we dont detect an interactable then dont continue
-            // However if we detected an interactable + we pressing the interact button, then: 
-            if (inputManager.Interacting)
+
+            if (inputManager != null && !inputManager.Interacting && _currentHoldTarget != null)
+            {
+                CancelActiveHold();
+                return;
+            }
+
+            if (inputManager != null && inputManager.Interacting && _currentHoldTarget == null && !alreadyInteracted && !_requireRePress)
+            {
+                _currentHoldTarget = highlightedInteractable;
+            }
+
+            if (_currentHoldTarget == null || _currentHoldTarget.IsForbiddenInteraction(weaponReferences))
+            {
+                if (_currentHoldTarget != null) CancelActiveHold();
+                return;
+            }
+
+            var col = _currentHoldTarget.GetComponent<Collider>() ?? _currentHoldTarget.GetComponentInChildren<Collider>();
+            Vector3 targetPos = col != null ? col.ClosestPoint(mainCamera.transform.position) : _currentHoldTarget.transform.position;
+            if (Vector3.Distance(mainCamera.transform.position, targetPos) > detectInteractionDistance + 1.0f)
+            {
+                CancelActiveHold();
+                return;
+            }
+
+            if (progressElapsed <= 0f)
+            {
+                _lockedHoldDuration = Mathf.Max(0.0001f, _currentHoldTarget.GetHoldDuration(progressRequiredToInteract));
+                _lockedInstantInteraction = _currentHoldTarget.InstantInteraction;
+            }
+
+            if (progressElapsed > 0f && Mathf.Abs(_currentHoldTarget.GetHoldDuration(progressRequiredToInteract) - _lockedHoldDuration) > 0.01f)
+            {
+                CancelActiveHold();
+                return;
+            }
+
+            if (inputManager != null && inputManager.Interacting)
             {
                 progressElapsed += Time.deltaTime;
-                if (progressRequiredToInteract > 0)
+                _currentHoldTarget.OnHoldProgressUpdate(progressElapsed / _lockedHoldDuration);
+
+                if (!_lockedInstantInteraction)
                 {
-                    Events.OnInteractionProgressChanged?.Invoke(progressElapsed / progressRequiredToInteract);
+                    Events.OnInteractionProgressChanged?.Invoke(progressElapsed / _lockedHoldDuration);
                 }
 
-                // Interact
-                if (progressElapsed >= progressRequiredToInteract || highlightedInteractable.InstantInteraction && progressElapsed > 0) PerformInteraction();
-            }
-            else
-            {
-                ResetInteractionProgress();
+                if (progressElapsed >= _lockedHoldDuration || (_lockedInstantInteraction && progressElapsed > 0))
+                {
+                    PerformInteraction();
+                }
             }
         }
 
         private void PerformInteraction()
         {
             ResetInteractionProgress();
-            // prevent from spamming
             alreadyInteracted = true;
-            // Perform any interaction you may like
-            // Please note that classes that inherit from interactable can override the virtual void Interact()
-            highlightedInteractable.Interact(this.transform);
-            // Prevent from spamming but let the user interact again
+            _requireRePress = true;
+
+            Interactable targetToInteract = _currentHoldTarget != null ? _currentHoldTarget : highlightedInteractable;
+            _currentHoldTarget = null;
+
+            if (targetToInteract != null)
+            {
+                targetToInteract.Interact(this.transform);
+                targetToInteract.Unhighlight();
+            }
+
             Invoke(nameof(ResetInteractTimer), interactInterval);
-            
-            Events.OnPerformInteraction?.Invoke();  
+            Events.OnPerformInteraction?.Invoke();
 
-            // Manage UI
-            highlightedInteractable?.Unhighlight();
-            highlightedInteractable = null;
+            if (highlightedInteractable != null) ForceRefreshUI(highlightedInteractable); else DisableInteractionUI();
 
-            userEvents.OnFinishInteraction.Invoke(); // Call our event
+            userEvents.OnFinishInteraction.Invoke();
             Events.OnFinishInteraction?.Invoke();
         }
 
