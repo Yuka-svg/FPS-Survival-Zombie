@@ -20,25 +20,29 @@ public class SpecialEnemyDirector : MonoBehaviour
 {
     public static SpecialEnemyDirector Instance;
 
-    [Header("Boomer")]
+    [Header("Special Enemies Pool (Tier 1: Boomer, Big Guy, Witch)")]
     [Tooltip("The Boomer prefab to spawn (SM_Chr_ZombieBoss_Slobber_01).")]
     public GameObject boomerPrefab;
+    [Tooltip("The Big Guy prefab to spawn (BigGuy_Boss).")]
+    public GameObject bigGuyPrefab;
+    [Tooltip("The Witch prefab to spawn (Witch_Boss).")]
+    public GameObject witchPrefab;
 
     [Header("Player")]
     public Transform player;
 
-    [Header("Boomer Gating")]
-    [Tooltip("Boomers only start appearing once the wave reaches this number.")]
+    [Header("Special Enemies Gating")]
+    [Tooltip("Special enemies (Boomer, Big Guy, Witch) start appearing once the wave reaches this number.")]
     public int firstWave = 3;
-    [Tooltip("Seconds between Boomer spawn attempts once gating allows them.")]
+    [Tooltip("Seconds between special enemy spawn attempts once gating allows them.")]
     public float spawnInterval = 28f;
-    [Tooltip("Maximum Boomers alive at once.")]
+    [Tooltip("Maximum special enemies alive at once.")]
     public int maxAlive = 2;
 
-    [Header("Boomer Placement")]
-    [Tooltip("Closest a Boomer may spawn to the player (XZ).")]
+    [Header("Special Enemies Placement")]
+    [Tooltip("Closest a special enemy may spawn to the player (XZ).")]
     public float minDistanceFromPlayer = 16f;
-    [Tooltip("Farthest a Boomer may spawn to the player (XZ).")]
+    [Tooltip("Farthest a special enemy may spawn to the player (XZ).")]
     public float maxDistanceFromPlayer = 36f;
 
     [Header("Tank")]
@@ -128,11 +132,12 @@ public class SpecialEnemyDirector : MonoBehaviour
         int wave = WaveManager.Instance != null ? WaveManager.Instance.currentWave : 1;
 
         //------------------------------------------------
-        // BOOMER
+        // SPECIAL ENEMIES POOL (Tier 1: Boomer, Big Guy, Witch)
         //------------------------------------------------
-        if (boomerPrefab != null && wave >= firstWave)
+        bool hasSpecialPool = boomerPrefab != null || bigGuyPrefab != null || witchPrefab != null;
+        if (hasSpecialPool && wave >= firstWave)
         {
-            PruneDeadBoomers();
+            PruneDeadSpecialEnemies();
 
             _timer += Time.deltaTime;
 
@@ -141,7 +146,7 @@ public class SpecialEnemyDirector : MonoBehaviour
                 _timer = 0f;
 
                 if (_alive.Count < maxAlive)
-                    TrySpawnBoomer();
+                    TrySpawnSpecialEnemy();
             }
         }
 
@@ -173,7 +178,7 @@ public class SpecialEnemyDirector : MonoBehaviour
         }
     }
 
-    private void PruneDeadBoomers()
+    private void PruneDeadSpecialEnemies()
     {
         for (int i = _alive.Count - 1; i >= 0; i--)
         {
@@ -184,8 +189,16 @@ public class SpecialEnemyDirector : MonoBehaviour
                 continue;
             }
 
-            BoomerAI b = go.GetComponent<BoomerAI>();
-            if (b != null && b.IsDead)
+            ISpecialEnemy s = go.GetComponent<ISpecialEnemy>();
+            if (s != null && s.IsDead)
+            {
+                _alive.RemoveAt(i);
+                continue;
+            }
+
+            // Fallback for damageable readout if ISpecialEnemy is missing
+            IEnemyHealthReadout readout = go.GetComponent<IEnemyHealthReadout>();
+            if (readout != null && readout.IsDead)
                 _alive.RemoveAt(i);
         }
     }
@@ -207,18 +220,28 @@ public class SpecialEnemyDirector : MonoBehaviour
         }
     }
 
-    private void TrySpawnBoomer()
+    private void TrySpawnSpecialEnemy()
     {
+        // Build pool from assigned non-null prefabs
+        List<GameObject> pool = new List<GameObject>();
+        if (boomerPrefab != null) pool.Add(boomerPrefab);
+        if (bigGuyPrefab != null) pool.Add(bigGuyPrefab);
+        if (witchPrefab != null) pool.Add(witchPrefab);
+
+        if (pool.Count == 0)
+            return;
+
         Vector3 spawnPos;
         if (!TryGetSpawnPosition(out spawnPos, minDistanceFromPlayer, maxDistanceFromPlayer))
             return;
 
-        GameObject boomer = Instantiate(
-            boomerPrefab,
+        GameObject selectedPrefab = pool[Random.Range(0, pool.Count)];
+        GameObject enemy = Instantiate(
+            selectedPrefab,
             spawnPos,
             Quaternion.identity);
 
-        _alive.Add(boomer);
+        _alive.Add(enemy);
     }
 
     private void TrySpawnTank(int wave)
