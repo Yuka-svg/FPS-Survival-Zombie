@@ -248,24 +248,24 @@
                     <ui:Label name="header0" class="branch-header" text="MOVEMENT" />
                     <ui:Label name="sub0" class="branch-sub" text="+ STAMINA" />
                     <ui:VisualElement name="nodes0" class="node-container" />
-                    <ui:Label name="next0" class="next-desc" text="" />
                     <ui:Label name="cost0" class="cost-label muted" text="NEXT  2 SP" />
+                    <ui:Label name="next0" class="next-desc" text="" />
                 </ui:VisualElement>
                 <ui:VisualElement name="branch1" class="branch">
                     <ui:VisualElement name="icon1" class="branch-icon icon-aim" />
                     <ui:Label name="header1" class="branch-header" text="AIM" />
                     <ui:Label name="sub1" class="branch-sub" text="+ DAMAGE" />
                     <ui:VisualElement name="nodes1" class="node-container" />
-                    <ui:Label name="next1" class="next-desc" text="" />
                     <ui:Label name="cost1" class="cost-label muted" text="NEXT  2 SP" />
+                    <ui:Label name="next1" class="next-desc" text="" />
                 </ui:VisualElement>
                 <ui:VisualElement name="branch2" class="branch">
                     <ui:VisualElement name="icon2" class="branch-icon icon-intelligence" />
                     <ui:Label name="header2" class="branch-header" text="INTELLIGENCE" />
                     <ui:Label name="sub2" class="branch-sub" text="+ HP" />
                     <ui:VisualElement name="nodes2" class="node-container" />
-                    <ui:Label name="next2" class="next-desc" text="" />
                     <ui:Label name="cost2" class="cost-label muted" text="NEXT  2 SP" />
+                    <ui:Label name="next2" class="next-desc" text="" />
                 </ui:VisualElement>
                 <ui:Label name="hint" text="[TAB] CLOSE" />
             </ui:VisualElement>

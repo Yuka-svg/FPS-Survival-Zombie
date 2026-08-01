@@ -650,19 +650,19 @@ public class SkillTreeWidget : MonoBehaviour
         
         // Left divider (between column 0 and 1)
         painter.BeginPath();
-        painter.MoveTo(new Vector2(380f, 140f));
-        painter.LineTo(new Vector2(381.5f, 140f));
-        painter.LineTo(new Vector2(381.5f, rect.height - 120f));
-        painter.LineTo(new Vector2(380f, rect.height - 120f));
+        painter.MoveTo(new Vector2(380f, 130f));
+        painter.LineTo(new Vector2(381.5f, 130f));
+        painter.LineTo(new Vector2(381.5f, rect.height - 60f));
+        painter.LineTo(new Vector2(380f, rect.height - 60f));
         painter.ClosePath();
         painter.Fill();
 
         // Right divider (between column 1 and 2)
         painter.BeginPath();
-        painter.MoveTo(new Vector2(700f, 140f));
-        painter.LineTo(new Vector2(701.5f, 140f));
-        painter.LineTo(new Vector2(701.5f, rect.height - 120f));
-        painter.LineTo(new Vector2(700f, rect.height - 120f));
+        painter.MoveTo(new Vector2(700f, 130f));
+        painter.LineTo(new Vector2(701.5f, 130f));
+        painter.LineTo(new Vector2(701.5f, rect.height - 60f));
+        painter.LineTo(new Vector2(700f, rect.height - 60f));
         painter.ClosePath();
         painter.Fill();
 

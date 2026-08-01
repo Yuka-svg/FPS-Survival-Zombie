@@ -107,15 +107,15 @@
     flex-direction: column;
     align-items: center;
 }
-#branch0 { left: 80px; top: 155px; }
-#branch1 { left: 400px; top: 155px; }
-#branch2 { left: 720px; top: 155px; }
+#branch0 { left: 80px; top: 132px; }
+#branch1 { left: 400px; top: 132px; }
+#branch2 { left: 720px; top: 132px; }
 
 /* SVG Branch Icons */
 .branch-icon {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 6px;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 4px;
     -unity-background-image-tint-color: rgb(230, 80, 40);
     -unity-background-scale-mode: scale-to-fit;
 }
@@ -133,17 +133,17 @@
 }
 
 .branch-header {
-    height: 36px;
+    height: 24px;
     color: rgb(230, 80, 40);
-    font-size: 26px;
+    font-size: 18px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
 }
 
 .branch-sub {
-    height: 24px;
+    height: 16px;
     color: rgba(230, 80, 40, 0.5);
-    font-size: 16px;
+    font-size: 13px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
 }
@@ -152,8 +152,8 @@
     position: relative;
     width: 64px;
     height: 440px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 /* Skill node squares (Tactical Style) */
@@ -276,19 +276,21 @@
 
 /* Next-node description */
 .next-desc {
-    height: 22px;
+    min-height: 48px;
     width: 280px;
-    color: rgba(230, 80, 40, 0.6);
-    font-size: 16px;
+    color: rgba(230, 80, 40, 0.85);
+    font-size: 13px;
+    white-space: normal;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
-    -unity-text-align: middle-center;
+    -unity-text-align: upper-center;
 }
 
 /* Cost / status label */
 .cost-label {
-    height: 24px;
+    height: 22px;
     width: 280px;
-    font-size: 20px;
+    font-size: 16px;
+    margin-bottom: 4px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
 }
@@ -306,12 +308,12 @@
 #hint {
     position: absolute;
     left: 50%;
-    bottom: 24px;
+    bottom: 14px;
     translate: -50%;
     width: 800px;
-    height: 28px;
+    height: 24px;
     color: rgba(230, 80, 40, 0.5);
-    font-size: 18px;
+    font-size: 15px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
 }
