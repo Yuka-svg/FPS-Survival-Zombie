@@ -324,7 +324,7 @@ public class PanelManager : MonoBehaviour
                 string[] hudElementNames = {
                     "HealthCluster", "StaminaCluster", "AmmoCluster",
                     "CompassViewport", "ThreatWidget", "HUDChips",
-                    "QuestTracker", "Crosshair", "FPSLabel"
+                    "RightHUDColumn", "Crosshair", "FPSLabel"
                 };
 
                 foreach (var elName in hudElementNames)

@@ -144,7 +144,6 @@
         <ui:VisualElement name="CombatFeedbackHUD" picking-mode="Ignore">
             <ui:VisualElement name="Hitmarker" />
             <ui:VisualElement name="DamageNumbers" />
-            <ui:VisualElement name="Killfeed" />
         </ui:VisualElement>
         <ui:VisualElement name="DamageDirection" picking-mode="Ignore" />
         <!-- Boss -->
@@ -168,27 +167,30 @@
         <!-- Health Flash + Low Health Vignette -->
         <ui:VisualElement name="HealthFlash" picking-mode="Ignore" />
         <ui:VisualElement name="LowHealthVignette" picking-mode="Ignore" />
-        <!-- Quest + Journal -->
-        <ui:VisualElement name="QuestTracker">
-            <ui:VisualElement name="MinimapContainer" style="display: none;">
-                <ui:VisualElement name="MinimapImage" />
-                <ui:VisualElement name="MinimapMarkerLayer" picking-mode="Ignore" />
-                <ui:VisualElement name="MinimapQuestMarker" picking-mode="Ignore" />
-                <ui:VisualElement name="MinimapEdgeArrow" picking-mode="Ignore" />
-                <ui:VisualElement name="MinimapPlayerArrow" />
+        <!-- Top-Right Column (QuestTracker + Killfeed) -->
+        <ui:VisualElement name="RightHUDColumn" picking-mode="Ignore">
+            <ui:VisualElement name="QuestTracker">
+                <ui:VisualElement name="MinimapContainer" style="display: none;">
+                    <ui:VisualElement name="MinimapImage" />
+                    <ui:VisualElement name="MinimapMarkerLayer" picking-mode="Ignore" />
+                    <ui:VisualElement name="MinimapQuestMarker" picking-mode="Ignore" />
+                    <ui:VisualElement name="MinimapEdgeArrow" picking-mode="Ignore" />
+                    <ui:VisualElement name="MinimapPlayerArrow" />
+                </ui:VisualElement>
+                <ui:VisualElement name="MainPanel">
+                    <ui:Label name="Chapter" text="" />
+                    <ui:Label name="Title" text="" />
+                    <ui:Label name="Objective" text="" />
+                    <ui:Label name="Instructions" text="" />
+                    <ui:Label name="Collectibles" text="" />
+                </ui:VisualElement>
+                <ui:VisualElement name="QuestDivider" class="quest-divider" />
+                <ui:VisualElement name="SidePanel">
+                    <ui:Label name="SideHeader" text="SIDE QUESTS" />
+                    <ui:VisualElement name="SideLines" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="MainPanel">
-                <ui:Label name="Chapter" text="" />
-                <ui:Label name="Title" text="" />
-                <ui:Label name="Objective" text="" />
-                <ui:Label name="Instructions" text="" />
-                <ui:Label name="Collectibles" text="" />
-            </ui:VisualElement>
-            <ui:VisualElement name="QuestDivider" class="quest-divider" />
-            <ui:VisualElement name="SidePanel">
-                <ui:Label name="SideHeader" text="SIDE QUESTS" />
-                <ui:VisualElement name="SideLines" />
-            </ui:VisualElement>
+            <ui:VisualElement name="Killfeed" />
         </ui:VisualElement>
         <ui:VisualElement name="JournalUI" style="display: none;">
             <ui:VisualElement name="scrim" class="journal-scrim" picking-mode="Position" />

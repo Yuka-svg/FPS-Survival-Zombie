@@ -53,7 +53,7 @@ public class CombatFeedbackHUD : MonoBehaviour
         if (_root == null) return;
         _hitmarker = _root.Q("Hitmarker");
         _dmgContainer = _root.Q("DamageNumbers");
-        _killContainer = _root.Q("Killfeed");
+        _killContainer = doc.rootVisualElement != null ? doc.rootVisualElement.Q("Killfeed") : null;
 
         BuildHitmarkerBars();
         BuildDamagePool();
@@ -163,6 +163,14 @@ public class CombatFeedbackHUD : MonoBehaviour
 
     public void ShowKill(string name)
     {
+        if (_killContainer == null)
+        {
+            var doc = GetComponent<UIDocument>();
+            if (doc != null && doc.rootVisualElement != null)
+                _killContainer = doc.rootVisualElement.Q("Killfeed");
+        }
+        if (_killContainer == null) return;
+
         Kill k = null;
         for (int i = 0; i < _killPool.Count; i++)
         {

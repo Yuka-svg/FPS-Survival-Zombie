@@ -89,11 +89,13 @@
 }
 
 #Killfeed {
-    position: absolute;
-    right: var(--space-xxl, 24px);
-    top: 90px; /* Shifted down slightly to clear QuestTracker at top-right */
-    width: 360px;
-    height: 400px;
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 320px;
+    height: auto;
+    max-height: 240px;
+    margin-top: 10px;
     flex-direction: column;
     align-items: flex-end;
 }
