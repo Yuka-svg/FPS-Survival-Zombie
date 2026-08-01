@@ -480,16 +480,16 @@ public class CombatFeedbackHUD : MonoBehaviour
         if (vectorSvg != null)
         {
             element.style.display = DisplayStyle.Flex;
-            element.style.backgroundImage = Background.FromVectorImage(vectorSvg);
+            element.SetBackgroundImageSafe(vectorSvg);
         }
         else if (spriteImg != null)
         {
             element.style.display = DisplayStyle.Flex;
-            element.style.backgroundImage = Background.FromSprite(spriteImg);
+            element.SetBackgroundImageSafe(spriteImg);
         }
         else
         {
-            element.style.backgroundImage = StyleKeyword.Null;
+            element.SetBackgroundImageSafe((Sprite)null);
             element.style.display = DisplayStyle.None;
         }
     }

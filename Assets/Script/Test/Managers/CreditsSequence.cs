@@ -166,7 +166,7 @@ public class CreditsSequence : MonoBehaviour
             logo.style.width = LogoHeight;
             logo.style.height = LogoHeight;
             logo.style.marginBottom = SectionGapTop;
-            logo.style.backgroundImage = new StyleBackground(schoolLogo);
+            logo.SetBackgroundImageSafe(schoolLogo);
             logo.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
             _scrollContent.Add(logo);
             y += LogoHeight + SectionGapTop;

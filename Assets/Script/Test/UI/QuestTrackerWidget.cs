@@ -361,7 +361,7 @@ public class QuestTrackerWidget : MonoBehaviour
 
         if (_minimapImage != null)
         {
-            _minimapImage.style.backgroundImage = StyleKeyword.Null;
+            _minimapImage.SetBackgroundImageSafe((RenderTexture)null);
         }
 
         if (StoryManager.Instance != null)
@@ -1105,13 +1105,10 @@ public class QuestTrackerWidget : MonoBehaviour
             _questGroup.style.width = Length.Percent(100);
         }
 
-        if (_minimapImage != null && MinimapController.Instance != null)
+        if (_minimapImage != null)
         {
-            var tex = MinimapController.Instance.MinimapTexture;
-            if (tex != null)
-            {
-                _minimapImage.style.backgroundImage = Background.FromRenderTexture(tex);
-            }
+            var tex = MinimapController.Instance != null ? MinimapController.Instance.MinimapTexture : null;
+            _minimapImage.SetBackgroundImageSafe(tex);
         }
 
         UpdateStoryContent();
@@ -1248,13 +1245,10 @@ public class QuestTrackerWidget : MonoBehaviour
 
         if (_isMinimapMode)
         {
-            if (_minimapImage != null && MinimapController.Instance != null)
+            if (_minimapImage != null)
             {
-                var tex = MinimapController.Instance.MinimapTexture;
-                if (tex != null)
-                {
-                    _minimapImage.style.backgroundImage = Background.FromRenderTexture(tex);
-                }
+                var tex = MinimapController.Instance != null ? MinimapController.Instance.MinimapTexture : null;
+                _minimapImage.SetBackgroundImageSafe(tex);
             }
         }
         else

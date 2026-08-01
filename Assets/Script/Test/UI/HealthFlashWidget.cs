@@ -35,8 +35,7 @@ public class HealthFlashWidget : MonoBehaviour
             enabled = false;
             return;
         }
-        if (vignetteSprite != null)
-            _flash.style.backgroundImage = new StyleBackground(vignetteSprite);
+        _flash.SetBackgroundImageSafe(vignetteSprite);
     }
 
     private void OnEnable()

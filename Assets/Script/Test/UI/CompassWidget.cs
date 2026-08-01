@@ -30,7 +30,7 @@ public class CompassWidget : MonoBehaviour
         // Clear background image from CompassStrip to remove compas.png (and its dots)
         if (_strip != null)
         {
-            _strip.style.backgroundImage = null;
+            _strip.SetBackgroundImageSafe((Sprite)null);
         }
 
         if (_viewport != null)
@@ -322,9 +322,9 @@ public class CompassWidget : MonoBehaviour
             _blips[i].style.top = 4f;
             _blips[i].style.opacity = opacity;
 
+            _blips[i].SetBackgroundImageSafe(m.icon);
             if (m.icon != null)
             {
-                _blips[i].style.backgroundImage = new StyleBackground(m.icon);
                 _blips[i].style.unityBackgroundImageTintColor = new Color(255f / 255f, 42f / 255f, 42f / 255f, 0.95f);
             }
         }

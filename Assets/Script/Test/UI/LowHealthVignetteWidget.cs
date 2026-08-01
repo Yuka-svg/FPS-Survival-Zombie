@@ -21,8 +21,7 @@ public class LowHealthVignetteWidget : MonoBehaviour
             enabled = false;
             return;
         }
-        if (vignetteTexture != null)
-            _vignette.style.backgroundImage = vignetteTexture;
+        _vignette.SetBackgroundImageSafe(vignetteTexture);
     }
 
     private void OnEnable()

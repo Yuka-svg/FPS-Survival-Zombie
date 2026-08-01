@@ -35,10 +35,7 @@ public class IconDisplayerWidget : MonoBehaviour
         root.style.width = iconSize.x;
         root.style.height = iconSize.y;
 
-        if (iconSprite != null)
-        {
-            root.style.backgroundImage = new StyleBackground(iconSprite);
-        }
+        root.SetBackgroundImageSafe(iconSprite);
 
         _doc.rootVisualElement.Add(root);
     }

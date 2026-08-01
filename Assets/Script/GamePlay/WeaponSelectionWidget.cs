@@ -86,8 +86,7 @@ public class WeaponSelectionWidget : MonoBehaviour
 
             var icon = new VisualElement();
             icon.AddToClassList("weapon-card-icon");
-            if (weapon.icon != null)
-                icon.style.backgroundImage = new StyleBackground(weapon.icon);
+            icon.SetBackgroundImageSafe(weapon.icon);
             card.Add(icon);
 
             var label = new Label(weapon._name);

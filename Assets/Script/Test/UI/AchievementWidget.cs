@@ -126,8 +126,7 @@ public class AchievementWidget : MonoBehaviour
             iconEl.name = "Icon";
             iconEl.AddToClassList("ach-icon");
             iconEl.style.backgroundColor = unlocked ? Accent : new Color(Muted.r, Muted.g, Muted.b, 0.3f);
-            if (ach.icon != null)
-                iconEl.style.backgroundImage = new StyleBackground(ach.icon);
+            iconEl.SetBackgroundImageSafe(ach.icon);
             row.Add(iconEl);
 
             var textCol = new VisualElement();
@@ -170,8 +169,8 @@ public class AchievementWidget : MonoBehaviour
             var ach = _popupQueue.Dequeue();
             if (_popupTitle != null) _popupTitle.text = ach.title;
             if (_popupDesc != null) _popupDesc.text = ach.description;
-            if (ach.icon != null && _popupIcon != null)
-                _popupIcon.style.backgroundImage = new StyleBackground(ach.icon);
+            if (_popupIcon != null)
+                _popupIcon.SetBackgroundImageSafe(ach.icon);
 
             _popupRoot.style.opacity = 1f;
             yield return new WaitForSecondsRealtime(popupFadeIn + popupHold);

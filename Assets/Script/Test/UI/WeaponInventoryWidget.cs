@@ -61,10 +61,7 @@ public class WeaponInventoryWidget : MonoBehaviour
             _slots[i].style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
             if (!used) continue;
             var info = slots[i];
-            if (info.icon != null)
-                _icons[i].style.backgroundImage = new StyleBackground(info.icon);
-            else
-                _icons[i].style.backgroundImage = null;
+            _icons[i].SetBackgroundImageSafe(info.icon);
             _icons[i].style.opacity = info.occupied ? 1f : 0.12f;
         }
         HandleSelected(_adapter.SelectedWeaponIndex);

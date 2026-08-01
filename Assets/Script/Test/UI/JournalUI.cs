@@ -181,13 +181,13 @@ public class JournalUI : MonoBehaviour
             _content.style.marginTop = contentTopOffset;
         }
 
+        if (_illustration != null)
+        {
+            _illustration.SetBackgroundImageSafe(journal.image);
+        }
         if (journal.image != null)
         {
-            if (_illustration != null)
-            {
-                _illustration.style.display = DisplayStyle.Flex;
-                _illustration.style.backgroundImage = new StyleBackground(journal.image);
-            }
+            if (_illustration != null) _illustration.style.display = DisplayStyle.Flex;
             if (_crease != null) _crease.style.display = DisplayStyle.Flex;
             if (_scroll != null)
             {

@@ -42,8 +42,7 @@ public class WeaponIndicatorWidget : MonoBehaviour
         if (_weaponName != null) _weaponName.text = string.IsNullOrEmpty(n) ? string.Empty : n.ToUpperInvariant();
         if (_weaponIcon != null)
         {
-            if (icon != null) _weaponIcon.style.backgroundImage = new StyleBackground(icon);
-            else _weaponIcon.style.backgroundImage = null;
+            _weaponIcon.SetBackgroundImageSafe(icon);
         }
 
         _currentOpacity = 0.1f;

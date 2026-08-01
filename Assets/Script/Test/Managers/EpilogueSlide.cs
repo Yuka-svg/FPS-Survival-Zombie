@@ -95,10 +95,13 @@ public class EpilogueSlide : MonoBehaviour
             titleEl.text = titleText;
 
         _illustrationEl = _root.Q("Illustration");
-        if (_illustrationEl != null && illustration != null)
+        if (_illustrationEl != null)
         {
-            _illustrationEl.style.backgroundImage = new StyleBackground(illustration);
-            _illustrationEl.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            _illustrationEl.SetBackgroundImageSafe(illustration);
+            if (illustration != null)
+            {
+                _illustrationEl.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            }
         }
 
         _text = _root.Q<Label>("BodyText");
