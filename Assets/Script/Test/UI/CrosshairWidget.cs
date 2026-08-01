@@ -5,9 +5,9 @@ using UnityEngine.UIElements;
 public class CrosshairWidget : MonoBehaviour
 {
     [Header("Geometry (reference px @1920x1080)")]
-    public float lineLength = 10f;
-    public float lineThickness = 2f;
-    public float enemyThickness = 5f;
+    public float lineLength = 16f;
+    public float lineThickness = 3.2f;
+    public float enemyThickness = 5.5f;
 
     [Header("Spread per state")]
     public float defaultSpread = 20f;
@@ -25,6 +25,11 @@ public class CrosshairWidget : MonoBehaviour
     private CowsinsHUDAdapter _adapter;
     private float _spread;
     private float _thickness;
+
+    // Hitmarker feedback state
+    private float _hitmarkerAlpha;
+    private float _hitmarkerScale = 1f;
+    private bool _isHeadshot;
 
     private const int BarCount = 13;
     private static readonly string[] BarNames =
@@ -80,11 +85,16 @@ public class CrosshairWidget : MonoBehaviour
         _adapter = CowsinsHUDAdapter.Instance;
         if (_adapter == null) yield break;
         _adapter.OnFired += HandleFired;
+        _adapter.OnEnemyHit += HandleEnemyHit;
     }
 
     private void OnDisable()
     {
-        if (_adapter != null) _adapter.OnFired -= HandleFired;
+        if (_adapter != null)
+        {
+            _adapter.OnFired -= HandleFired;
+            _adapter.OnEnemyHit -= HandleEnemyHit;
+        }
         if (_container != null) _container.generateVisualContent -= OnGenerateCrosshairOverlay;
         StopAllCoroutines();
     }
@@ -96,11 +106,25 @@ public class CrosshairWidget : MonoBehaviour
         _spread = Mathf.Lerp(_spread, kick, 0.25f);
     }
 
+    private void HandleEnemyHit(bool isHeadshot, float damage)
+    {
+        _isHeadshot = isHeadshot;
+        _hitmarkerAlpha = 1f;
+        _hitmarkerScale = isHeadshot ? 1.45f : 1.2f;
+    }
+
     private void Update()
     {
         if (_container == null) return;
         float dt = Time.unscaledDeltaTime;
         var a = _adapter;
+
+        // Decay Hitmarker animation
+        if (_hitmarkerAlpha > 0f)
+        {
+            _hitmarkerAlpha = Mathf.MoveTowards(_hitmarkerAlpha, 0f, (_isHeadshot ? 4.5f : 6f) * dt);
+            _hitmarkerScale = Mathf.MoveTowards(_hitmarkerScale, 1f, 8f * dt);
+        }
 
         float target = defaultSpread;
         if (a != null)
@@ -232,6 +256,45 @@ public class CrosshairWidget : MonoBehaviour
             painter.LineTo(center + new Vector2(-dSize, 0));
             painter.ClosePath();
             painter.Fill();
+        }
+
+        // 3. Draw Dynamic Hitmarker (X-mark) when hitting an enemy
+        if (_hitmarkerAlpha > 0.005f)
+        {
+            float hitGap = (_isHeadshot ? 7f : 5f) * _hitmarkerScale;
+            float hitLen = (_isHeadshot ? 16f : 11f) * _hitmarkerScale;
+            float strokeWidth = _isHeadshot ? 3.6f : 2.6f;
+
+            Color hitColor = _isHeadshot
+                ? new Color(255f / 255f, 35f / 255f, 45f / 255f, _hitmarkerAlpha)
+                : new Color(255f / 255f, 255f / 255f, 255f / 255f, _hitmarkerAlpha * 0.95f);
+
+            Color hitShadow = new Color(6f / 255f, 12f / 255f, 18f / 255f, _hitmarkerAlpha * 0.9f);
+
+            for (int i = 0; i < 4; i++)
+            {
+                float angleDeg = 45f + i * 90f;
+                float rad = angleDeg * Mathf.Deg2Rad;
+                Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+                Vector2 p1 = center + dir * hitGap;
+                Vector2 p2 = center + dir * (hitGap + hitLen);
+
+                // Shadow stroke
+                painter.strokeColor = hitShadow;
+                painter.lineWidth = strokeWidth + 2.2f;
+                painter.BeginPath();
+                painter.MoveTo(p1);
+                painter.LineTo(p2);
+                painter.Stroke();
+
+                // Neon Hitmarker stroke
+                painter.strokeColor = hitColor;
+                painter.lineWidth = strokeWidth;
+                painter.BeginPath();
+                painter.MoveTo(p1);
+                painter.LineTo(p2);
+                painter.Stroke();
+            }
         }
     }
 }

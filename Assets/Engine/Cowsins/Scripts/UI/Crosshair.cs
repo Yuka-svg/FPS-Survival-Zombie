@@ -1,4 +1,4 @@
-﻿/// <summary>
+/// <summary>
 /// This script belongs to cowsins™ as a part of the cowsins´ FPS Engine. All rights reserved. 
 /// </summary>
 using UnityEngine;
@@ -125,6 +125,8 @@ namespace cowsins
         /// </summary>
         void OnGUI()
         {
+            // Legacy IMGUI crosshair rendering disabled in favor of modern UI Toolkit CrosshairWidget
+            return;
             if (playerStatsProvider.IsDead
                 || weaponController.Weapon != null && weaponBehaviour.IsAiming && removeCrosshairOnAiming
                 || PauseMenu.Instance != null && PauseMenu.isPaused && hideCrosshairOnPaused

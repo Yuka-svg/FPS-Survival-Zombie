@@ -115,6 +115,8 @@ public class CowsinsHUDAdapter : MonoBehaviour
     public bool EnemySpotted { get; private set; }
     public float WeaponCrosshairResize => (_weapon != null && _weapon.Weapon != null) ? _weapon.Weapon.crosshairResize : 0f;
     public event Action<bool> OnEnemySpottedChanged;
+    /// <summary>(isHeadshot, damage)</summary>
+    public event Action<bool, float> OnEnemyHit;
 
     // Equipped weapon's crosshair shape (engine-free mirror of Weapon_SO.crosshairParts).
     public bool CHTop { get; private set; } = true;
@@ -594,12 +596,13 @@ public class CowsinsHUDAdapter : MonoBehaviour
         }
     }
 
-    // ---- Progression: Coins / XP (Cowsins static UIEvents) ----
+    // ---- Progression & Combat Events (Cowsins static UIEvents) ----
     private void SubscribeStatic()
     {
         if (_staticBound) return;
         UIEvents.onCoinsChange += HandleCoinsChanged;
         UIEvents.onExperienceCollected += HandleXpChanged;
+        UIEvents.onEnemyHit += HandleEnemyHit;
         _staticBound = true;
     }
 
@@ -608,11 +611,13 @@ public class CowsinsHUDAdapter : MonoBehaviour
         if (!_staticBound) return;
         UIEvents.onCoinsChange -= HandleCoinsChanged;
         UIEvents.onExperienceCollected -= HandleXpChanged;
+        UIEvents.onEnemyHit -= HandleEnemyHit;
         _staticBound = false;
     }
 
     private void HandleCoinsChanged(int amount, bool updatePanel) => PullCoins();
     private void HandleXpChanged(bool updatePanel) => PullXp();
+    private void HandleEnemyHit(bool headshot, bool damagePopUp, Vector3 position, float damage) => OnEnemyHit?.Invoke(headshot, damage);
 
     private void PullCoins()
     {
