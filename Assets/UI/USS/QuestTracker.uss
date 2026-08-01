@@ -25,6 +25,12 @@
     margin: 0;
 }
 
+.content-wrapper {
+    position: relative;
+    width: 100%;
+    flex-grow: 1;
+}
+
 .quest-group {
     flex-direction: column;
     width: 100%;

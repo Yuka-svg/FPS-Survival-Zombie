@@ -44,6 +44,7 @@ public class QuestTrackerWidget : MonoBehaviour
     private VisualElement _minimapEdgeArrow;
     private bool _isMinimapMode = false;
 
+    private VisualElement _contentWrapper;
     private VisualElement _questGroup;
     private bool _isTransitioning = false;
     private Coroutine _transitionCoroutine;
@@ -85,6 +86,16 @@ public class QuestTrackerWidget : MonoBehaviour
         _minimapQuestMarker = root.Q("MinimapQuestMarker");
         _minimapEdgeArrow = root.Q("MinimapEdgeArrow");
 
+        if (_contentWrapper == null)
+        {
+            _contentWrapper = _container?.Q("ContentWrapper") ?? new VisualElement { name = "ContentWrapper" };
+            _contentWrapper.AddToClassList("content-wrapper");
+            if (_contentWrapper.parent == null && _container != null)
+            {
+                _container.Add(_contentWrapper);
+            }
+        }
+
         if (_questGroup == null)
         {
             _questGroup = new VisualElement { name = "QuestGroup" };
@@ -98,7 +109,13 @@ public class QuestTrackerWidget : MonoBehaviour
             if (_divider != null) _questGroup.Add(_divider);
             if (_sidePanel != null) _questGroup.Add(_sidePanel);
 
-            if (_container != null) _container.Add(_questGroup);
+            if (_contentWrapper != null) _contentWrapper.Add(_questGroup);
+        }
+
+        if (_minimapContainer != null && _minimapContainer.parent != _contentWrapper && _contentWrapper != null)
+        {
+            _minimapContainer.RemoveFromHierarchy();
+            _contentWrapper.Add(_minimapContainer);
         }
 
         bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
@@ -940,7 +957,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _minimapContainer.style.position = Position.Absolute;
             _minimapContainer.style.top = 0f;
             _minimapContainer.style.left = 0f;
-            _minimapContainer.style.width = 292f;
+            _minimapContainer.style.width = Length.Percent(100);
         }
 
         if (_questGroup != null)
@@ -948,7 +965,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _questGroup.style.position = Position.Absolute;
             _questGroup.style.top = 0f;
             _questGroup.style.left = 0f;
-            _questGroup.style.width = 292f;
+            _questGroup.style.width = Length.Percent(100);
         }
 
         if (_minimapImage != null && MinimapController.Instance != null)
