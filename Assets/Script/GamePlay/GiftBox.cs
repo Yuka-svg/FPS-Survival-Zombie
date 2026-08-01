@@ -51,10 +51,10 @@ public class GiftBox : Pickeable
     {
         base.Interact(player);
 
-        if (AdRewardManager.Instance != null)
-            AdRewardManager.Instance.ShowAd(player);
-
-        Destroy(gameObject);
+        if (AdRewardManager.Instance != null && AdRewardManager.Instance.ShowAd(player))
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void SnapToGround()

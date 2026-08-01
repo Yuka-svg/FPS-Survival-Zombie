@@ -449,11 +449,11 @@
         </ui:VisualElement>
         
         <!-- ==================== AdRewardPanel ==================== -->
-        <ui:VisualElement name="AdRewardPanel" style="display: none;">
-            <ui:VisualElement name="AdVignette" />
-            <ui:VisualElement name="AdCardShadow" />
-            <ui:VisualElement name="AdCard">
-                <ui:VisualElement name="AdTopAccent" />
+        <ui:VisualElement name="AdRewardPanel" class="ui-panel-root" style="display: none;">
+            <ui:VisualElement name="AdVignette" class="ui-panel-vignette" picking-mode="Ignore" />
+            <ui:VisualElement name="AdCard" class="ui-panel-card">
+                <ui:VisualElement name="AdCardShadow" class="card-shadow" picking-mode="Ignore" />
+                <ui:VisualElement name="AdTopAccent" class="ui-panel-accent" />
                 <ui:Label name="AdTitle" text="QUẢNG CÁO" />
                 <ui:VisualElement name="AdDivider" />
                 <ui:VisualElement name="AdContent">
@@ -465,10 +465,12 @@
                         <ui:VisualElement class="ad-placeholder-icon" />
                         <ui:Label class="ad-placeholder-label" text="ĐANG PHÁT QUẢNG CÁO..." />
                     </ui:VisualElement>
-                    <ui:Button name="WatchAdButton" text="XEM QUẢNG CÁO" class="gameover-button" />
                     <ui:Label name="AdRewardText" text="" />
                 </ui:VisualElement>
-                <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="gameover-button" style="display: none;" />
+                <ui:VisualElement name="AdFooter" class="ad-footer">
+                    <ui:Button name="WatchAdButton" text="XEM QUẢNG CÁO" class="gameover-button" />
+                    <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="gameover-button" style="display: none;" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 

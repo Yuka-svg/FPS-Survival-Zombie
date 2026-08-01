@@ -19,6 +19,7 @@ public class AdRewardManager : MonoBehaviour
 
     private UIDocument _doc;
     private VisualElement _panel;
+    private VisualElement _card;
     private Label _titleLabel;
     private Label _timerLabel;
     private Label _rewardLabel;
@@ -27,6 +28,8 @@ public class AdRewardManager : MonoBehaviour
     private Button _watchButton;
     private Button _closeButton;
     private bool _ready;
+    private bool _isPanelOpen;
+    private Coroutine _adCoroutine;
     private Transform _currentPlayer;
     private PlayerControl _playerControl;
     private float _previousTimeScale = 1f;
@@ -87,6 +90,7 @@ public class AdRewardManager : MonoBehaviour
         _panel = root.Q("AdRewardPanel");
         if (_panel == null) return;
 
+        _card = _panel.Q("AdCard");
         _titleLabel = _panel.Q<Label>("AdTitle");
         _timerLabel = _panel.Q<Label>("AdTimer");
         _rewardLabel = _panel.Q<Label>("AdRewardText");
@@ -97,8 +101,16 @@ public class AdRewardManager : MonoBehaviour
 
         _panel.style.display = DisplayStyle.None;
 
-        if (_watchButton != null) _watchButton.clicked += StartAd;
-        if (_closeButton != null) _closeButton.clicked += ClosePanel;
+        if (_watchButton != null)
+        {
+            _watchButton.clicked -= StartAd;
+            _watchButton.clicked += StartAd;
+        }
+        if (_closeButton != null)
+        {
+            _closeButton.clicked -= ClosePanel;
+            _closeButton.clicked += ClosePanel;
+        }
 
         _ready = true;
     }
@@ -171,9 +183,18 @@ public class AdRewardManager : MonoBehaviour
         });
     }
 
-    public void ShowAd(Transform player)
+    public bool ShowAd(Transform player)
     {
         Debug.Log("[AdReward] ShowAd called. Player=" + (player != null ? player.name : "null") + " _ready=" + _ready);
+
+        if (_isPanelOpen) return false;
+
+        if (PanelManager.Instance != null && !PanelManager.Instance.CanOpenPanel("AdReward"))
+        {
+            _currentPlayer = null;
+            _playerControl = null;
+            return false;
+        }
 
         _currentPlayer = player;
         _playerControl = player != null ? player.GetComponentInChildren<PlayerControl>() : null;
@@ -181,16 +202,15 @@ public class AdRewardManager : MonoBehaviour
         if (!_ready)
         {
             SetupUI();
-            if (!_ready) return;
+            if (!_ready) return false;
         }
+
+        _isPanelOpen = true;
 
         // Use PanelManager to properly register the panel and handle pause/control/cursor
         if (PanelManager.Instance != null)
         {
-            PanelManager.Instance.OpenPanel("AdReward", _panel, null, () =>
-            {
-                Debug.Log("[AdReward] Panel close callback triggered.");
-            });
+            PanelManager.Instance.OpenPanel("AdReward", _panel, _card, ClosePanel);
         }
         else
         {
@@ -213,23 +233,30 @@ public class AdRewardManager : MonoBehaviour
                 _timerLabel.text = "Đang tải quảng cáo...";
         }
         if (_rewardLabel != null) _rewardLabel.text = "";
-        _watchButton.style.display = DisplayStyle.None;
+        if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
         if (_closeButton != null) _closeButton.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
 
         // Auto-play ad
         StartAd();
+        return true;
     }
 
     private void StartAd()
     {
+        if (_adCoroutine != null)
+        {
+            StopCoroutine(_adCoroutine);
+            _adCoroutine = null;
+        }
+
         if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.Flex;
 
 #if UNITY_EDITOR
-        StartCoroutine(EditorSimulateAd());
+        _adCoroutine = StartCoroutine(EditorSimulateAd());
 #else
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
@@ -244,7 +271,7 @@ public class AdRewardManager : MonoBehaviour
             if (_timerLabel != null) _timerLabel.text = "Đang tải quảng cáo...";
             if (_watchButton != null) _watchButton.SetEnabled(false);
             if (!_isAdLoading) LoadRewardedAd();
-            StartCoroutine(WaitForAdThenShow());
+            _adCoroutine = StartCoroutine(WaitForAdThenShow());
         }
 #endif
     }
@@ -274,6 +301,7 @@ public class AdRewardManager : MonoBehaviour
             if (_timerLabel != null) _timerLabel.text = "Không thể tải quảng cáo!";
             if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
         }
+        _adCoroutine = null;
     }
 
     private IEnumerator EditorSimulateAd()
@@ -290,10 +318,13 @@ public class AdRewardManager : MonoBehaviour
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
         GrantRandomReward();
         if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
+        _adCoroutine = null;
     }
 
     private void GrantRandomReward()
     {
+        if (!_isPanelOpen) return;
+
         string[] rewards = { "Coin", "Exp", "Ammo", "Health" };
         string selected = rewards[Random.Range(0, rewards.Length)];
 
@@ -353,15 +384,21 @@ public class AdRewardManager : MonoBehaviour
 
     private void ClosePanel()
     {
-        if (_isAdReady && _rewardedAd != null)
-            _rewardedAd.Destroy();
-        _isAdReady = false;
-        _rewardedAd = null;
+        if (!_isPanelOpen) return;
+        _isPanelOpen = false;
+
+        if (_adCoroutine != null)
+        {
+            StopCoroutine(_adCoroutine);
+            _adCoroutine = null;
+        }
+
+        DestroyAd();
 
         // Use PanelManager to properly close and restore state
         if (PanelManager.Instance != null)
         {
-            PanelManager.Instance.ClosePanel("AdReward", _panel, null);
+            PanelManager.Instance.ClosePanel("AdReward", _panel, _card);
         }
         else
         {
