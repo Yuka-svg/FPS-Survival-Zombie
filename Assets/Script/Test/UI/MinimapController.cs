@@ -120,6 +120,8 @@ public class MinimapController : MonoBehaviour
     }
 
     private bool _previousFogState;
+    private float _previousShadowDistance;
+    private bool _isShadowDistanceModified;
 
     private void OnEnable()
     {
@@ -131,6 +133,7 @@ public class MinimapController : MonoBehaviour
     {
         Camera.onPreRender -= OnCameraPreRender;
         Camera.onPostRender -= OnCameraPostRender;
+        RestoreShadowDistance();
     }
 
     private void OnCameraPreRender(Camera cam)
@@ -139,6 +142,13 @@ public class MinimapController : MonoBehaviour
         {
             _previousFogState = RenderSettings.fog;
             RenderSettings.fog = false;
+
+            if (!_isShadowDistanceModified && QualitySettings.shadowDistance > 0f)
+            {
+                _previousShadowDistance = QualitySettings.shadowDistance;
+                QualitySettings.shadowDistance = 0f;
+                _isShadowDistanceModified = true;
+            }
         }
     }
 
@@ -147,6 +157,16 @@ public class MinimapController : MonoBehaviour
         if (_minimapCamera != null && cam == _minimapCamera)
         {
             RenderSettings.fog = _previousFogState;
+            RestoreShadowDistance();
+        }
+    }
+
+    private void RestoreShadowDistance()
+    {
+        if (_isShadowDistanceModified)
+        {
+            QualitySettings.shadowDistance = _previousShadowDistance;
+            _isShadowDistanceModified = false;
         }
     }
 
