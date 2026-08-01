@@ -1547,6 +1547,8 @@ MonoBehaviour:
   shootStopDuration: 0.5
   speedSmoothTime: 0.15
   abandonCombatDistance: 12
+  teleportDistance: 30
+  teleportBehindOffset: 3
   fireMode: 1
   burstInterval: 0.08
   detectRange: 25
@@ -1598,6 +1600,8 @@ MonoBehaviour:
   scrimColor: {r: 0, g: 0, b: 0, a: 0.6}
   lineFontSize: 26
   choiceFontSize: 22
+  hintColor: {r: 0.306, g: 0.804, b: 0.769, a: 1}
+  hintFontSize: 14
 --- !u!114 &1497418385421106619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1644,7 +1648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78b04658fe5da8044b78b4d147bc29d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CleaningStaffDialogueTrigger
-  uniqueID: 4ad10622-25e4-4c12-9028-5c0a1c07e2b4
+  uniqueID: ea127f07-4d70-4cee-8b93-728d415ce42b
   interactable: 0
   interactText: 
   instantInteraction: 0
@@ -1656,13 +1660,34 @@ MonoBehaviour:
   - question: "Khu c\xE1ch ly c\u1EE7a b\u1EC7nh vi\u1EC7n n\u1EB1m \u1EDF t\u1EA7ng
       2, \u0111\xFAng kh\xF4ng?"
     correctAnswer: 1
+    hint: "G\u1EE3i \xFD: T\xF4i th\u1EA5y ghi ch\xFA 'KHOA C\xC1CH LY - T\u1EA6NG
+      2' tr\xEAn t\u01B0\u1EDDng h\xE0nh lang."
   - question: "Anh th\u1EA5y b\u1EC7nh nh\xE2n s\u1ED1 0 \u0111\u01B0\u1EE3c \u0111\u01B0a
       v\xE0o l\xFAc n\u1EEDa \u0111\xEAm?"
     correctAnswer: 0
+    hint: "G\u1EE3i \xFD: Bi\xEAn b\u1EA3n nh\u1EADp vi\u1EC7n ghi r\xF5 th\u1EDDi
+      \u0111i\u1EC3m l\xFAc tr\u1EDDi v\u1EEBa s\xE1ng."
   - question: "Anh c\xF3 th\u1EA5y m\u1ED9t b\xE1c s\u0129 m\u1EB7c \xE1o cho\xE0ng
       tr\u1EAFng ch\u1EA1y v\u1EC1 ph\xEDa c\u1EA7u thang tho\xE1t hi\u1EC3m kh\xF4ng?"
     correctAnswer: 1
+    hint: "G\u1EE3i \xFD: B\u1EA1n c\xF3 nh\u1EDB \u0111\xE3 nh\xECn th\u1EA5y ai
+      \u0111\xF3 ch\u1EA1y v\u1EC1 ph\xEDa c\u1EA7u thang l\xFAc m\u1EDBi v\xE0o
+      kh\xF4ng?"
   defaultInteractText: "H\u1ECFi chuy\u1EC7n"
+  smallTalkLines:
+  - "Anh c\xF3 b\u1ECB th\u01B0\u01A1ng \u1EDF \u0111\xE2u kh\xF4ng? T\xF4i c\xF3
+    th\u1EC3 b\u0103ng b\xF3 cho anh."
+  - "H\xF4m nay c\xF2n s\u1ED1ng l\xE0 m\u1ED9t ng\xE0y t\u1ED1t r\u1ED3i, \u0111\xFAng
+    kh\xF4ng?"
+  - "T\xF4i v\u1EABn nh\u1EDB m\xF9i c\u1ED3n trong b\u1EC7nh vi\u1EC7n... Gi\u1EDD
+    ch\u1EC9 c\xF2n m\xF9i kh\xF3i."
+  - "\u0110\u1EEBng lo, t\xF4i s\u1EBD ch\xFA \xFD ph\xEDa sau l\u01B0ng anh."
+  rescuedThankLines:
+  - "C\u1EA3m \u01A1n anh \u0111\xE3 c\u1EE9u t\xF4i l\xFAc n\xE3y. Anh c\xF3 sao
+    kh\xF4ng?"
+  - "Nh\u1EDD anh k\xE9o t\xF4i d\u1EADy k\u1ECBp l\xFAc. C\u1EA3m \u01A1n anh nhi\u1EC1u
+    l\u1EAFm."
+  smallTalkInteractText: "H\u1ECFi chuy\u1EC7n"
   proximityDistance: 4
   proximityKey: 101
 --- !u!1 &1666537584531476590

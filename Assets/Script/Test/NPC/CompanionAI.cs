@@ -860,15 +860,9 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
         if (byPlayer && _bubble != null && !string.IsNullOrEmpty(rescuedThankLine))
         {
             // Show thank-you dialogue, auto-hide after rescuedThankHoldDuration.
-            // ShowSpeech internally freezes time (Time.timeScale = 0f) via
-            // DialogueBubble.Show, which would pause gameplay. We immediately
-            // restore timeScale so the player can keep moving/fighting while
-            // the thank-you bubble fades away on its own timer.
+            // Speech bubbles do NOT freeze time (see DialogueBubble.Show), so
+            // the player can keep moving/fighting while it fades away.
             _bubble.ShowSpeech(rescuedThankLine, rescuedThankHoldDuration);
-            bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
-            bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-            if (!pauseOpen && !gameOver && Time.timeScale == 0f)
-                Time.timeScale = 1f;
             Debug.Log("[CompanionAI] Rescued by player. Revived at " + (healthFraction * 100f) + "% HP.");
         }
         else

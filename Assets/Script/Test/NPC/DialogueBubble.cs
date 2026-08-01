@@ -40,6 +40,7 @@ public class DialogueBubble : MonoBehaviour
     private bool _choiceActive;
     private System.Action<bool> _choiceCallback;
     private float _prevTimeScale = 1f;
+    private bool _didPause; // True when this bubble froze the game (choice mode only).
     private bool _themed; // True when the DialogueBubble.uss stylesheet was applied.
 
     public bool IsVisible => _panelGO != null && _root != null && _root.resolvedStyle.opacity > 0f;
@@ -204,7 +205,9 @@ public class DialogueBubble : MonoBehaviour
         if (_lineLabel != null) _lineLabel.text = line;
         if (_choiceLabel != null) _choiceLabel.style.display = DisplayStyle.None;
         if (_hintLabel != null) _hintLabel.style.display = DisplayStyle.None;
-        Show();
+        // Speech/small-talk lines do NOT pause the game — the player can keep
+        // moving and fighting while the bubble fades on its own timer.
+        Show(pauseGame: false);
         if (_routine != null) StopCoroutine(_routine);
         _routine = StartCoroutine(HideAfter(fadeIn + holdDuration));
     }
@@ -243,7 +246,9 @@ public class DialogueBubble : MonoBehaviour
         }
         _choiceCallback = onChoice;
         _choiceActive = true;
-        Show();
+        // Choices freeze the game so zombies can't attack while the player is
+        // answering the NPC's question.
+        Show(pauseGame: true);
         if (_routine != null) StopCoroutine(_routine);
     }
 
@@ -258,25 +263,29 @@ public class DialogueBubble : MonoBehaviour
 
     // ---- Show / Hide ----
 
-    private void Show()
+    private void Show(bool pauseGame)
     {
         if (_root != null)
         {
             _root.style.display = DisplayStyle.Flex;
             _root.style.opacity = 1f;
         }
-        // Pause the game while the dialogue is visible so zombies don't
-        // attack the player while they're reading / choosing. Skip if the
-        // pause menu or game-over screen is already open (they manage
-        // timeScale themselves).
+        // Only choice mode pauses the game (so zombies don't attack the player
+        // while they're reading / choosing). Speech/small-talk lines never
+        // pause. Skip if the pause menu or game-over screen is already open
+        // (they manage timeScale themselves).
         bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
         bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-        if (!pauseOpen && !gameOver && Time.timeScale > 0f)
+        if (pauseGame && !pauseOpen && !gameOver && Time.timeScale > 0f)
         {
             // Only capture prevTimeScale once — nested Show() calls must not
             // overwrite the original value, otherwise ForceHide → Hide would
             // restore 0 instead of the correct pre-dialogue timeScale.
-            if (_prevTimeScale <= 0f) _prevTimeScale = Time.timeScale;
+            if (!_didPause)
+            {
+                _prevTimeScale = Time.timeScale;
+                _didPause = true;
+            }
             Time.timeScale = 0f;
         }
     }
@@ -309,8 +318,9 @@ public class DialogueBubble : MonoBehaviour
         // and the pause menu / game-over screen isn't currently open.
         bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
         bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-        if (!pauseOpen && !gameOver && Time.timeScale == 0f)
+        if (_didPause && !pauseOpen && !gameOver)
         {
+            _didPause = false;
             Time.timeScale = _prevTimeScale > 0f ? _prevTimeScale : 1f;
         }
     }
@@ -327,7 +337,7 @@ public class DialogueBubble : MonoBehaviour
         // Safety: if the dialogue is destroyed while still visible (e.g. scene
         // unload), restore timeScale so the game doesn't stay frozen.
         // Must guard against Managers destroyed in the same frame (scene unload).
-        if (Time.timeScale == 0f)
+        if (_didPause)
         {
             bool pauseOpen = false;
             bool gameOver = false;
