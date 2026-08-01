@@ -35,7 +35,14 @@ public class HealthFlashWidget : MonoBehaviour
             enabled = false;
             return;
         }
-        _flash.SetBackgroundImageSafe(vignetteSprite);
+        if (vignetteSprite != null)
+        {
+            _flash.SetBackgroundImageSafe(vignetteSprite);
+        }
+        else
+        {
+            Debug.LogWarning("[HealthFlashWidget] vignetteSprite is null! Please assign HurtVignetteWhite sprite in Inspector.");
+        }
     }
 
     private void OnEnable()

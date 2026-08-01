@@ -21,28 +21,47 @@ public class LowHealthVignetteWidget : MonoBehaviour
             enabled = false;
             return;
         }
-        _vignette.SetBackgroundImageSafe(vignetteTexture);
+        if (vignetteTexture != null)
+            _vignette.SetBackgroundImageSafe(vignetteTexture);
     }
 
     private void OnEnable()
     {
-        _adapter = CowsinsHUDAdapter.Instance;
-        if (_adapter != null)
+        StartCoroutine(Bind());
+    }
+
+    private System.Collections.IEnumerator Bind()
+    {
+        float timeout = 12f;
+        while (CowsinsHUDAdapter.Instance == null && timeout > 0f)
         {
-            _adapter.OnHealthChanged += OnHealthChanged;
-            Apply(_adapter.Health / _adapter.MaxHealth);
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
         }
+        _adapter = CowsinsHUDAdapter.Instance;
+        if (_adapter == null) yield break;
+
+        _adapter.OnHealthChanged -= OnHealthChanged;
+        _adapter.OnHealthChanged += OnHealthChanged;
+
+        float maxHp = _adapter.MaxHealth > 0f ? _adapter.MaxHealth : 1f;
+        Apply(_adapter.Health / maxHp);
     }
 
     private void OnDisable()
     {
         if (_adapter != null)
+        {
             _adapter.OnHealthChanged -= OnHealthChanged;
+            _adapter = null;
+        }
+        StopAllCoroutines();
     }
 
     private void OnHealthChanged(float health, float maxHealth, bool tookDamage)
     {
-        Apply(health / maxHealth);
+        float maxHp = maxHealth > 0f ? maxHealth : 1f;
+        Apply(health / maxHp);
     }
 
     private void Apply(float ratio)
