@@ -138,16 +138,6 @@ public class EnemyHealthBar : MonoBehaviour
     {
         if (_barGO != null && _barGO)
         {
-            var doc = _barGO.GetComponent<UIDocument>();
-            if (doc != null && doc)
-            {
-                if (doc.rootVisualElement != null)
-                {
-                    doc.rootVisualElement.Clear();
-                }
-                doc.visualTreeAsset = null;
-                doc.panelSettings = null;
-            }
             Destroy(_barGO);
         }
         _fill = null;
