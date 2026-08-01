@@ -1,3 +1,5 @@
+using UnityEngine;
+
 [DefaultExecutionOrder(90)]
 public class MinimapController : MonoBehaviour
 {
