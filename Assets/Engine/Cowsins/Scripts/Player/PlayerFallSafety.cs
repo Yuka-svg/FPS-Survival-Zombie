@@ -29,6 +29,13 @@ namespace cowsins
         [Tooltip("Hotkey to trigger player position reset.")]
         [SerializeField] private KeyCode resetHotkey = KeyCode.F8;
 
+        [Header("Height Boost Settings (F9)")]
+        [Tooltip("Enable F9 hotkey to increase Player Y position.")]
+        [SerializeField] private bool allowF9HeightBoost = true;
+
+        [Tooltip("Height added on F9 key press.")]
+        [SerializeField] private float f9HeightBoostAmount = 20f;
+
         public KeyCode ResetHotkey
         {
             get => resetHotkey;
@@ -136,11 +143,22 @@ namespace cowsins
                     TriggerResetPosition(ignoreCooldown: false);
                 }
             }
+            if (allowF9HeightBoost && UnityEngine.InputSystem.Keyboard.current != null)
+            {
+                if (UnityEngine.InputSystem.Keyboard.current.f9Key.wasPressedThisFrame)
+                {
+                    TriggerF9HeightBoost();
+                }
+            }
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER && !ENABLE_INPUT_SYSTEM
             if (allowHotkeyReset && Input.GetKeyDown(resetHotkey))
             {
                 TriggerResetPosition(ignoreCooldown: false);
+            }
+            if (allowF9HeightBoost && Input.GetKeyDown(KeyCode.F9))
+            {
+                TriggerF9HeightBoost();
             }
 #endif
         }
@@ -366,6 +384,63 @@ namespace cowsins
                 Vector3 top = pos + Vector3.up * Mathf.Max(radius + 0.2f, height - radius);
 
                 return !Physics.CheckCapsule(bottom, top, checkRadius, mask, QueryTriggerInteraction.Ignore);
+            }
+        }
+
+        /// <summary>
+        /// Teleports player Y position upwards by f9HeightBoostAmount (default +20m).
+        /// Performs overhead 3D CapsuleCast sweep to prevent clipping into ceilings/geometry,
+        /// and disables fall damage on landing.
+        /// </summary>
+        [ContextMenu("Trigger F9 Height Boost (+20Y)")]
+        public void TriggerF9HeightBoost()
+        {
+            if (!enabled || !gameObject.activeInHierarchy || !Application.isPlaying) return;
+            if (IsInputBlocked()) return;
+
+            CapsuleCollider col = GetComponent<CapsuleCollider>();
+            float radius = col != null ? col.radius : 0.4f;
+            float height = playerMovement != null ? playerMovement.OriginalCapsuleHeight : 1.75f;
+            LayerMask mask = playerMovement != null && playerMovement.playerSettings != null
+                ? (LayerMask)playerMovement.playerSettings.whatIsGround
+                : (LayerMask)~0;
+
+            // Calculate bottom and top spheres of player capsule
+            Vector3 bottom = transform.position + Vector3.up * (radius + 0.1f);
+            Vector3 top = transform.position + Vector3.up * Mathf.Max(radius + 0.2f, height - radius);
+
+            float targetUpDistance = f9HeightBoostAmount;
+
+            // Perform 3D CapsuleCast upward to detect ceiling or overhead obstacles
+            if (Physics.CapsuleCast(bottom, top, radius * 0.85f, Vector3.up, out RaycastHit hit, f9HeightBoostAmount, mask, QueryTriggerInteraction.Ignore))
+            {
+                targetUpDistance = Mathf.Max(0f, hit.distance - 0.15f);
+            }
+
+            if (targetUpDistance <= 0.05f) return; // Overhead blocked immediately
+
+            Vector3 targetPosition = transform.position + Vector3.up * targetUpDistance;
+
+            // Prevent fall damage on landing in PlayerStats
+            if (playerStats is PlayerStats concreteStats)
+            {
+                concreteStats.PreventNextFallDamage();
+            }
+            else
+            {
+                var statsComp = GetComponent<PlayerStats>();
+                if (statsComp != null) statsComp.PreventNextFallDamage();
+            }
+
+            // Perform safe teleport
+            if (playerMovement != null)
+            {
+                playerMovement.TeleportPlayer(targetPosition, transform.rotation, false, false);
+            }
+            else
+            {
+                transform.position = targetPosition;
+                Physics.SyncTransforms();
             }
         }
     }

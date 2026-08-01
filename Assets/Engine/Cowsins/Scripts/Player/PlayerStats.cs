@@ -57,6 +57,7 @@ namespace cowsins
         // Internal use
 
         private float? currentFallHeight = null;
+        private bool ignoreNextFallDamage = false;
         private float lastDamageTime = -999f;
 
         private bool isDead;
@@ -287,6 +288,16 @@ namespace cowsins
         /// </summary>
         private void ManageFallDamage()
         {
+            if (ignoreNextFallDamage)
+            {
+                currentFallHeight = null;
+                if (player != null && player.Grounded)
+                {
+                    ignoreNextFallDamage = false;
+                }
+                return;
+            }
+
             // Grab current player height
             if (!player.Grounded && transform.position.y > currentFallHeight || !player.Grounded && currentFallHeight == null) currentFallHeight = transform.position.y;
 
@@ -306,6 +317,12 @@ namespace cowsins
                 // Reset height
                 currentFallHeight = null;
             }
+        }
+
+        public void PreventNextFallDamage()
+        {
+            ignoreNextFallDamage = true;
+            currentFallHeight = null;
         }
 
         public void SetFallHeight(float newFallHeight) => currentFallHeight = newFallHeight;
