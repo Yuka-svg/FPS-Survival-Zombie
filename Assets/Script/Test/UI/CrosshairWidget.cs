@@ -17,6 +17,10 @@ public class CrosshairWidget : MonoBehaviour
     public float jumpSpread = 160f;
     public float resizeSpeed = 15f;
 
+    [Header("Aim Transition")]
+    [Range(0.10f, 0.50f), Tooltip("Crosshair reticle fade duration in seconds (aiming/unaiming). Default 0.20s = exactly 200ms visible transition.")]
+    public float aimFadeDuration = 0.20f;
+
     [Header("Behavior")]
     public bool showOuterRadialTicks = false;
     public bool removeCrosshairOnAiming = true;
@@ -33,6 +37,14 @@ public class CrosshairWidget : MonoBehaviour
     private CowsinsHUDAdapter _adapter;
     private float _spread;
     private float _thickness;
+
+    // Reticle transition & repaint state
+    private float _reticleOpacity = 1f;
+    private float _lastRepaintedOpacity = -1f;
+    private float _lastRepaintedHitmarkerAlpha = -1f;
+    private float _lastRepaintedSpread = -1f;
+    private float _lastRepaintedThickness = -1f;
+    private bool _lastEnemySpotted = false;
 
     // Hitmarker feedback state
     private float _hitmarkerAlpha;
@@ -62,6 +74,14 @@ public class CrosshairWidget : MonoBehaviour
             _container.generateVisualContent += OnGenerateCrosshairOverlay;
             _initialized = true;
         }
+
+        if (_container != null)
+        {
+            _container.style.opacity = StyleKeyword.Null;
+        }
+        _reticleOpacity = 1f;
+        _lastRepaintedOpacity = -1f;
+
         StartCoroutine(Bind());
     }
 
@@ -107,13 +127,16 @@ public class CrosshairWidget : MonoBehaviour
         float dt = Time.unscaledDeltaTime;
         var a = _adapter;
 
-        // Decay Hitmarker animation
-        if (_hitmarkerAlpha > 0f)
+        // 1. Independent Hitmarker Decay animation
+        bool hitmarkerActive = _hitmarkerAlpha > 0.0001f;
+        if (hitmarkerActive)
         {
-            _hitmarkerAlpha = Mathf.MoveTowards(_hitmarkerAlpha, 0f, (_isHeadshot ? 4.5f : 6f) * dt);
+            float decayRate = _isHeadshot ? 4.5f : 6f;
+            _hitmarkerAlpha = Mathf.MoveTowards(_hitmarkerAlpha, 0f, decayRate * dt);
             _hitmarkerScale = Mathf.MoveTowards(_hitmarkerScale, 1f, 8f * dt);
         }
 
+        // 2. Spread & Thickness Calculation
         float target = defaultSpread;
         if (a != null)
         {
@@ -130,10 +153,30 @@ public class CrosshairWidget : MonoBehaviour
         _spread = Mathf.Lerp(_spread, target, resizeSpeed * dt);
         _thickness = Mathf.Lerp(_thickness, a != null && a.EnemySpotted ? enemyThickness : lineThickness, resizeSpeed * dt);
 
+        // 3. Gameplay Aiming State & Linear 0.20s Opacity Lerp
         bool hidden = a != null && (a.IsDead || (a.IsAiming && removeCrosshairOnAiming) || (hideCrosshairOnInspecting && a.IsInspecting));
-        _container.style.opacity = Mathf.MoveTowards(_container.style.opacity.value, hidden ? 0f : 1f, 12f * dt);
+        float targetOpacity = hidden ? 0f : 1f;
+        float speed = 1.0f / Mathf.Max(0.01f, aimFadeDuration);
+        _reticleOpacity = Mathf.MoveTowards(_reticleOpacity, targetOpacity, speed * dt);
 
-        _container.MarkDirtyRepaint();
+        // 4. Optimized Canvas Dirty Repaint Check
+        bool reticleVisible = _reticleOpacity > 0.0001f;
+        bool opacityChanging = Mathf.Abs(_reticleOpacity - _lastRepaintedOpacity) > 0.0001f;
+        bool hitmarkerChanging = Mathf.Abs(_hitmarkerAlpha - _lastRepaintedHitmarkerAlpha) > 0.0001f;
+        bool spreadChanging = reticleVisible && Mathf.Abs(_spread - _lastRepaintedSpread) > 0.1f;
+        bool thicknessChanging = reticleVisible && Mathf.Abs(_thickness - _lastRepaintedThickness) > 0.01f;
+        bool currentEnemySpotted = a != null && a.EnemySpotted;
+        bool enemySpottedChanging = currentEnemySpotted != _lastEnemySpotted;
+
+        if (opacityChanging || hitmarkerActive || hitmarkerChanging || spreadChanging || thicknessChanging || enemySpottedChanging)
+        {
+            _lastRepaintedOpacity = _reticleOpacity;
+            _lastRepaintedHitmarkerAlpha = _hitmarkerAlpha;
+            _lastRepaintedSpread = _spread;
+            _lastRepaintedThickness = _thickness;
+            _lastEnemySpotted = currentEnemySpotted;
+            _container.MarkDirtyRepaint();
+        }
     }
 
     private void OnGenerateCrosshairOverlay(MeshGenerationContext ctx)
@@ -146,7 +189,10 @@ public class CrosshairWidget : MonoBehaviour
         Vector2 center = new Vector2(width / 2f, height / 2f);
         bool spotted = _adapter != null && _adapter.EnemySpotted;
 
-        Color primaryColor = spotted ? enemySpottedColor : defaultColor;
+        float reticleAlpha = _reticleOpacity;
+        Color basePrimaryColor = spotted ? enemySpottedColor : defaultColor;
+        Color primaryColor = new Color(basePrimaryColor.r, basePrimaryColor.g, basePrimaryColor.b, basePrimaryColor.a * reticleAlpha);
+        Color reticleShadowColor = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * reticleAlpha);
 
         float spread = _spread;
         float halfGap = spread / 2f;
@@ -159,7 +205,7 @@ public class CrosshairWidget : MonoBehaviour
         void DrawLine(Vector2 p1, Vector2 p2, float thickness)
         {
             // Shadow pass
-            painter.strokeColor = shadowColor;
+            painter.strokeColor = reticleShadowColor;
             painter.lineWidth = thickness + 2.4f;
             painter.lineCap = LineCap.Round;
             painter.BeginPath();
@@ -181,7 +227,7 @@ public class CrosshairWidget : MonoBehaviour
         void DrawLBracket(Vector2 pStart, Vector2 pCorner, Vector2 pEnd, float thickness)
         {
             // Shadow pass
-            painter.strokeColor = shadowColor;
+            painter.strokeColor = reticleShadowColor;
             painter.lineWidth = thickness + 2.4f;
             painter.lineCap = LineCap.Butt;
             painter.lineJoin = LineJoin.Miter;
@@ -238,7 +284,7 @@ public class CrosshairWidget : MonoBehaviour
         {
             float dSize = 5.5f;
             // Shadow Pass
-            painter.fillColor = shadowColor;
+            painter.fillColor = reticleShadowColor;
             painter.BeginPath();
             painter.MoveTo(center + new Vector2(0, -dSize - 1.5f));
             painter.LineTo(center + new Vector2(dSize + 1.5f, 0));
