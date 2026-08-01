@@ -22,8 +22,11 @@ public class ChapterZoneHighlight : MonoBehaviour
     [Tooltip("Height of the 4 vertical glow panels (world units).")]
     public float panelHeight = 6f;
 
-    [Tooltip("Thickness of the 4 vertical glow panels (world units).")]
-    public float panelThickness = 0.6f;
+    [Tooltip("Thickness of the front/back panels (Z edges) - increased for better visibility.")]
+    public float panelThickness = 5f;
+    
+    [Tooltip("Thickness of the left/right panels (X edges) - increased for better visibility.")]
+    public float panelThicknessSide = 5f;
 
     [Tooltip("Opacity multiplier for the edge panels.")]
     [Range(0f, 1f)] public float panelAlpha = 0.35f;
@@ -66,6 +69,7 @@ public class ChapterZoneHighlight : MonoBehaviour
     private float _animTime;
 
     private static Mesh _quadMesh;
+    private static Mesh _doubleSidedQuadMesh;
     private static Mesh _cylinderMesh;
 
     private void Reset()
@@ -140,9 +144,49 @@ public class ChapterZoneHighlight : MonoBehaviour
     private static Mesh GetQuadMesh()
     {
         if (_quadMesh != null) return _quadMesh;
-        var temp = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        _quadMesh = temp.GetComponent<MeshFilter>().sharedMesh;
-        Object.DestroyImmediate(temp);
+        // Create a double-sided quad mesh for visibility from all angles
+        _quadMesh = new Mesh();
+        
+        // Create 6 vertices (3 for front face, 3 for back face)
+        Vector3[] vertices = new Vector3[6];
+        vertices[0] = new Vector3(-0.5f, -0.5f, 0f);  // Front face
+        vertices[1] = new Vector3(0.5f, -0.5f, 0f);
+        vertices[2] = new Vector3(-0.5f, 0.5f, 0f);
+        vertices[3] = new Vector3(0.5f, -0.5f, 0f);  // Back face (wound opposite)
+        vertices[4] = new Vector3(0.5f, 0.5f, 0f);
+        vertices[5] = new Vector3(-0.5f, 0.5f, 0f);
+        
+        // UV coordinates
+        Vector2[] uv = new Vector2[6];
+        uv[0] = new Vector2(0f, 0f);
+        uv[1] = new Vector2(1f, 0f);
+        uv[2] = new Vector2(0f, 1f);
+        uv[3] = new Vector2(1f, 0f);
+        uv[4] = new Vector2(1f, 1f);
+        uv[5] = new Vector2(0f, 1f);
+        
+        // Triangles
+        int[] triangles = new int[6];
+        triangles[0] = 0;
+        triangles[1] = 1;
+        triangles[2] = 2;
+        triangles[3] = 3;
+        triangles[4] = 4;
+        triangles[5] = 5;
+        
+        // Normals (pointing outward from both sides)
+        Vector3[] normals = new Vector3[6];
+        for (int i = 0; i < 6; i++)
+        {
+            normals[i] = Vector3.back;
+        }
+        
+        _quadMesh.vertices = vertices;
+        _quadMesh.uv = uv;
+        _quadMesh.triangles = triangles;
+        _quadMesh.normals = normals;
+        _quadMesh.RecalculateBounds();
+        
         return _quadMesh;
     }
 
@@ -199,26 +243,43 @@ public class ChapterZoneHighlight : MonoBehaviour
         float halfX = size.x * 0.5f;
         float halfZ = size.z * 0.5f;
         Vector3[] edgeCenters = {
-            new Vector3(center.x - halfX, 0f, center.z),   // X-
-            new Vector3(center.x + halfX, 0f, center.z),   // X+
-            new Vector3(center.x, 0f, center.z - halfZ),   // Z-
-            new Vector3(center.x, 0f, center.z + halfZ),   // Z+
+            new Vector3(center.x - halfX, 0f, center.z),   // X- (left edge, spans Z via scale)
+            new Vector3(center.x + halfX, 0f, center.z),   // X+ (right edge, spans Z via scale)
+            new Vector3(center.x, 0f, center.z - halfZ),   // Z- (back edge, spans X via scale)
+            new Vector3(center.x, 0f, center.z + halfZ),   // Z+ (front edge, spans X via scale)
         };
         Vector3[] edgeSizes = {
-            new Vector3(panelThickness, panelHeight, size.z),
-            new Vector3(panelThickness, panelHeight, size.z),
-            new Vector3(size.x, panelHeight, panelThickness),
-            new Vector3(size.x, panelHeight, panelThickness),
+            new Vector3(panelThicknessSide, panelHeight, size.z),  // X- (left): Z = boundary.z (spans full Z length)
+            new Vector3(panelThicknessSide, panelHeight, size.z),  // X+ (right): Z = boundary.z (spans full Z length)
+            new Vector3(size.x, panelHeight, panelThickness),       // Z- (back): X = boundary.x (spans full X width)
+            new Vector3(size.x, panelHeight, panelThickness),       // Z+ (front): X = boundary.x (spans full X width)
+        };
+        // Add proper rotations for each panel so they face outward from the zone
+        // Note: Unity's default quad has normal facing -Z (back), so we adjust accordingly
+        // These rotations ensure world normals point outward from the zone
+        Quaternion[] edgeRotations = {
+            Quaternion.Euler(0f, 90f, 0f),   // X- panel: rotate 90° so -Z normal faces left (-X)
+            Quaternion.Euler(0f, -90f, 0f),  // X+ panel: rotate -90° so -Z normal faces right (+X)
+            Quaternion.Euler(0f, 0f, 0f),    // Z- panel: no rotation, -Z normal faces back (-Z)
+            Quaternion.Euler(0f, 180f, 0f),  // Z+ panel: rotate 180° so -Z normal faces forward (+Z)
         };
 
         _panelMat = new Material(unlitShader) { name = "ZoneGlowPanel_Runtime" };
         _panelMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, panelAlpha);
+        
+        // Enable double-sided rendering for visibility from all angles
+        _panelMat.SetFloat("_Cull", 0f); // 0 = off (double-sided), 1 = back, 2 = front
+        
+        // Enable double-sided rendering so panels are visible from both sides
+        _panelMat.SetFloat("_Mode", 3); // Transparent mode
+        _panelMat.SetFloat("_Cull", 0); // Disable culling (double-sided)
 
         for (int i = 0; i < 4; i++)
         {
             var go = new GameObject($"GlowPanel_{i}");
             go.transform.SetParent(_root.transform, false);
             go.transform.localPosition = edgeCenters[i];
+            go.transform.localRotation = edgeRotations[i];
             go.transform.localScale = edgeSizes[i];
 
             var filter = go.AddComponent<MeshFilter>();
