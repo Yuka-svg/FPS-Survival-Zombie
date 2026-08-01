@@ -112,6 +112,7 @@ public class CowsinsHUDAdapter : MonoBehaviour
     public float MoveCrouchSpeed => _moveState != null ? _moveState.CrouchSpeed : 0f;
     public bool MoveIsIdle => _moveState != null && _moveState.IsIdle;
     public bool IsAiming => _weaponBehaviourProv != null && _weaponBehaviourProv.IsAiming;
+    public bool IsInspecting => _interactManager != null && _interactManager.Inspecting;
     public bool EnemySpotted { get; private set; }
     public float WeaponCrosshairResize => (_weapon != null && _weapon.Weapon != null) ? _weapon.Weapon.crosshairResize : 0f;
     public event Action<bool> OnEnemySpottedChanged;
@@ -140,6 +141,7 @@ public class CowsinsHUDAdapter : MonoBehaviour
     private float _lastStaminaPolled = -1f;
     private IPlayerMovementStateProvider _moveState;
     private IWeaponBehaviourProvider _weaponBehaviourProv;
+    private IInteractManagerProvider _interactManager;
     private PlayerMovementEvents _moveEvents;
     private InteractManagerEvents _interactEvents;
     private float _lastHealth = -1f;
@@ -256,6 +258,7 @@ public class CowsinsHUDAdapter : MonoBehaviour
         if (_deps == null) yield break;
         _moveState = _deps.PlayerMovementState;
         _weaponBehaviourProv = _deps.WeaponBehaviour;
+        _interactManager = _deps.InteractManager;
     }
 
     private void HandleAllowed(string text) { InteractText = text; OnInteractPrompt?.Invoke(true, text); }

@@ -17,11 +17,19 @@ public class CrosshairWidget : MonoBehaviour
     public float jumpSpread = 160f;
     public float resizeSpeed = 15f;
 
-    [Header("Behaviour")]
+    [Header("Behavior")]
+    public bool showOuterRadialTicks = false;
     public bool removeCrosshairOnAiming = true;
+    public bool hideCrosshairOnInspecting = true;
+
+    [Header("Colors")]
+    public Color defaultColor = new Color(0f, 255f / 255f, 204f / 255f, 0.95f);
+    public Color enemySpottedColor = new Color(255f / 255f, 42f / 255f, 42f / 255f, 0.95f);
+    public Color hitmarkerColor = new Color(255f / 255f, 255f / 255f, 255f / 255f, 0.95f);
+    public Color headshotHitmarkerColor = new Color(255f / 255f, 35f / 255f, 45f / 255f, 0.95f);
+    public Color shadowColor = new Color(6f / 255f, 12f / 255f, 18f / 255f, 0.9f);
 
     private VisualElement _container;
-    private VisualElement[] _bars;
     private CowsinsHUDAdapter _adapter;
     private float _spread;
     private float _thickness;
@@ -31,21 +39,10 @@ public class CrosshairWidget : MonoBehaviour
     private float _hitmarkerScale = 1f;
     private bool _isHeadshot;
 
-    private const int BarCount = 13;
-    private static readonly string[] BarNames =
-    {
-        "CHTop", "CHDown", "CHLeft", "CHRight", "CHCenter",
-        "CHTL_H", "CHTL_V", "CHTR_H", "CHTR_V",
-        "CHBL_H", "CHBL_V", "CHBR_H", "CHBR_V"
-    };
-
     private bool _initialized;
 
     private void Awake()
     {
-        lineLength = 16f;
-        lineThickness = 3.2f;
-        enemyThickness = 5.5f;
         _spread = defaultSpread;
         _thickness = lineThickness;
     }
@@ -58,24 +55,14 @@ public class CrosshairWidget : MonoBehaviour
             if (doc == null) { enabled = false; return; }
             _container = doc.rootVisualElement.Q("Crosshair");
             if (_container == null) { enabled = false; return; }
-            Build();
+
+            // Clear any old child VisualElements (bars) if present in UXML to ensure 0 DOM child nodes
+            _container.Clear();
+
             _container.generateVisualContent += OnGenerateCrosshairOverlay;
             _initialized = true;
         }
         StartCoroutine(Bind());
-    }
-
-    private void Build()
-    {
-        _bars = new VisualElement[BarCount];
-        for (int i = 0; i < BarCount; i++)
-        {
-            var bar = new VisualElement { name = BarNames[i] };
-            bar.AddToClassList("crosshair-bar");
-            bar.usageHints = UsageHints.DynamicTransform | UsageHints.DynamicColor;
-            _container.Add(bar);
-            _bars[i] = bar;
-        }
     }
 
     private IEnumerator Bind()
@@ -96,6 +83,7 @@ public class CrosshairWidget : MonoBehaviour
             _adapter.OnEnemyHit -= HandleEnemyHit;
         }
         if (_container != null) _container.generateVisualContent -= OnGenerateCrosshairOverlay;
+        _initialized = false;
         StopAllCoroutines();
     }
 
@@ -142,50 +130,10 @@ public class CrosshairWidget : MonoBehaviour
         _spread = Mathf.Lerp(_spread, target, resizeSpeed * dt);
         _thickness = Mathf.Lerp(_thickness, a != null && a.EnemySpotted ? enemyThickness : lineThickness, resizeSpeed * dt);
 
-        bool spotted = a != null && a.EnemySpotted;
-        float cx = _container.resolvedStyle.width / 2f;
-        float cy = _container.resolvedStyle.height / 2f;
-        float L = lineLength, t = _thickness;
-        float halfGap = _spread / 2f;
-        float s = _spread;
-
-        bool noWeapon = a == null || !a.HasWeapon;
-        Set(_bars[0],  noWeapon || a.CHTop,      0f,     halfGap,   t,  L,   spotted, cx, cy);
-        Set(_bars[1],  noWeapon || a.CHDown,      0f,     -halfGap,  t,  L,   spotted, cx, cy);
-        Set(_bars[2],  noWeapon || a.CHRight,     halfGap, 0f,       L,  t,   spotted, cx, cy);
-        Set(_bars[3],  noWeapon || a.CHLeft,      -halfGap,0f,       L,  t,   spotted, cx, cy);
-
-        float d = Mathf.Min(t, L);
-        Set(_bars[4],  false, 0f, 0f, d, d, spotted, cx, cy); // Rendered via C# Painter2D Diamond
-
-        bool tl = a != null && a.HasWeapon && a.CHTopLeft;
-        bool tr = a != null && a.HasWeapon && a.CHTopRight;
-        bool bl = a != null && a.HasWeapon && a.CHBottomLeft;
-        bool br = a != null && a.HasWeapon && a.CHBottomRight;
-        Set(_bars[5],  tl, -s + L / 2f,  s - t / 2f,  L,  t,  spotted, cx, cy);
-        Set(_bars[6],  tl, -s + t / 2f,  s - L / 2f,  t,  L,  spotted, cx, cy);
-        Set(_bars[7],  tr,  s - L / 2f,  s - t / 2f,  L,  t,  spotted, cx, cy);
-        Set(_bars[8],  tr,  s - t / 2f,  s - L / 2f,  t,  L,  spotted, cx, cy);
-        Set(_bars[9],  bl, -s + L / 2f, -s + t / 2f,  L,  t,  spotted, cx, cy);
-        Set(_bars[10], bl, -s + t / 2f, -s + L / 2f,  t,  L,  spotted, cx, cy);
-        Set(_bars[11], br,  s - L / 2f, -s + t / 2f,  L,  t,  spotted, cx, cy);
-        Set(_bars[12], br,  s - t / 2f, -s + L / 2f,  t,  L,  spotted, cx, cy);
-
-        bool hidden = a != null && (a.IsDead || (a.IsAiming && removeCrosshairOnAiming));
+        bool hidden = a != null && (a.IsDead || (a.IsAiming && removeCrosshairOnAiming) || (hideCrosshairOnInspecting && a.IsInspecting));
         _container.style.opacity = Mathf.MoveTowards(_container.style.opacity.value, hidden ? 0f : 1f, 12f * dt);
 
         _container.MarkDirtyRepaint();
-    }
-
-    private void Set(VisualElement bar, bool active, float posX, float posY, float w, float h, bool enemy, float cx, float cy)
-    {
-        if (bar == null) return;
-        bar.EnableInClassList("crosshair-bar--hidden", !active);
-        if (!active) return;
-        bar.style.translate = new Translate(cx + posX - w / 2f, cy - posY - h / 2f);
-        bar.style.width = w;
-        bar.style.height = h;
-        bar.EnableInClassList("crosshair-bar--enemy", enemy);
     }
 
     private void OnGenerateCrosshairOverlay(MeshGenerationContext ctx)
@@ -198,46 +146,98 @@ public class CrosshairWidget : MonoBehaviour
         Vector2 center = new Vector2(width / 2f, height / 2f);
         bool spotted = _adapter != null && _adapter.EnemySpotted;
 
-        Color primaryColor = spotted ? new Color(255f / 255f, 42f / 255f, 42f / 255f, 0.95f)
-                                     : new Color(0f / 255f, 255f / 255f, 204f / 255f, 0.95f);
-        Color shadowColor = new Color(6f / 255f, 12f / 255f, 18f / 255f, 0.9f);
+        Color primaryColor = spotted ? enemySpottedColor : defaultColor;
 
         float spread = _spread;
+        float halfGap = spread / 2f;
+        float L = lineLength;
+        float t = _thickness;
 
-        // 1. Draw 4 Outer Range Finder Radial Ticks (at 45°, 135°, 225°, 315°)
-        float outerRadius = spread + 20f;
-        float tickLen = 11f;
+        bool noWeapon = _adapter == null || !_adapter.HasWeapon;
 
-        for (int i = 0; i < 4; i++)
+        // Helper Dual-Pass Stroke Line
+        void DrawLine(Vector2 p1, Vector2 p2, float thickness)
         {
-            float angleDeg = 45f + i * 90f;
-            float rad = angleDeg * Mathf.Deg2Rad;
-            Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
-            Vector2 p1 = center + dir * outerRadius;
-            Vector2 p2 = center + dir * (outerRadius + tickLen);
-
-            // Shadow outline
+            // Shadow pass
             painter.strokeColor = shadowColor;
-            painter.lineWidth = 4.5f;
+            painter.lineWidth = thickness + 2.4f;
+            painter.lineCap = LineCap.Round;
             painter.BeginPath();
             painter.MoveTo(p1);
             painter.LineTo(p2);
             painter.Stroke();
 
-            // Neon stroke
+            // Primary Neon pass
             painter.strokeColor = primaryColor;
-            painter.lineWidth = 2.4f;
+            painter.lineWidth = thickness;
+            painter.lineCap = LineCap.Round;
             painter.BeginPath();
             painter.MoveTo(p1);
             painter.LineTo(p2);
             painter.Stroke();
         }
 
-        // 2. Draw Center Diamond Reticle (45-degree rotated square dot)
-        if (_adapter == null || !_adapter.HasWeapon || _adapter.CHCenter)
+        // Helper Dual-Pass Continuous L-Bracket Path (triet tieu 100% corner overlap blobs)
+        void DrawLBracket(Vector2 pStart, Vector2 pCorner, Vector2 pEnd, float thickness)
+        {
+            // Shadow pass
+            painter.strokeColor = shadowColor;
+            painter.lineWidth = thickness + 2.4f;
+            painter.lineCap = LineCap.Butt;
+            painter.lineJoin = LineJoin.Miter;
+            painter.BeginPath();
+            painter.MoveTo(pStart);
+            painter.LineTo(pCorner);
+            painter.LineTo(pEnd);
+            painter.Stroke();
+
+            // Primary Neon pass
+            painter.strokeColor = primaryColor;
+            painter.lineWidth = thickness;
+            painter.lineCap = LineCap.Butt;
+            painter.lineJoin = LineJoin.Miter;
+            painter.BeginPath();
+            painter.MoveTo(pStart);
+            painter.LineTo(pCorner);
+            painter.LineTo(pEnd);
+            painter.Stroke();
+        }
+
+        // 1. Main 4 Crosshair Bars
+        if (noWeapon || _adapter.CHTop)   DrawLine(center + new Vector2(0f, -halfGap), center + new Vector2(0f, -halfGap - L), t);
+        if (noWeapon || _adapter.CHDown)  DrawLine(center + new Vector2(0f, halfGap),  center + new Vector2(0f, halfGap + L),  t);
+        if (noWeapon || _adapter.CHLeft)  DrawLine(center + new Vector2(-halfGap, 0f), center + new Vector2(-halfGap - L, 0f), t);
+        if (noWeapon || _adapter.CHRight) DrawLine(center + new Vector2(halfGap, 0f),  center + new Vector2(halfGap + L, 0f),  t);
+
+        // 2. Continuous 4 L-Brackets (Corner Reticles)
+        float s = spread;
+        float bLen = L * 0.85f;
+        if (!noWeapon && _adapter.CHTopLeft)
+        {
+            Vector2 corner = center + new Vector2(-s, -s);
+            DrawLBracket(corner + new Vector2(0f, bLen), corner, corner + new Vector2(bLen, 0f), t);
+        }
+        if (!noWeapon && _adapter.CHTopRight)
+        {
+            Vector2 corner = center + new Vector2(s, -s);
+            DrawLBracket(corner + new Vector2(0f, bLen), corner, corner + new Vector2(-bLen, 0f), t);
+        }
+        if (!noWeapon && _adapter.CHBottomLeft)
+        {
+            Vector2 corner = center + new Vector2(-s, s);
+            DrawLBracket(corner + new Vector2(0f, -bLen), corner, corner + new Vector2(bLen, 0f), t);
+        }
+        if (!noWeapon && _adapter.CHBottomRight)
+        {
+            Vector2 corner = center + new Vector2(s, s);
+            DrawLBracket(corner + new Vector2(0f, -bLen), corner, corner + new Vector2(-bLen, 0f), t);
+        }
+
+        // 3. Center Reticle (Dot / Diamond)
+        if (noWeapon || _adapter.CHCenter)
         {
             float dSize = 5.5f;
-            // Shadow Diamond
+            // Shadow Pass
             painter.fillColor = shadowColor;
             painter.BeginPath();
             painter.MoveTo(center + new Vector2(0, -dSize - 1.5f));
@@ -247,7 +247,7 @@ public class CrosshairWidget : MonoBehaviour
             painter.ClosePath();
             painter.Fill();
 
-            // Neon Diamond
+            // Primary Neon Pass
             painter.fillColor = primaryColor;
             painter.BeginPath();
             painter.MoveTo(center + new Vector2(0, -dSize));
@@ -258,18 +258,34 @@ public class CrosshairWidget : MonoBehaviour
             painter.Fill();
         }
 
-        // 3. Draw Dynamic Hitmarker (X-mark) when hitting an enemy
+        // 4. Outer Range Finder Radial Ticks (at 45°, 135°, 225°, 315°) - Optional
+        if (showOuterRadialTicks)
+        {
+            float outerRadius = spread + 20f;
+            float tickLen = 11f;
+
+            for (int i = 0; i < 4; i++)
+            {
+                float angleDeg = 45f + i * 90f;
+                float rad = angleDeg * Mathf.Deg2Rad;
+                Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+                Vector2 p1 = center + dir * outerRadius;
+                Vector2 p2 = center + dir * (outerRadius + tickLen);
+
+                DrawLine(p1, p2, 2.4f);
+            }
+        }
+
+        // 5. Dynamic Hitmarker (X-mark) when hitting an enemy
         if (_hitmarkerAlpha > 0.005f)
         {
             float hitGap = (_isHeadshot ? 7f : 5f) * _hitmarkerScale;
             float hitLen = (_isHeadshot ? 16f : 11f) * _hitmarkerScale;
             float strokeWidth = _isHeadshot ? 3.6f : 2.6f;
 
-            Color hitColor = _isHeadshot
-                ? new Color(255f / 255f, 35f / 255f, 45f / 255f, _hitmarkerAlpha)
-                : new Color(255f / 255f, 255f / 255f, 255f / 255f, _hitmarkerAlpha * 0.95f);
-
-            Color hitShadow = new Color(6f / 255f, 12f / 255f, 18f / 255f, _hitmarkerAlpha * 0.9f);
+            Color activeHitColor = _isHeadshot ? headshotHitmarkerColor : hitmarkerColor;
+            Color curHitColor = new Color(activeHitColor.r, activeHitColor.g, activeHitColor.b, activeHitColor.a * _hitmarkerAlpha);
+            Color curHitShadow = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * _hitmarkerAlpha);
 
             for (int i = 0; i < 4; i++)
             {
@@ -280,7 +296,7 @@ public class CrosshairWidget : MonoBehaviour
                 Vector2 p2 = center + dir * (hitGap + hitLen);
 
                 // Shadow stroke
-                painter.strokeColor = hitShadow;
+                painter.strokeColor = curHitShadow;
                 painter.lineWidth = strokeWidth + 2.2f;
                 painter.BeginPath();
                 painter.MoveTo(p1);
@@ -288,7 +304,7 @@ public class CrosshairWidget : MonoBehaviour
                 painter.Stroke();
 
                 // Neon Hitmarker stroke
-                painter.strokeColor = hitColor;
+                painter.strokeColor = curHitColor;
                 painter.lineWidth = strokeWidth;
                 painter.BeginPath();
                 painter.MoveTo(p1);

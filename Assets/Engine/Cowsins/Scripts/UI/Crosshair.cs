@@ -21,9 +21,6 @@ namespace cowsins
         [SerializeField, Tooltip("If enabled, the crosshair will not be displayed when the game is paused.")] private bool hideCrosshairOnPaused;
         [SerializeField, Tooltip("If enabled, the crosshair will not be displayed when the player is inspecting.")] private bool hideCrosshairOnInspecting;
 
-        [Tooltip(" How much space it takes from your screen"), SerializeField]
-        private float size = 10f;
-
         [Tooltip(" Thickness of the crosshair  "), SerializeField]
         private float width = 2f;
 
@@ -54,8 +51,6 @@ namespace cowsins
         private IInteractManagerProvider interactManager; // IInteractManagerProvider is implemented in InteractManager.cs
         private CrosshairShape crosshairShape;
 
-        private Texture2D crosshairTexture;
-
         private bool isVisible = true;
         private float spread;
         private float originalWidth;
@@ -69,9 +64,6 @@ namespace cowsins
             ResetCrosshair();
 
             crosshairShape = GetComponent<CrosshairShape>();
-
-            crosshairTexture = new Texture2D(1, 1);
-            crosshairTexture.wrapMode = TextureWrapMode.Repeat;
         }
 
         private void Start()
@@ -118,68 +110,6 @@ namespace cowsins
                 }
             }
             else Resize(jumpSpread);
-        }
-
-        /// <summary>
-        /// Draw the crosshair as our UI
-        /// </summary>
-        void OnGUI()
-        {
-            // Legacy IMGUI crosshair rendering disabled in favor of modern UI Toolkit CrosshairWidget
-            return;
-            if (playerStatsProvider.IsDead
-                || weaponController.Weapon != null && weaponBehaviour.IsAiming && removeCrosshairOnAiming
-                || PauseMenu.Instance != null && PauseMenu.isPaused && hideCrosshairOnPaused
-                || interactManager.Inspecting && hideCrosshairOnInspecting
-                || !isVisible) return;
-
-            crosshairTexture.SetPixel(0, 0, color);
-            crosshairTexture.Apply();
-
-            CrosshairParts tempCrosshairParts = crosshairShape.CurrentCrosshairParts;
-
-            if(tempCrosshairParts == null) return;
-
-            if (tempCrosshairParts.downPart) GUI.DrawTexture(new Rect(Screen.width / 2 - width / 2, (Screen.height / 2 - size / 2) + spread / 2, width, size), crosshairTexture);
-
-            if (tempCrosshairParts.topPart) GUI.DrawTexture(new Rect(Screen.width / 2 - width / 2, (Screen.height / 2 - size / 2) - spread / 2, width, size), crosshairTexture);
-
-            if (tempCrosshairParts.rightPart) GUI.DrawTexture(new Rect((Screen.width / 2 - size / 2) + spread / 2, Screen.height / 2 - width / 2, size, width), crosshairTexture);
-
-            if (tempCrosshairParts.leftPart) GUI.DrawTexture(new Rect((Screen.width / 2 - size / 2) - spread / 2, Screen.height / 2 - width / 2, size, width), crosshairTexture);
-
-            Vector2 center = new Vector2(Screen.width / 2, Screen.height / 2);
-            if (tempCrosshairParts.center)
-            {
-                float radius = Mathf.Min(width, size) / 2;
-                Rect circleRect = new Rect(center.x - radius, center.y - radius, radius * 2, radius * 2);
-
-                GUI.DrawTexture(circleRect, crosshairTexture);
-            }
-
-            if(tempCrosshairParts.topLeftBracket)
-            {
-                GUI.DrawTexture(new Rect(center.x - spread, center.y - spread, size, width), crosshairTexture);
-                GUI.DrawTexture(new Rect(center.x - spread, center.y - spread, width, size), crosshairTexture);
-            }
-
-            if (tempCrosshairParts.topRightBracket)
-            {
-                GUI.DrawTexture(new Rect(center.x + spread - size, center.y - spread, size, width), crosshairTexture);
-                GUI.DrawTexture(new Rect(center.x + spread - width, center.y - spread, width, size), crosshairTexture);
-            }
-
-            if (tempCrosshairParts.bottomLeftBracket)
-            {
-                GUI.DrawTexture(new Rect(center.x - spread, center.y + spread - width, size, width), crosshairTexture);
-                GUI.DrawTexture(new Rect(center.x - spread, center.y + spread - size, width, size), crosshairTexture);
-            }
-
-            if (tempCrosshairParts.bottomRightBracket)
-            {
-                GUI.DrawTexture(new Rect(center.x + spread - size, center.y + spread - width, size, width), crosshairTexture);
-                GUI.DrawTexture(new Rect(center.x + spread - width, center.y + spread - size, width, size), crosshairTexture);
-            }
         }
 
         private void ResetCrosshair()
