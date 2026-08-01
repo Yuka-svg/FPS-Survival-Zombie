@@ -28,6 +28,11 @@ public class CombatFeedbackHUD : MonoBehaviour
     [SerializeField] private Sprite spriteWeaponMelee;
     [SerializeField] private Sprite spriteSkull;
 
+    [Header("Weapon Asset Database")]
+    [SerializeField] private Weapon_SO[] weaponDatabase;
+
+    private readonly Dictionary<string, Sprite> _weaponIconCache = new Dictionary<string, Sprite>(System.StringComparer.OrdinalIgnoreCase);
+
     private static readonly string[] _numberStrings = new string[1000];
     private static string GetDamageString(int dmg, bool crit)
     {
@@ -101,6 +106,32 @@ public class CombatFeedbackHUD : MonoBehaviour
         if (spriteWeaponShotgun == null) spriteWeaponShotgun = Resources.Load<Sprite>("Icons/icon_weapon_shotgun");
         if (spriteWeaponMelee == null) spriteWeaponMelee = Resources.Load<Sprite>("Icons/icon_weapon_melee");
         if (spriteSkull == null) spriteSkull = Resources.Load<Sprite>("Icons/icon_skull");
+
+        if (weaponDatabase == null || weaponDatabase.Length == 0)
+        {
+            var loadedWeapons = Resources.LoadAll<Weapon_SO>("");
+            if (loadedWeapons != null && loadedWeapons.Length > 0)
+            {
+                weaponDatabase = loadedWeapons;
+            }
+        }
+        BuildWeaponIconCache();
+    }
+
+    private void BuildWeaponIconCache()
+    {
+        _weaponIconCache.Clear();
+        if (weaponDatabase != null)
+        {
+            foreach (var w in weaponDatabase)
+            {
+                if (w == null) continue;
+                if (!string.IsNullOrEmpty(w._name) && w.icon != null)
+                    _weaponIconCache[w._name] = w.icon;
+                if (!string.IsNullOrEmpty(w.name) && w.icon != null)
+                    _weaponIconCache[w.name] = w.icon;
+            }
+        }
     }
 
     private void OnDestroy()
@@ -214,15 +245,15 @@ public class CombatFeedbackHUD : MonoBehaviour
 
         string kName = string.IsNullOrEmpty(report.killerName) ? "Player" : report.killerName;
         string vName = string.IsNullOrEmpty(report.victimName) ? "Zombie" : report.victimName;
-        string wName = string.IsNullOrEmpty(report.weaponName) ? GetActivePlayerWeaponName() : report.weaponName;
+        string wName = report.weaponName;
 
         k.killerLabel.text = kName;
         k.victimLabel.text = vName;
 
         k.killerIcon.style.display = DisplayStyle.None;
 
-        var (weaponSvg, weaponSprite) = GetWeaponVectorImage(wName);
-        SetIcon(k.weaponIcon, weaponSvg, weaponSprite);
+        Sprite weaponSprite = GetWeaponIcon(wName);
+        SetIcon(k.weaponIcon, null, weaponSprite);
         SetIcon(k.zombieIcon, iconZombie, spriteZombie);
 
         if (report.isHeadshot)
@@ -391,23 +422,56 @@ public class CombatFeedbackHUD : MonoBehaviour
         return k;
     }
 
-    private (VectorImage svg, Sprite sprite) GetWeaponVectorImage(string weaponName)
+    private Sprite GetWeaponIcon(string weaponName)
     {
-        if (string.IsNullOrEmpty(weaponName)) return (iconSkull, spriteSkull);
-        string lower = weaponName.ToLowerInvariant();
+        // 1. Tra cuu trong Cache neuc weaponName duoc truy cap
+        if (!string.IsNullOrEmpty(weaponName))
+        {
+            if (_weaponIconCache.TryGetValue(weaponName, out Sprite cachedSprite) && cachedSprite != null)
+                return cachedSprite;
 
-        if (lower.Contains("rifle") || lower.Contains("ak") || lower.Contains("m4") || lower.Contains("assault") || lower.Contains("smg") || lower.Contains("mp5") || lower.Contains("burst"))
-            return (iconWeaponRifle, spriteWeaponRifle);
-        if (lower.Contains("pistol") || lower.Contains("glock") || lower.Contains("revolver") || lower.Contains("handgun"))
-            return (iconWeaponPistol, spriteWeaponPistol);
-        if (lower.Contains("shotgun") || lower.Contains("pump") || lower.Contains("gauge") || lower.Contains("trench"))
-            return (iconWeaponShotgun, spriteWeaponShotgun);
-        if (lower.Contains("knife") || lower.Contains("melee") || lower.Contains("blade") || lower.Contains("sword") || lower.Contains("katana"))
-            return (iconWeaponMelee, spriteWeaponMelee);
-        if (lower.Contains("rocket") || lower.Contains("launcher") || lower.Contains("grenade") || lower.Contains("explosive"))
-            return (iconSkull, spriteSkull);
+            string lower = weaponName.ToLowerInvariant();
+            foreach (var kvp in _weaponIconCache)
+            {
+                if (string.IsNullOrEmpty(kvp.Key)) continue;
+                string kLower = kvp.Key.ToLowerInvariant();
+                if (kLower == lower || kLower.Contains(lower) || lower.Contains(kLower))
+                {
+                    if (kvp.Value != null) return kvp.Value;
+                }
+            }
+        }
 
-        return (iconSkull, spriteSkull);
+        // 2. Tra cuu vu khi dang trang bi neu weaponName rong hoac khong co trong cache
+        var activeWeapon = GetActivePlayerWeaponSO();
+        if (activeWeapon != null && activeWeapon.icon != null)
+        {
+            return activeWeapon.icon;
+        }
+
+        // 3. Fallback theo tu khoa loai vu khi
+        if (!string.IsNullOrEmpty(weaponName))
+        {
+            string lower = weaponName.ToLowerInvariant();
+            if (lower.Contains("rifle") || lower.Contains("ak") || lower.Contains("m4") || lower.Contains("assault") || lower.Contains("smg") || lower.Contains("mp5") || lower.Contains("burst"))
+                return spriteWeaponRifle;
+            if (lower.Contains("pistol") || lower.Contains("glock") || lower.Contains("revolver") || lower.Contains("handgun"))
+                return spriteWeaponPistol;
+            if (lower.Contains("shotgun") || lower.Contains("pump") || lower.Contains("gauge") || lower.Contains("trench"))
+                return spriteWeaponShotgun;
+            if (lower.Contains("knife") || lower.Contains("melee") || lower.Contains("blade") || lower.Contains("sword") || lower.Contains("katana"))
+                return spriteWeaponMelee;
+        }
+
+        return spriteSkull;
+    }
+
+    private Weapon_SO GetActivePlayerWeaponSO()
+    {
+        var wc = Object.FindFirstObjectByType<WeaponController>();
+        if (wc != null && wc.Weapon != null)
+            return wc.Weapon;
+        return null;
     }
 
     private void SetIcon(VisualElement element, VectorImage vectorSvg, Sprite spriteImg)
