@@ -10,17 +10,12 @@ public class GiftBox : Pickeable
     public override void Awake()
     {
         base.Awake();
-        interactText = "Mở quà [E]";
+        interactText = "Mở quà";
         rotates = true;
         translates = true;
 
         GetComponent<Collider>().isTrigger = true;
         GetComponent<Rigidbody>().isKinematic = true;
-
-        typeof(Interactable).GetField("instantInteraction",
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Instance)
-            ?.SetValue(this, true);
 
         ApplyRandomModel();
     }
