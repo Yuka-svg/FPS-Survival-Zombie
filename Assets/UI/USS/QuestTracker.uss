@@ -177,19 +177,20 @@
 
 .minimap-blip-boss {
     position: absolute;
-    width: 14px;
-    height: 14px;
-    border-radius: 7px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
     background-color: #FF2200;
     border-width: 2px;
     border-color: #FFDD00;
+    transform-origin: 50% 50%;
 }
 
 .minimap-blip-journal {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
     background-color: #FFDD00;
     border-width: 1px;
     border-color: #FFFFFF;
@@ -198,9 +199,9 @@
 
 .minimap-blip-sidequest {
     position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
     background-color: #00FF66;
     border-width: 1px;
     border-color: #FFFFFF;

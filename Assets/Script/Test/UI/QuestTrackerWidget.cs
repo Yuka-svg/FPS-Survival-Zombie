@@ -365,14 +365,14 @@ public class QuestTrackerWidget : MonoBehaviour
 
         float pulseAngle = Time.unscaledTime * 4f;
         float opacityPulse = 0.85f + 0.15f * Mathf.Sin(pulseAngle);
-        float scalePulse = 1.0f + 0.12f * Mathf.Sin(pulseAngle);
+        float scalePulse = 1.125f + 0.075f * Mathf.Sin(pulseAngle); // Mathematically exact [1.05x, 1.20x] range
 
         var scaleStyle = new StyleScale(new Scale(new Vector2(scalePulse, scalePulse)));
 
         ApplyPoolPulse(_zombieBlips, opacityPulse, false, scaleStyle);
         ApplyPoolPulse(_companionBlips, opacityPulse, false, scaleStyle);
         ApplyPoolPulse(_specialBlips, opacityPulse, false, scaleStyle);
-        ApplyPoolPulse(_bossBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_bossBlips, opacityPulse, true, scaleStyle); // Boss blips pulse scale breathing!
         ApplyPoolPulse(_journalBlips, opacityPulse, true, scaleStyle);
         ApplyPoolPulse(_sideQuestBlips, opacityPulse, true, scaleStyle);
 
@@ -520,10 +520,10 @@ public class QuestTrackerWidget : MonoBehaviour
 
         float markerElementHalf = 8.0f; // Main quest marker 16px element half-width
         float arrowElementHalf = 8.0f;  // Edge arrow 16px element half-width
-        float arrowEdgeMargin = 11.5f;  // Safety margin preventing clipping at 45 deg angle (sqrt(8^2 + 8^2) = 11.31px)
+        float edgeMargin = 11.5f;       // 11.5px safety margin for 1.20x quest marker scale & 45 deg edge arrow rotation
 
-        float markerEdgeLimit = halfWidth - markerElementHalf;
-        float arrowEdgeLimit = halfWidth - arrowEdgeMargin;
+        float markerEdgeLimit = halfWidth - edgeMargin; // 134.5px
+        float arrowEdgeLimit = markerEdgeLimit;         // 134.5px (0px jump, 0px clipping)
         bool isOutside = Mathf.Abs(uiDX) > markerEdgeLimit || Mathf.Abs(uiDY) > markerEdgeLimit;
 
         if (!isOutside)
@@ -638,7 +638,7 @@ public class QuestTrackerWidget : MonoBehaviour
             float dz = -(pos.z - playerPos.z) * scale;
             float maxOffset = Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dz));
 
-            float enemyHalfSize = enemy.EnemyType == EnemyType.Boss ? 7.0f : (enemy.EnemyType == EnemyType.Special ? 5.0f : 3.0f);
+            float enemyHalfSize = enemy.EnemyType == EnemyType.Boss ? (9.0f * 1.20f) : (enemy.EnemyType == EnemyType.Special ? 5.0f : 3.0f);
             if (maxOffset > halfWidth - enemyHalfSize) continue;
 
             float sqrDist = dx * dx + dz * dz;
@@ -704,7 +704,7 @@ public class QuestTrackerWidget : MonoBehaviour
 
         // Render Bosses (up to 5) - Reverse assignment
         int bTotal = Mathf.Min(_bossCandidates.Count, _bossBlips.Count);
-        float bossHalfSize = 7.0f; // 14px
+        float bossHalfSize = 9.0f; // 18px
         for (int i = 0; i < _bossBlips.Count; i++)
         {
             if (i < bTotal)
@@ -728,8 +728,8 @@ public class QuestTrackerWidget : MonoBehaviour
 
         // 3. Journal Blips (up to 10)
         int jCount = 0;
-        float journalHalfSize = 4.0f; // 8px
-        float journalEdgeLimit = halfWidth - journalHalfSize;
+        float journalHalfSize = 5.0f; // 10px
+        float journalEdgeLimit = halfWidth - (journalHalfSize * 1.20f);
 
         for (int i = Collectible.ActiveCollectibles.Count - 1; i >= 0; i--)
         {
@@ -757,8 +757,8 @@ public class QuestTrackerWidget : MonoBehaviour
 
         // 4. Side Quest Green Blips (up to 5)
         int sideCount = 0;
-        float sideHalfSize = 5.0f; // 10px
-        float sideEdgeLimit = halfWidth - sideHalfSize;
+        float sideHalfSize = 6.0f; // 12px
+        float sideEdgeLimit = halfWidth - (sideHalfSize * 1.20f);
 
         var sqm = SideQuestManager.Instance;
         if (sqm != null && sqm.ActiveQuests != null)
