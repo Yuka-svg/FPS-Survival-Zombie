@@ -124,8 +124,7 @@ public class CompassWidget : MonoBehaviour
                 ? new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.9f) 
                 : new Color(210f / 255f, 215f / 255f, 225f / 255f, 0.45f);
                 
-            label.style.unityTextAlign = TextAnchor.MiddleCenter;
-            label.style.top = isCardinal ? 10f : 12f; // Positioned safely to prevent clipping at bottom
+            label.style.unityTextAlign = TextAnchor.LowerCenter;
             
             if (fontDef.font != null || fontDef.fontAsset != null)
             {
@@ -186,7 +185,7 @@ public class CompassWidget : MonoBehaviour
         if (rect.width <= 0 || rect.height <= 0) return;
 
         var painter = ctx.painter2D;
-        float chamferSize = 8f;
+        float chamferSize = 6f;
 
         // 1. Draw solid dark blue-gray translucent background shape (0.85 alpha)
         Color fillCol = new Color(9f / 255f, 13f / 255f, 19f / 255f, 0.85f);
@@ -242,27 +241,27 @@ public class CompassWidget : MonoBehaviour
 
         // Bottom-Right
         painter.BeginPath();
-        painter.MoveTo(new Vector2(rect.width, rect.height - chamferSize - 4f));
+        painter.MoveTo(new Vector2(rect.width, rect.height - 3f));
         painter.LineTo(new Vector2(rect.width, rect.height - chamferSize));
         painter.LineTo(new Vector2(rect.width - chamferSize, rect.height));
-        painter.LineTo(new Vector2(rect.width - chamferSize - 4f, rect.height));
+        painter.LineTo(new Vector2(rect.width - 3f, rect.height));
         painter.Stroke();
 
         // Bottom-Left
         painter.BeginPath();
-        painter.MoveTo(new Vector2(chamferSize + 4f, rect.height));
+        painter.MoveTo(new Vector2(3f, rect.height));
         painter.LineTo(new Vector2(chamferSize, rect.height));
         painter.LineTo(new Vector2(0, rect.height - chamferSize));
-        painter.LineTo(new Vector2(0, rect.height - chamferSize - 4f));
+        painter.LineTo(new Vector2(0, rect.height - 3f));
         painter.Stroke();
 
         // 4. Center Pointer (Downward golden triangle)
         painter.fillColor = new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.95f);
         painter.BeginPath();
         float midX = rect.width / 2f;
-        painter.MoveTo(new Vector2(midX - 5f, 0));
-        painter.LineTo(new Vector2(midX + 5f, 0));
-        painter.LineTo(new Vector2(midX, 6f));
+        painter.MoveTo(new Vector2(midX - 3.5f, 0));
+        painter.LineTo(new Vector2(midX + 3.5f, 0));
+        painter.LineTo(new Vector2(midX, 3f));
         painter.ClosePath();
         painter.Fill();
 
@@ -305,7 +304,7 @@ public class CompassWidget : MonoBehaviour
             float maxDist = 120f;
             
             float minSize = 4f;   // Very small when far
-            float maxSize = 10f;  // Compact when near to leave room for direction letters below
+            float maxSize = 7f;   // Compact size to fit neatly near top edge (top: 4px)
             
             float minOpacity = 0.25f; // Faded when far
             float maxOpacity = 0.95f; // Bright when near
@@ -316,11 +315,11 @@ public class CompassWidget : MonoBehaviour
 
             float angle = Vector2.SignedAngle(m.PlanarPosition - playerPos, fwd);
             
-            // Position blips dynamically near top (top: 2px) to separate vertically from letters
+            // Position blips dynamically near top edge (top: 4px) to sit flush at top
             _blips[i].style.width = size;
             _blips[i].style.height = size;
             _blips[i].style.left = (angle / 360f * viewportWidth) + viewportWidth / 2f - size / 2f;
-            _blips[i].style.top = 2f;
+            _blips[i].style.top = 4f;
             _blips[i].style.opacity = opacity;
 
             if (m.icon != null)

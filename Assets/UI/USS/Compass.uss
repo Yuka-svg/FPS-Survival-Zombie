@@ -7,7 +7,7 @@
     left: 50%;
     margin-left: -180px;
     width: 360px;
-    height: 34px;
+    height: 36px;
     overflow: hidden;
     background-color: transparent;
     border-radius: 0;
@@ -18,8 +18,8 @@
     position: absolute;
     margin: 0;
     padding: 0;
-    height: 16px;
-    -unity-text-align: middle-center;
+    bottom: 2px;
+    -unity-text-align: lower-center;
 }
 
 #CompassStrip {
@@ -42,7 +42,7 @@
 #CompassHeading {
     display: none;
     position: absolute;
-    top: 42px; /* Directly below the compass strip */
+    top: 44px; /* Directly below the compass strip */
     left: 50%;
     margin-left: -50px;
     width: 100px;
