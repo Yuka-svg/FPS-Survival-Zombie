@@ -1,5 +1,5 @@
 /// <summary>
-/// This script belongs to cowsins™ as a part of the cowsins´ FPS Engine. All rights reserved. 
+/// This script belongs to cowsins as a part of the cowsins FPS Engine. All rights reserved. 
 /// </summary>
 using UnityEngine;
 using UnityEngine.Events;
@@ -184,6 +184,10 @@ namespace cowsins
                 interactable.Highlight();
                 Events.OnInteractionProgressChanged?.Invoke(-1f);
                 Events.OnAllowedInteraction?.Invoke(interactable.interactText);
+            }
+            else
+            {
+                DisableInteractionUI();
             }
         }
 

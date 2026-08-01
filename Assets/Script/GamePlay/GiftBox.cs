@@ -47,13 +47,35 @@ public class GiftBox : Pickeable
         SnapToGround();
     }
 
+    private bool _isOpened = false;
+
     public override void Interact(Transform player)
     {
+        if (_isOpened) return;
+
+        var col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        if (player != null)
+        {
+            var im = player.GetComponent<InteractManager>();
+            if (im != null && im.HighlightedInteractable == this)
+            {
+                im.ForceRefreshUI(null);
+            }
+        }
+
         base.Interact(player);
 
         if (AdRewardManager.Instance != null && AdRewardManager.Instance.ShowAd(player))
         {
+            _isOpened = true;
             Destroy(gameObject);
+        }
+        else
+        {
+            if (col != null) col.enabled = true;
+            _isOpened = false;
         }
     }
 
