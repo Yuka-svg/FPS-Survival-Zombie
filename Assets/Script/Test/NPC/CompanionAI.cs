@@ -22,6 +22,14 @@ using System.Collections;
 [RequireComponent(typeof(AudioSource))]
 public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
 {
+    public static readonly List<CompanionAI> ActiveCompanions = new List<CompanionAI>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void InitOnLoad()
+    {
+        ActiveCompanions.Clear();
+    }
+
     public enum State { Waiting, Following, Downed, WalkingAway }
     public enum FireMode { Shotgun, Burst }
 
@@ -246,6 +254,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
 
     private void OnEnable()
     {
+        if (!ActiveCompanions.Contains(this)) ActiveCompanions.Add(this);
         currentHealth = maxHealth;
         _agent.speed = followSpeed;
         _agent.acceleration = 8f; // Smooth acceleration (L4D2 style)
@@ -257,6 +266,11 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
         _agent.updateRotation = false;
         _agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
         _agent.avoidancePriority = 50;
+    }
+
+    private void OnDisable()
+    {
+        ActiveCompanions.Remove(this);
     }
 
     private void Start()

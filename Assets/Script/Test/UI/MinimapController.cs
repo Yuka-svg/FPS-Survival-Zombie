@@ -1,5 +1,4 @@
-using UnityEngine;
-
+[DefaultExecutionOrder(90)]
 public class MinimapController : MonoBehaviour
 {
     public static MinimapController Instance { get; private set; }
@@ -15,6 +14,7 @@ public class MinimapController : MonoBehaviour
 
     public RenderTexture MinimapTexture => _minimapTexture;
     public float OrthographicSize => _minimapCamera != null ? _minimapCamera.orthographicSize : orthographicSize;
+    public Transform PlayerTransform => _playerTransform;
 
     public float CameraYawRotation
     {

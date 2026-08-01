@@ -150,19 +150,49 @@
     width: 6px;
     height: 6px;
     border-radius: 3px;
-    background-color: #ff3333;
+    background-color: #FF1111;
     border-width: 1px;
-    border-color: #990000;
+    border-color: #000000;
+}
+
+.minimap-blip-companion {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #00FFCC;
+    border-width: 1.5px;
+    border-color: #FFFFFF;
+}
+
+.minimap-blip-special {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #FF00FF;
+    border-width: 1.5px;
+    border-color: #FFFFFF;
+}
+
+.minimap-blip-boss {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: #FF2200;
+    border-width: 2px;
+    border-color: #FFDD00;
 }
 
 .minimap-blip-journal {
     position: absolute;
     width: 8px;
     height: 8px;
-    border-radius: 4px;
-    background-color: #ffcc00;
+    border-radius: 2px;
+    background-color: #FFDD00;
     border-width: 1px;
-    border-color: #998800;
+    border-color: #FFFFFF;
 }
 
 .minimap-blip-sidequest {
@@ -170,9 +200,9 @@
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: #00ff66;
+    background-color: #00FF66;
     border-width: 1px;
-    border-color: #ffffff;
+    border-color: #FFFFFF;
 }
 
 #MinimapQuestMarker {
@@ -180,9 +210,9 @@
     width: 16px;
     height: 16px;
     border-radius: 8px;
-    background-color: #00e5ff;
+    background-color: #00E5FF;
     border-width: 1.5px;
-    border-color: #ffffff;
+    border-color: #FFFFFF;
     transform-origin: 50% 50%;
 }
 

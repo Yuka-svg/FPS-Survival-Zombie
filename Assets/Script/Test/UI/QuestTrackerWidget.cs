@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using cowsins;
 
+[DefaultExecutionOrder(100)]
 public class QuestTrackerWidget : MonoBehaviour
 {
     [Header("Layout")]
@@ -29,10 +31,13 @@ public class QuestTrackerWidget : MonoBehaviour
     private VisualElement _minimapEdgeArrow;
     private bool _isMinimapMode = false;
 
-    // Fixed pre-instantiated VisualElement Pools for zero-GC blips rendering
+    // Fixed pre-instantiated VisualElement Pools for zero-GC blips rendering across 6 categories
     private readonly List<VisualElement> _zombieBlips = new List<VisualElement>();
+    private readonly List<VisualElement> _companionBlips = new List<VisualElement>();
+    private readonly List<VisualElement> _specialBlips = new List<VisualElement>();
     private readonly List<VisualElement> _journalBlips = new List<VisualElement>();
     private readonly List<VisualElement> _sideQuestBlips = new List<VisualElement>();
+    private readonly List<VisualElement> _bossBlips = new List<VisualElement>();
     private float _markerUpdateTimer = 0f;
 
     private void Awake()
@@ -76,11 +81,14 @@ public class QuestTrackerWidget : MonoBehaviour
 
         _minimapMarkerLayer.Clear();
         _zombieBlips.Clear();
+        _companionBlips.Clear();
         _journalBlips.Clear();
         _sideQuestBlips.Clear();
+        _specialBlips.Clear();
+        _bossBlips.Clear();
 
-        // 1. Zombie Blips Pool (20 elements)
-        for (int i = 0; i < 20; i++)
+        // 1. Zombie Blips Pool (40 elements - bottom DOM layer)
+        for (int i = 0; i < 40; i++)
         {
             var blip = new VisualElement();
             blip.AddToClassList("minimap-blip-zombie");
@@ -90,7 +98,18 @@ public class QuestTrackerWidget : MonoBehaviour
             _zombieBlips.Add(blip);
         }
 
-        // 2. Journal Blips Pool (10 elements)
+        // 2. Companion Blips Pool (5 elements)
+        for (int i = 0; i < 5; i++)
+        {
+            var blip = new VisualElement();
+            blip.AddToClassList("minimap-blip-companion");
+            blip.style.position = Position.Absolute;
+            blip.style.display = DisplayStyle.None;
+            _minimapMarkerLayer.Add(blip);
+            _companionBlips.Add(blip);
+        }
+
+        // 3. Journal Blips Pool (10 elements)
         for (int i = 0; i < 10; i++)
         {
             var blip = new VisualElement();
@@ -101,7 +120,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _journalBlips.Add(blip);
         }
 
-        // 3. Side Quest Blips Pool (5 elements)
+        // 4. Side Quest Blips Pool (5 elements)
         for (int i = 0; i < 5; i++)
         {
             var blip = new VisualElement();
@@ -110,6 +129,28 @@ public class QuestTrackerWidget : MonoBehaviour
             blip.style.display = DisplayStyle.None;
             _minimapMarkerLayer.Add(blip);
             _sideQuestBlips.Add(blip);
+        }
+
+        // 5. Special Infected Blips Pool (8 elements)
+        for (int i = 0; i < 8; i++)
+        {
+            var blip = new VisualElement();
+            blip.AddToClassList("minimap-blip-special");
+            blip.style.position = Position.Absolute;
+            blip.style.display = DisplayStyle.None;
+            _minimapMarkerLayer.Add(blip);
+            _specialBlips.Add(blip);
+        }
+
+        // 6. Boss Blips Pool (5 elements - top DOM layer)
+        for (int i = 0; i < 5; i++)
+        {
+            var blip = new VisualElement();
+            blip.AddToClassList("minimap-blip-boss");
+            blip.style.position = Position.Absolute;
+            blip.style.display = DisplayStyle.None;
+            _minimapMarkerLayer.Add(blip);
+            _bossBlips.Add(blip);
         }
     }
 
@@ -232,37 +273,6 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void Update()
     {
-        if (_isMinimapMode)
-        {
-            // 1. Dual-Rate System: 60+ FPS smooth frame update for Player Arrow rotation and Main Quest Edge Arrow/Marker
-            if (_minimapPlayerArrow != null && MinimapController.Instance != null)
-            {
-                float rot = MinimapController.Instance.CameraYawRotation;
-                _minimapPlayerArrow.style.rotate = new Rotate(Angle.Degrees(rot));
-            }
-
-            if (_minimapQuestMarker != null && _minimapEdgeArrow != null)
-            {
-                UpdateMainQuestMarkerAndArrow();
-            }
-
-            // Tint adjustment to prevent daytime solar overexposure glare on minimap
-            if (_minimapImage != null)
-            {
-                float dayWeight = DayNightCycle.Instance != null ? DayNightCycle.Instance.CurrentDayWeight : 0f;
-                float factor = Mathf.Lerp(1.0f, 0.72f, dayWeight);
-                _minimapImage.style.unityBackgroundImageTintColor = new Color(factor, factor, factor, 1.0f);
-            }
-
-            // 2. Dual-Rate System: 10 FPS timer tick for Zombie, Journal, and Side Quest Blips
-            _markerUpdateTimer += Time.deltaTime;
-            if (_markerUpdateTimer >= 0.1f)
-            {
-                _markerUpdateTimer = 0f;
-                UpdateMinimapBlips();
-            }
-        }
-
         // Story Mode - Key M Toggle
         bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
         if (!isEndless)
@@ -300,6 +310,62 @@ public class QuestTrackerWidget : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (_isMinimapMode)
+        {
+            Transform pTrans = MinimapController.Instance != null && MinimapController.Instance.PlayerTransform != null
+                ? MinimapController.Instance.PlayerTransform
+                : (Camera.main != null ? Camera.main.transform : null);
+
+            if (pTrans == null)
+            {
+                HideAllBlipPools();
+                return;
+            }
+
+            // 1. Dual-Rate System: Smooth frame update for Player Arrow rotation and Main Quest Edge Arrow/Marker
+            if (_minimapPlayerArrow != null && MinimapController.Instance != null)
+            {
+                float rot = MinimapController.Instance.CameraYawRotation;
+                _minimapPlayerArrow.style.rotate = new Rotate(Angle.Degrees(rot));
+            }
+
+            if (_minimapQuestMarker != null && _minimapEdgeArrow != null)
+            {
+                UpdateMainQuestMarkerAndArrow(pTrans);
+            }
+
+            // Tint adjustment to prevent daytime solar overexposure glare on minimap
+            if (_minimapImage != null)
+            {
+                float dayWeight = DayNightCycle.Instance != null ? DayNightCycle.Instance.CurrentDayWeight : 0f;
+                float factor = Mathf.Lerp(1.0f, 0.72f, dayWeight);
+                _minimapImage.style.unityBackgroundImageTintColor = new Color(factor, factor, factor, 1.0f);
+            }
+
+            // 2. Dual-Rate System: 10 FPS timer tick for secondary blips
+            _markerUpdateTimer += Time.deltaTime;
+            if (_markerUpdateTimer >= 0.1f)
+            {
+                _markerUpdateTimer = 0f;
+                UpdateMinimapBlips(pTrans);
+            }
+        }
+    }
+
+    private void HideAllBlipPools()
+    {
+        for (int i = 0; i < _zombieBlips.Count; i++) _zombieBlips[i].style.display = DisplayStyle.None;
+        for (int i = 0; i < _companionBlips.Count; i++) _companionBlips[i].style.display = DisplayStyle.None;
+        for (int i = 0; i < _journalBlips.Count; i++) _journalBlips[i].style.display = DisplayStyle.None;
+        for (int i = 0; i < _sideQuestBlips.Count; i++) _sideQuestBlips[i].style.display = DisplayStyle.None;
+        for (int i = 0; i < _specialBlips.Count; i++) _specialBlips[i].style.display = DisplayStyle.None;
+        for (int i = 0; i < _bossBlips.Count; i++) _bossBlips[i].style.display = DisplayStyle.None;
+        if (_minimapQuestMarker != null) _minimapQuestMarker.style.display = DisplayStyle.None;
+        if (_minimapEdgeArrow != null) _minimapEdgeArrow.style.display = DisplayStyle.None;
     }
 
     private Vector3? GetMainQuestObjectivePosition()
@@ -379,98 +445,236 @@ public class QuestTrackerWidget : MonoBehaviour
         return null;
     }
 
-    private void UpdateMainQuestMarkerAndArrow()
+    private void UpdateMainQuestMarkerAndArrow(Transform pTrans)
     {
         Vector3? targetPos = GetMainQuestObjectivePosition();
-        if (!targetPos.HasValue || Camera.main == null)
+        if (!targetPos.HasValue || pTrans == null)
         {
-            _minimapQuestMarker.style.display = DisplayStyle.None;
-            _minimapEdgeArrow.style.display = DisplayStyle.None;
+            if (_minimapQuestMarker != null) _minimapQuestMarker.style.display = DisplayStyle.None;
+            if (_minimapEdgeArrow != null) _minimapEdgeArrow.style.display = DisplayStyle.None;
             return;
         }
 
-        Vector3 playerPos = Camera.main.transform.position;
+        Vector3 playerPos = pTrans.position;
         Vector3 worldPos = targetPos.Value;
 
+        float halfWidth = _minimapMarkerLayer != null && _minimapMarkerLayer.layout.width > 0 ? _minimapMarkerLayer.layout.width * 0.5f : 146f;
         float orthoSize = MinimapController.Instance != null ? MinimapController.Instance.OrthographicSize : 22f;
         if (orthoSize < 0.1f) orthoSize = 22f;
 
-        float scale = 146f / orthoSize;
+        float scale = halfWidth / orthoSize;
         float uiDX = (worldPos.x - playerPos.x) * scale;
         float uiDY = -(worldPos.z - playerPos.z) * scale;
 
-        float edgeLimit = 130f;
+        float halfSize = 8.0f; // Main quest marker 16px
+        float edgeLimit = halfWidth - halfSize;
         bool isOutside = Mathf.Abs(uiDX) > edgeLimit || Mathf.Abs(uiDY) > edgeLimit;
 
         if (!isOutside)
         {
             // Inside Minimap bounds: show Main Quest Marker
-            _minimapQuestMarker.style.display = DisplayStyle.Flex;
-            _minimapEdgeArrow.style.display = DisplayStyle.None;
-
-            _minimapQuestMarker.style.left = 146f + uiDX - 8f;
-            _minimapQuestMarker.style.top = 146f + uiDY - 8f;
+            if (_minimapQuestMarker != null)
+            {
+                _minimapQuestMarker.style.display = DisplayStyle.Flex;
+                _minimapQuestMarker.style.left = halfWidth + uiDX - halfSize;
+                _minimapQuestMarker.style.top = halfWidth + uiDY - halfSize;
+            }
+            if (_minimapEdgeArrow != null) _minimapEdgeArrow.style.display = DisplayStyle.None;
         }
         else
         {
             // Outside Minimap bounds: show Edge Arrow smoothly clamped to square boundary
-            _minimapQuestMarker.style.display = DisplayStyle.None;
-            _minimapEdgeArrow.style.display = DisplayStyle.Flex;
+            if (_minimapQuestMarker != null) _minimapQuestMarker.style.display = DisplayStyle.None;
+            if (_minimapEdgeArrow != null)
+            {
+                _minimapEdgeArrow.style.display = DisplayStyle.Flex;
 
-            float maxCoord = Mathf.Max(Mathf.Abs(uiDX), Mathf.Abs(uiDY));
-            float scaleFactor = edgeLimit / maxCoord;
+                float maxCoord = Mathf.Max(Mathf.Abs(uiDX), Mathf.Abs(uiDY));
+                float scaleFactor = edgeLimit / maxCoord;
 
-            float clampDX = uiDX * scaleFactor;
-            float clampDY = uiDY * scaleFactor;
+                float clampDX = uiDX * scaleFactor;
+                float clampDY = uiDY * scaleFactor;
 
-            _minimapEdgeArrow.style.left = 146f + clampDX - 8f;
-            _minimapEdgeArrow.style.top = 146f + clampDY - 8f;
+                _minimapEdgeArrow.style.left = halfWidth + clampDX - halfSize;
+                _minimapEdgeArrow.style.top = halfWidth + clampDY - halfSize;
 
-            float angle = Mathf.Atan2(uiDX, -uiDY) * Mathf.Rad2Deg;
-            _minimapEdgeArrow.style.rotate = new Rotate(Angle.Degrees(angle));
+                float angle = Mathf.Atan2(uiDX, -uiDY) * Mathf.Rad2Deg;
+                _minimapEdgeArrow.style.rotate = new Rotate(Angle.Degrees(angle));
+            }
         }
     }
 
-    private void UpdateMinimapBlips()
+    private struct EnemySortEntry
     {
-        if (!_isMinimapMode || Camera.main == null || _minimapMarkerLayer == null) return;
+        public MonoBehaviour EnemyMB;
+        public EnemyType EnemyType;
+        public float SqrDist;
+    }
 
-        Vector3 playerPos = Camera.main.transform.position;
+    private readonly List<EnemySortEntry> _normalCandidates = new List<EnemySortEntry>();
+    private readonly List<EnemySortEntry> _specialCandidates = new List<EnemySortEntry>();
+    private readonly List<EnemySortEntry> _bossCandidates = new List<EnemySortEntry>();
+
+    private void UpdateMinimapBlips(Transform pTrans)
+    {
+        if (!_isMinimapMode || pTrans == null || _minimapMarkerLayer == null)
+        {
+            HideAllBlipPools();
+            return;
+        }
+
+        Vector3 playerPos = pTrans.position;
+        float halfWidth = _minimapMarkerLayer.layout.width > 0 ? _minimapMarkerLayer.layout.width * 0.5f : 146f;
         float orthoSize = MinimapController.Instance != null ? MinimapController.Instance.OrthographicSize : 22f;
         if (orthoSize < 0.1f) orthoSize = 22f;
-        float scale = 146f / orthoSize;
+        float scale = halfWidth / orthoSize;
 
-        float edgeLimit = 130f;
+        // 1. Companion Blips (up to 5 elements)
+        int cCount = 0;
+        float companionHalfSize = 5.0f; // 10px
+        float companionEdgeLimit = halfWidth - companionHalfSize;
 
-        // 1. Zombie Blips (up to 20, excluding companion allies)
-        int zCount = 0;
+        for (int i = CompanionAI.ActiveCompanions.Count - 1; i >= 0; i--)
+        {
+            if (cCount >= _companionBlips.Count) break;
+            var companion = CompanionAI.ActiveCompanions[i];
+            if (companion == null || !companion || companion.gameObject == null || !companion.gameObject.activeInHierarchy) continue;
+
+            // Filter state: Waiting (in save room), Following (active), Downed (wounded)
+            if (companion.CurrentState != CompanionAI.State.Waiting &&
+                companion.CurrentState != CompanionAI.State.Following &&
+                companion.CurrentState != CompanionAI.State.Downed) continue;
+
+            Vector3 pos = companion.transform.position;
+            if (Mathf.Abs(pos.y - playerPos.y) > 12f) continue;
+
+            float dx = (pos.x - playerPos.x) * scale;
+            float dz = -(pos.z - playerPos.z) * scale;
+
+            if (Mathf.Abs(dx) <= companionEdgeLimit && Mathf.Abs(dz) <= companionEdgeLimit)
+            {
+                var blip = _companionBlips[cCount];
+                blip.style.left = halfWidth + dx - companionHalfSize;
+                blip.style.top = halfWidth + dz - companionHalfSize;
+                blip.style.display = DisplayStyle.Flex;
+                cCount++;
+            }
+        }
+        for (int i = cCount; i < _companionBlips.Count; i++)
+            _companionBlips[i].style.display = DisplayStyle.None;
+
+        // 2. Enemy Blips (Two-stage selection and type routing)
+        _normalCandidates.Clear();
+        _specialCandidates.Clear();
+        _bossCandidates.Clear();
+
         for (int i = EnemyRegistry.ActiveEnemies.Count - 1; i >= 0; i--)
         {
-            if (zCount >= _zombieBlips.Count) break;
             var enemy = EnemyRegistry.ActiveEnemies[i];
             var mb = enemy as MonoBehaviour;
             if (mb == null || !mb || mb.gameObject == null || !mb.gameObject.activeInHierarchy || enemy.IsDead) continue;
+            if (mb is CompanionAI) continue; // Exclude companions from enemy loops
 
             Vector3 pos = mb.transform.position;
             if (Mathf.Abs(pos.y - playerPos.y) > 12f) continue;
 
             float dx = (pos.x - playerPos.x) * scale;
             float dz = -(pos.z - playerPos.z) * scale;
+            float maxOffset = Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dz));
 
-            if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
+            float enemyHalfSize = enemy.EnemyType == EnemyType.Boss ? 7.0f : (enemy.EnemyType == EnemyType.Special ? 5.0f : 3.0f);
+            if (maxOffset > halfWidth - enemyHalfSize) continue;
+
+            float sqrDist = dx * dx + dz * dz;
+            var entry = new EnemySortEntry { EnemyMB = mb, EnemyType = enemy.EnemyType, SqrDist = sqrDist };
+
+            if (enemy.EnemyType == EnemyType.Boss) _bossCandidates.Add(entry);
+            else if (enemy.EnemyType == EnemyType.Special) _specialCandidates.Add(entry);
+            else _normalCandidates.Add(entry);
+        }
+
+        // Sort candidates by distance ascending (closest first)
+        _normalCandidates.Sort((a, b) => a.SqrDist.CompareTo(b.SqrDist));
+        _specialCandidates.Sort((a, b) => a.SqrDist.CompareTo(b.SqrDist));
+        _bossCandidates.Sort((a, b) => a.SqrDist.CompareTo(b.SqrDist));
+
+        // Render Normal Zombies (up to 40) - Reverse assignment so closest threat gets highest DOM index in pool
+        int nTotal = Mathf.Min(_normalCandidates.Count, _zombieBlips.Count);
+        float normalHalfSize = 3.0f; // 6px
+        for (int i = 0; i < _zombieBlips.Count; i++)
+        {
+            if (i < nTotal)
             {
-                var blip = _zombieBlips[zCount];
-                blip.style.left = 146f + dx - 3f;
-                blip.style.top = 146f + dz - 3f;
+                int srcIdx = nTotal - 1 - i;
+                var entry = _normalCandidates[srcIdx];
+                Vector3 pos = entry.EnemyMB.transform.position;
+                float dx = (pos.x - playerPos.x) * scale;
+                float dz = -(pos.z - playerPos.z) * scale;
+
+                var blip = _zombieBlips[i];
+                blip.style.left = halfWidth + dx - normalHalfSize;
+                blip.style.top = halfWidth + dz - normalHalfSize;
                 blip.style.display = DisplayStyle.Flex;
-                zCount++;
+            }
+            else
+            {
+                _zombieBlips[i].style.display = DisplayStyle.None;
             }
         }
-        for (int i = zCount; i < _zombieBlips.Count; i++)
-            _zombieBlips[i].style.display = DisplayStyle.None;
 
-        // 2. Journal Blips (up to 10)
+        // Render Special Infected (up to 8) - Reverse assignment
+        int sTotal = Mathf.Min(_specialCandidates.Count, _specialBlips.Count);
+        float specialHalfSize = 5.0f; // 10px
+        for (int i = 0; i < _specialBlips.Count; i++)
+        {
+            if (i < sTotal)
+            {
+                int srcIdx = sTotal - 1 - i;
+                var entry = _specialCandidates[srcIdx];
+                Vector3 pos = entry.EnemyMB.transform.position;
+                float dx = (pos.x - playerPos.x) * scale;
+                float dz = -(pos.z - playerPos.z) * scale;
+
+                var blip = _specialBlips[i];
+                blip.style.left = halfWidth + dx - specialHalfSize;
+                blip.style.top = halfWidth + dz - specialHalfSize;
+                blip.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _specialBlips[i].style.display = DisplayStyle.None;
+            }
+        }
+
+        // Render Bosses (up to 5) - Reverse assignment
+        int bTotal = Mathf.Min(_bossCandidates.Count, _bossBlips.Count);
+        float bossHalfSize = 7.0f; // 14px
+        for (int i = 0; i < _bossBlips.Count; i++)
+        {
+            if (i < bTotal)
+            {
+                int srcIdx = bTotal - 1 - i;
+                var entry = _bossCandidates[srcIdx];
+                Vector3 pos = entry.EnemyMB.transform.position;
+                float dx = (pos.x - playerPos.x) * scale;
+                float dz = -(pos.z - playerPos.z) * scale;
+
+                var blip = _bossBlips[i];
+                blip.style.left = halfWidth + dx - bossHalfSize;
+                blip.style.top = halfWidth + dz - bossHalfSize;
+                blip.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _bossBlips[i].style.display = DisplayStyle.None;
+            }
+        }
+
+        // 3. Journal Blips (up to 10)
         int jCount = 0;
+        float journalHalfSize = 4.0f; // 8px
+        float journalEdgeLimit = halfWidth - journalHalfSize;
+
         for (int i = Collectible.ActiveCollectibles.Count - 1; i >= 0; i--)
         {
             if (jCount >= _journalBlips.Count) break;
@@ -483,11 +687,11 @@ public class QuestTrackerWidget : MonoBehaviour
             float dx = (pos.x - playerPos.x) * scale;
             float dz = -(pos.z - playerPos.z) * scale;
 
-            if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
+            if (Mathf.Abs(dx) <= journalEdgeLimit && Mathf.Abs(dz) <= journalEdgeLimit)
             {
                 var blip = _journalBlips[jCount];
-                blip.style.left = 146f + dx - 4f;
-                blip.style.top = 146f + dz - 4f;
+                blip.style.left = halfWidth + dx - journalHalfSize;
+                blip.style.top = halfWidth + dz - journalHalfSize;
                 blip.style.display = DisplayStyle.Flex;
                 jCount++;
             }
@@ -495,14 +699,17 @@ public class QuestTrackerWidget : MonoBehaviour
         for (int i = jCount; i < _journalBlips.Count; i++)
             _journalBlips[i].style.display = DisplayStyle.None;
 
-        // 3. Side Quest Green Blips (up to 5)
-        int sCount = 0;
+        // 4. Side Quest Green Blips (up to 5)
+        int sideCount = 0;
+        float sideHalfSize = 5.0f; // 10px
+        float sideEdgeLimit = halfWidth - sideHalfSize;
+
         var sqm = SideQuestManager.Instance;
         if (sqm != null && sqm.ActiveQuests != null)
         {
             for (int i = QuestBeacon.ActiveBeacons.Count - 1; i >= 0; i--)
             {
-                if (sCount >= _sideQuestBlips.Count) break;
+                if (sideCount >= _sideQuestBlips.Count) break;
                 var b = QuestBeacon.ActiveBeacons[i];
                 if (b == null || !b || b.gameObject == null || !b.gameObject.activeInHierarchy || !b.IsActive || b.showOnSideQuest == null) continue;
 
@@ -510,17 +717,17 @@ public class QuestTrackerWidget : MonoBehaviour
                 float dx = (pos.x - playerPos.x) * scale;
                 float dz = -(pos.z - playerPos.z) * scale;
 
-                if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
+                if (Mathf.Abs(dx) <= sideEdgeLimit && Mathf.Abs(dz) <= sideEdgeLimit)
                 {
-                    var blip = _sideQuestBlips[sCount];
-                    blip.style.left = 146f + dx - 5f;
-                    blip.style.top = 146f + dz - 5f;
+                    var blip = _sideQuestBlips[sideCount];
+                    blip.style.left = halfWidth + dx - sideHalfSize;
+                    blip.style.top = halfWidth + dz - sideHalfSize;
                     blip.style.display = DisplayStyle.Flex;
-                    sCount++;
+                    sideCount++;
                 }
             }
         }
-        for (int i = sCount; i < _sideQuestBlips.Count; i++)
+        for (int i = sideCount; i < _sideQuestBlips.Count; i++)
             _sideQuestBlips[i].style.display = DisplayStyle.None;
     }
 
