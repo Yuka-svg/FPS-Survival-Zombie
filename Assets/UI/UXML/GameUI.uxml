@@ -104,11 +104,6 @@
                 <ui:VisualElement name="HeatBarFill" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="ReloadIndicator">
-            <ui:VisualElement name="ReloadRing" />
-            <ui:Label name="ReloadPercent" text="0%" />
-            <ui:Label name="ReloadText" text="RELOADING" />
-        </ui:VisualElement>
         <!-- Compass -->
         <ui:VisualElement name="CompassViewport">
             <ui:VisualElement name="CompassStrip" />
@@ -124,6 +119,12 @@
         </ui:VisualElement>
         <!-- Crosshair -->
         <ui:VisualElement name="Crosshair" class="crosshair-container" />
+        <!-- Reload Indicator (positioned above Crosshair in depth) -->
+        <ui:VisualElement name="ReloadIndicator">
+            <ui:VisualElement name="ReloadRing" />
+            <ui:Label name="ReloadPercent" text="0%" />
+            <ui:Label name="ReloadText" text="RELOADING" />
+        </ui:VisualElement>
         <!-- FPS -->
         <ui:Label name="FPSLabel" text="-- FPS" class="fps-counter" />
         <!-- Interact -->
