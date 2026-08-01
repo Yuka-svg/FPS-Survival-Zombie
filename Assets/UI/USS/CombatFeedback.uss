@@ -111,7 +111,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    column-gap: 6px;
     padding-left: 10px;
     padding-right: 7px;
     border-right-width: 3px;
@@ -154,15 +153,15 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    -unity-text-wrap: nowrap;
-    margin: 0;
+    white-space: nowrap;
+    margin: 0 3px;
 }
 
 .killfeed-icon--avatar {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    margin: 0;
+    margin: 0 3px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -170,7 +169,7 @@
     width: 40px;
     height: 20px;
     flex-shrink: 0;
-    margin: 0;
+    margin: 0 3px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -178,7 +177,7 @@
     width: 18px;
     height: 18px;
     flex-shrink: 0;
-    margin: 0;
+    margin: 0 3px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -186,6 +185,6 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    margin: 0;
+    margin: 0 3px;
     -unity-background-scale-mode: scale-to-fit;
 }
