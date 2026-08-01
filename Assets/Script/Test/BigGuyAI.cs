@@ -641,7 +641,7 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
         // Provoke if dazed
         if (state == BigGuyState.Dazed)
-            Provoke();
+            StartScream();
 
         if (currentHealth <= 0)
         {

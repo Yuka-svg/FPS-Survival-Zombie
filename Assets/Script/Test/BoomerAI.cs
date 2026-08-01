@@ -9,12 +9,8 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
     protected bool lastHitWasHeadshot;
 
-    private void OnEnable()
-    {
-        EnemyRegistry.Register(this);
-        lastHitWasHeadshot = false;
-    }
     public int currentHealth;
+    public int maxHealth = 100;
 
     [Header("Detection")]
     public float detectRange = 20f;
@@ -215,6 +211,9 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
     private void OnEnable()
     {
+        EnemyRegistry.Register(this);
+        lastHitWasHeadshot = false;
+
         currentHealth = maxHealth;
         isDead = false;
         isHit = false;
@@ -620,7 +619,7 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
     public void TakeDamage(int damage)
     {
         // Once it has begun screaming/exploding, further hits no longer matter.
-        if (isDead || state == BoomerState.ScreamExplode || state == BoomerState.Dead)
+        if (isDead || isScreaming || hasStartedExplosion)
             return;
 
         currentHealth -= damage;

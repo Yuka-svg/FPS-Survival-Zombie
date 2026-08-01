@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using cowsins;
@@ -287,7 +288,7 @@ public class CombatFeedbackHUD : MonoBehaviour
 
         k.transEndCb = evt =>
         {
-            if (k.generation == currentGen && k.state == KillState.Exiting && evt.target == k.entry && evt.propertyName == "height")
+            if (k.generation == currentGen && k.state == KillState.Exiting && evt.target == k.entry && evt.stylePropertyNames.Contains("height"))
             {
                 _exitingKills.Remove(k);
                 ReturnToPool(k);
