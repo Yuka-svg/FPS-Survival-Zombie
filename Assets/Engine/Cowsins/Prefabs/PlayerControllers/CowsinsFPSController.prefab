@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 4612824603642630888}
   - component: {fileID: 510279444816935142}
   - component: {fileID: 4666388467220574006}
+  - component: {fileID: 6470651123860669105}
   m_Layer: 17
   m_Name: Player
   m_TagString: Player
@@ -1252,6 +1253,24 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 0
+--- !u!114 &6470651123860669105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4612824603642630890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14c052d0ff2b6d04082db6aba09d1b86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::cowsins.PlayerFallSafety
+  fallThresholdY: -10
+  useLastGroundedPosition: 1
+  safeGroundMinDuration: 0.5
+  teleportCooldown: 1
+  allowHotkeyReset: 1
+  resetHotkey: 289
 --- !u!1 &4612824603648159569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1387,6 +1406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4612824604642224939}
+  - component: {fileID: 7337680606973680108}
   m_Layer: 0
   m_Name: CowsinsFPSController
   m_TagString: Untagged
@@ -1415,6 +1435,24 @@ Transform:
   - {fileID: 4965469476012000204}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7337680606973680108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4612824604642224938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14c052d0ff2b6d04082db6aba09d1b86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::cowsins.PlayerFallSafety
+  fallThresholdY: -10
+  useLastGroundedPosition: 1
+  safeGroundMinDuration: 0.5
+  teleportCooldown: 1
+  allowHotkeyReset: 1
+  resetHotkey: 289
 --- !u!1 &4612824605049336392
 GameObject:
   m_ObjectHideFlags: 0

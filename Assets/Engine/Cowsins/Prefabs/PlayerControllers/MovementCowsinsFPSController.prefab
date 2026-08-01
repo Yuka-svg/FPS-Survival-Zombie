@@ -7542,6 +7542,9 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1935678919768080239}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4612824604642224938, guid: fa4cc848e07107e459dce4ea99d04302, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 905605100988020081}
     - targetCorrespondingSourceObject: {fileID: 4612824603642630890, guid: fa4cc848e07107e459dce4ea99d04302, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6437096418461326646}
@@ -7601,6 +7604,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c2cee8bc36cc80408adad2b6d2c5c01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraShake
+--- !u!1 &1195374611476548383 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4612824604642224938, guid: fa4cc848e07107e459dce4ea99d04302, type: 3}
+  m_PrefabInstance: {fileID: 5805941918662991925}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &905605100988020081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195374611476548383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14c052d0ff2b6d04082db6aba09d1b86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::cowsins.PlayerFallSafety
+  fallThresholdY: -10
+  useLastGroundedPosition: 1
+  safeGroundMinDuration: 0.5
+  teleportCooldown: 1
+  allowHotkeyReset: 1
+  resetHotkey: 289
 --- !u!114 &1195374612628124359 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4612824603642630898, guid: fa4cc848e07107e459dce4ea99d04302, type: 3}
