@@ -487,15 +487,7 @@ public class QuestTrackerWidget : MonoBehaviour
             }
         }
 
-                var beacon = QuestBeacon.ActiveBeacons[i];
-                if (beacon != null && beacon.gameObject.activeInHierarchy && beacon.TargetQuest == activeQuest)
-                {
-                    return beacon.transform.position;
-                }
-            }
-        }
-
-        // Priority 2: Fallback to active save room or chapter objective position
+        // Priority 4: Fallback to active save room or chapter objective position
         var saveRoom = FindAnyObjectByType<CheckPointView>();
         if (saveRoom != null && saveRoom.gameObject.activeInHierarchy)
         {
