@@ -153,6 +153,7 @@
     background-color: #FF1111;
     border-width: 1px;
     border-color: #000000;
+    transform-origin: 50% 50%;
 }
 
 .minimap-blip-companion {
@@ -163,6 +164,7 @@
     background-color: #00FFCC;
     border-width: 1.5px;
     border-color: #FFFFFF;
+    transform-origin: 50% 50%;
 }
 
 .minimap-blip-special {
@@ -173,6 +175,7 @@
     background-color: #FF00FF;
     border-width: 1.5px;
     border-color: #FFFFFF;
+    transform-origin: 50% 50%;
 }
 
 .minimap-blip-boss {

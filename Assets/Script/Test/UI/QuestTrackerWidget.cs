@@ -370,8 +370,8 @@ public class QuestTrackerWidget : MonoBehaviour
         var scaleStyle = new StyleScale(new Scale(new Vector2(scalePulse, scalePulse)));
 
         ApplyPoolPulse(_zombieBlips, opacityPulse, false, scaleStyle);
-        ApplyPoolPulse(_companionBlips, opacityPulse, false, scaleStyle);
-        ApplyPoolPulse(_specialBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_companionBlips, opacityPulse, true, scaleStyle);
+        ApplyPoolPulse(_specialBlips, opacityPulse, true, scaleStyle);
         ApplyPoolPulse(_bossBlips, opacityPulse, true, scaleStyle); // Boss blips pulse scale breathing!
         ApplyPoolPulse(_journalBlips, opacityPulse, true, scaleStyle);
         ApplyPoolPulse(_sideQuestBlips, opacityPulse, true, scaleStyle);
@@ -393,7 +393,7 @@ public class QuestTrackerWidget : MonoBehaviour
         }
     }
 
-    private void ApplyPoolPulse(List<VisualElement> pool, float opacity, bool isFixedMarker, StyleScale scaleStyle)
+    private void ApplyPoolPulse(List<VisualElement> pool, float opacity, bool enableScalePulse, StyleScale scaleStyle)
     {
         for (int i = 0; i < pool.Count; i++)
         {
@@ -401,7 +401,7 @@ public class QuestTrackerWidget : MonoBehaviour
             if (blip.style.display == DisplayStyle.Flex)
             {
                 blip.style.opacity = opacity;
-                if (isFixedMarker)
+                if (enableScalePulse)
                 {
                     blip.style.scale = scaleStyle;
                 }
@@ -588,7 +588,7 @@ public class QuestTrackerWidget : MonoBehaviour
         // 1. Companion Blips (up to 5 elements)
         int cCount = 0;
         float companionHalfSize = 5.0f; // 10px
-        float companionEdgeLimit = halfWidth - companionHalfSize;
+        float companionEdgeLimit = halfWidth - (companionHalfSize * 1.20f);
 
         for (int i = CompanionAI.ActiveCompanions.Count - 1; i >= 0; i--)
         {
@@ -638,7 +638,7 @@ public class QuestTrackerWidget : MonoBehaviour
             float dz = -(pos.z - playerPos.z) * scale;
             float maxOffset = Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dz));
 
-            float enemyHalfSize = enemy.EnemyType == EnemyType.Boss ? (9.0f * 1.20f) : (enemy.EnemyType == EnemyType.Special ? 5.0f : 3.0f);
+            float enemyHalfSize = enemy.EnemyType == EnemyType.Boss ? (9.0f * 1.20f) : (enemy.EnemyType == EnemyType.Special ? (5.0f * 1.20f) : 3.0f);
             if (maxOffset > halfWidth - enemyHalfSize) continue;
 
             float sqrDist = dx * dx + dz * dz;
