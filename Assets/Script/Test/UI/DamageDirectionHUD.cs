@@ -7,14 +7,12 @@ public class DamageDirectionHUD : MonoBehaviour
     public static DamageDirectionHUD Instance { get; private set; }
 
     public float radius = 160f;
-    public float arcWidth = 100f, arcHeight = 6f;
+    public float arcWidth = 48f, arcHeight = 24f;
     public float fadeTime = 1.0f;
     public int poolSize = 8;
 
     private readonly List<VisualElement> _pivots = new List<VisualElement>();
     private VisualElement _root;
-
-    private static readonly Color ArcColor = new Color(0.898f, 0.282f, 0.235f, 1f);
 
     private void OnEnable()
     {
@@ -50,7 +48,7 @@ public class DamageDirectionHUD : MonoBehaviour
             arc.usageHints = UsageHints.DynamicTransform;
             arc.style.width = arcWidth;
             arc.style.height = arcHeight;
-            arc.style.translate = new Translate(0, -radius);
+            arc.style.translate = new Translate(new Length(-50, LengthUnit.Percent), new Length(-radius, LengthUnit.Pixel));
             pivot.Add(arc);
         }
     }
@@ -71,7 +69,7 @@ public class DamageDirectionHUD : MonoBehaviour
             float a = _pivots[i].style.opacity.value;
             if (a < min) { min = a; idx = i; }
         }
-        _pivots[idx].style.rotate = new Rotate(Angle.Degrees(-bearing));
+        _pivots[idx].style.rotate = new Rotate(Angle.Degrees(bearing));
         _pivots[idx].style.opacity = 1f;
     }
 
