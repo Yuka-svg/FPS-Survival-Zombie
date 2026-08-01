@@ -2,38 +2,144 @@
 @import url("../USS/Shared.uss");
 
 /* DialogueBubble.uss — Runtime-loaded styles for NPC dialogue overlay.
-   Themed to match the game UI: dark surface panel + gold border,
-   Outfit SDF font for all dialogue text. Loaded by DialogueBubble.cs. */
+   AAA dark glassmorphic layout + gold accent borders + Outfit/BlackOps SDF fonts. */
 
 .dialogue-scrim {
-    background-color: var(--color-panel-bg, rgba(14, 17, 21, 0.92));
+    background-color: var(--color-panel-bg, rgba(14, 17, 21, 0.94));
     border-width: 1px;
-    border-color: var(--color-border-gold, rgba(217, 199, 115, 0.3));
+    border-color: var(--color-border-gold, rgba(217, 199, 115, 0.35));
     border-top-left-radius: var(--radius-m, 16px);
     border-top-right-radius: var(--radius-m, 16px);
     border-bottom-left-radius: var(--radius-m, 16px);
     border-bottom-right-radius: var(--radius-m, 16px);
+    padding: 20px 28px;
+    min-width: 480px;
+    max-width: 720px;
+    align-items: center;
+    transition: opacity 0.2s ease-out, scale 0.2s ease-out;
+    scale: 1 1;
+    opacity: 1;
 }
 
+.dialogue-hidden {
+    opacity: 0;
+    scale: 0.95 0.95;
+}
+
+.dialogue-visible {
+    opacity: 1;
+    scale: 1 1;
+}
+
+.dialogue-bump {
+    scale: 1.02 1.02;
+}
+
+/* --- Speaker Header Badge --- */
+.dialogue-header-badge {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(217, 199, 115, 0.12);
+    border-width: 1px;
+    border-color: var(--color-border-gold, rgba(217, 199, 115, 0.4));
+    border-radius: 12px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+}
+
+.dialogue-speaker-avatar {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.dialogue-speaker-name {
+    font-size: var(--fs-xs, 14px);
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    color: var(--color-text-gold, rgb(217, 199, 115));
+    letter-spacing: 1px;
+    -unity-text-align: middle-center;
+}
+
+/* --- Dialogue Main Line --- */
 .dialogue-line {
-    font-size: var(--fs-l, 22px);
+    font-size: var(--fs-l, 20px);
     -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
     -unity-font-style: bold;
     color: var(--color-text-primary, rgba(245, 245, 245, 1));
     white-space: normal;
     -unity-text-align: middle-center;
-    -unity-text-outline-width: var(--shadow-text-md, 2px);
-    -unity-text-outline-color: var(--shadow-color-default, rgba(0, 0, 0, 0.5));
+    margin-bottom: 12px;
+    -unity-text-outline-width: var(--shadow-text-sm, 1px);
+    -unity-text-outline-color: var(--shadow-color-default, rgba(0, 0, 0, 0.6));
 }
 
-.dialogue-choice {
-    font-size: var(--fs-s, 16px);
-    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
-    color: var(--color-text-gold, rgb(217, 199, 115));
-    white-space: normal;
+/* --- Choice Container & Interactive Buttons --- */
+.dialogue-choice-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.dialogue-choice-btn {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    background-color: rgba(26, 32, 39, 0.9);
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.35);
+    border-radius: var(--radius-s, 8px);
+    transition: scale 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out;
+    scale: 1 1;
+}
+
+.dialogue-choice-btn:hover {
+    scale: 1.04 1.04;
+    background-color: rgba(48, 56, 66, 0.95);
+    border-color: rgba(245, 225, 150, 0.8);
+}
+
+.dialogue-choice-btn:active {
+    scale: 0.97 0.97;
+    background-color: rgba(58, 68, 80, 1);
+}
+
+.dialogue-key-badge {
+    background-color: rgba(217, 199, 115, 0.25);
+    color: rgb(245, 225, 150);
+    font-size: 13px;
+    -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-right: 8px;
     -unity-text-align: middle-center;
-    -unity-text-outline-width: var(--shadow-text-sm, 1px);
-    -unity-text-outline-color: var(--shadow-color-dark, rgba(0, 0, 0, 0.8));
+}
+
+.dialogue-btn-text {
+    font-size: var(--fs-m, 16px);
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    -unity-text-align: middle-center;
+}
+
+/* --- Hint Container --- */
+.dialogue-hint-box {
+    background-color: rgba(78, 205, 196, 0.1);
+    border-width: 1px;
+    border-color: rgba(78, 205, 196, 0.4);
+    border-radius: var(--radius-s, 8px);
+    padding: 6px 16px;
+    margin-top: 12px;
+    align-items: center;
 }
 
 .dialogue-hint {
@@ -42,6 +148,5 @@
     color: var(--color-accent-cyan, rgb(78, 205, 196));
     white-space: normal;
     -unity-text-align: middle-center;
-    -unity-text-outline-width: var(--shadow-text-sm, 1px);
-    -unity-text-outline-color: var(--shadow-color-dark, rgba(0, 0, 0, 0.8));
 }
+

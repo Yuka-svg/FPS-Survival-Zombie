@@ -82,6 +82,7 @@ public class CompanionDialogueTrigger : Interactable
     private void Awake()
     {
         _bubble = GetComponent<DialogueBubble>();
+        if (_bubble != null) _bubble.defaultSpeakerName = "Đồng Đội Alex";
         var field = typeof(Interactable).GetField("instantInteraction",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (field != null) field.SetValue(this, true);

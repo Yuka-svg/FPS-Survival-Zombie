@@ -3,14 +3,14 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Screen-space dialogue bubble for the companion NPC.
-/// Uses the same approach as SimpleNotification — a screen-space UIDocument
-/// overlay that shows the dialogue line + Y/N prompt in the center of the screen.
-///
-/// Two modes:
-///   Speech — shows a single line, auto-hides after duration.
-///   Choice — shows a line + "Nhấn Y để đồng ý / N để từ chối", waits for Y/N input,
-///            fires OnChoiceMade(bool accepted).
+/// AAA Screen-space dialogue overlay for NPC interactions.
+/// Features:
+///   - Speaker Header Badge (Name + Avatar icon)
+///   - Dark Glassmorphism scrim panel with glowing gold border & Theme tokens
+///   - Typewriter effect with real-time coroutines (unscaled time safe)
+///   - Interactive UI Toolkit Choice Buttons ([Y] Agree / [N] Decline) with mouse hover/click + keyboard shortcuts
+///   - Cyan Accent Hint Box
+///   - Dynamic PickingMode & Cursor management integrated cleanly with PanelManager
 /// </summary>
 [RequireComponent(typeof(CompanionAI))]
 public class DialogueBubble : MonoBehaviour
@@ -19,12 +19,17 @@ public class DialogueBubble : MonoBehaviour
     public float fadeIn = 0.3f;
     public float speechHoldDuration = 4f;
     public float fadeOut = 0.8f;
+    public float typewriterSpeed = 0.025f;
+
+    [Header("Speaker Identity")]
+    public string defaultSpeakerName = "NPC";
+    public Sprite defaultSpeakerAvatar;
 
     [Header("Visuals")]
     public Color textColor = new Color(0.96f, 0.96f, 0.96f, 1f);
     public Color choiceColor = new Color(0.851f, 0.78f, 0.451f, 1f);
     public Color scrimColor = new Color(0.055f, 0.067f, 0.082f, 0.92f);
-    public float lineFontSize = 22f;
+    public float lineFontSize = 20f;
     public float choiceFontSize = 16f;
     public Color hintColor = new Color(0.306f, 0.804f, 0.769f, 1f);
     public float hintFontSize = 14f;
@@ -33,10 +38,27 @@ public class DialogueBubble : MonoBehaviour
     private UIDocument _doc;
     private VisualElement _root;
     private VisualElement _scrim;
+    private VisualElement _headerBadge;
+    private VisualElement _avatarImage;
+    private Label _speakerLabel;
     private Label _lineLabel;
-    private Label _choiceLabel;
+    private VisualElement _choiceContainer;
+    private Button _btnYes;
+    private Label _keyBadgeYes;
+    private Label _btnTextYes;
+    private Button _btnNo;
+    private Label _keyBadgeNo;
+    private Label _btnTextNo;
+    private VisualElement _hintBox;
     private Label _hintLabel;
+
     private Coroutine _routine;
+    private Coroutine _typewriterRoutine;
+    private bool _isTyping;
+    private string _fullText = "";
+    private float _lastSkipTime;
+    private float _lastSoundTime;
+
     private bool _choiceActive;
     private System.Action<bool> _choiceCallback;
     private float _prevTimeScale = 1f;
@@ -53,13 +75,32 @@ public class DialogueBubble : MonoBehaviour
 
     private void OnDisable()
     {
+        CleanupState();
+    }
+
+    private void CleanupState()
+    {
         if (_routine != null)
         {
             StopCoroutine(_routine);
             _routine = null;
         }
+        if (_typewriterRoutine != null)
+        {
+            StopCoroutine(_typewriterRoutine);
+            _typewriterRoutine = null;
+        }
+        _isTyping = false;
         _choiceActive = false;
         _choiceCallback = null;
+
+        // Unregister safely from PanelManager on disable
+        if (PanelManager.Instance != null)
+        {
+            PanelManager.Instance.RegisterPanelActive("DialogueBubble", false);
+        }
+
+        RestoreGameplayState();
     }
 
     private void Build()
@@ -69,16 +110,13 @@ public class DialogueBubble : MonoBehaviour
         _doc = _panelGO.GetComponent<UIDocument>();
         _doc.sortingOrder = 450; // Below SimpleNotification (500), above HUD
 
-        // Borrow panel settings from an existing screen-space UIDocument
-        // (same approach as SimpleNotification). Must filter out
-        // WorldSpacePanelSettings — see UIPanelSettingsUtil for details.
         var hudDoc = UIPanelSettingsUtil.FindScreenSpaceUIDocument(_doc);
         if (hudDoc != null)
             _doc.panelSettings = hudDoc.panelSettings;
         else
             Debug.LogWarning("[DialogueBubble] No screen-space UIDocument found to borrow panel settings.");
 
-        // Build visual tree programmatically.
+        // Root container
         _root = new VisualElement();
         _root.name = "DialogueBubbleRoot";
         _root.style.position = Position.Absolute;
@@ -86,46 +124,65 @@ public class DialogueBubble : MonoBehaviour
         _root.style.top = 0f;
         _root.style.right = 0f;
         _root.style.bottom = 0f;
-        _root.style.display = DisplayStyle.Flex;
+        _root.style.display = DisplayStyle.None;
         _root.style.alignItems = Align.Center;
         _root.style.justifyContent = Justify.Center;
-        _root.style.opacity = 0f; // Hidden by default
-        // The root is a full-screen overlay. It must NOT block input to other
-        // UI (e.g. GameOver panel, Pause menu) when hidden or visible — the
-        // dialogue only displays text, the player interacts via keyboard (Y/N),
-        // not by clicking on the bubble. Without Ignore, an opacity:0 root
-        // still picks input and blocks clicks on lower-sortingOrder UIs.
+        _root.style.opacity = 0f;
         _root.pickingMode = PickingMode.Ignore;
 
-        // Theme the bubble with the shared game UI stylesheet (Outfit SDF font,
-        // dark panel + gold border). Inline styles below act as a fallback when
-        // the stylesheet is missing so the widget never renders unreadable.
         var sheet = Resources.Load<StyleSheet>("DialogueBubble");
         _themed = sheet != null;
         if (sheet != null)
             _root.styleSheets.Add(sheet);
 
-        // Semi-transparent scrim behind the text.
+        // Scrim background panel
         _scrim = new VisualElement();
         _scrim.name = "DialogueScrim";
         _scrim.AddToClassList("dialogue-scrim");
-        if (!_themed) _scrim.style.backgroundColor = scrimColor;
+        _scrim.AddToClassList("dialogue-hidden");
         if (!_themed)
         {
-            _scrim.style.borderTopLeftRadius = 12f;
-            _scrim.style.borderTopRightRadius = 12f;
-            _scrim.style.borderBottomLeftRadius = 12f;
-            _scrim.style.borderBottomRightRadius = 12f;
+            _scrim.style.backgroundColor = scrimColor;
+            _scrim.style.borderTopLeftRadius = 16f;
+            _scrim.style.borderTopRightRadius = 16f;
+            _scrim.style.borderBottomLeftRadius = 16f;
+            _scrim.style.borderBottomRightRadius = 16f;
+            _scrim.style.paddingTop = 20f;
+            _scrim.style.paddingBottom = 20f;
+            _scrim.style.paddingLeft = 28f;
+            _scrim.style.paddingRight = 28f;
         }
-        _scrim.style.paddingTop = 20f;
-        _scrim.style.paddingBottom = 20f;
-        _scrim.style.paddingLeft = 30f;
-        _scrim.style.paddingRight = 30f;
-        _scrim.style.marginLeft = 200f;
-        _scrim.style.marginRight = 200f;
         _root.Add(_scrim);
 
-        // Main dialogue line.
+        // Allow clicking scrim to skip typewriter
+        _scrim.RegisterCallback<ClickEvent>(evt =>
+        {
+            if (_isTyping)
+            {
+                SkipTypewriter();
+                evt.StopPropagation();
+            }
+        });
+
+        // Speaker Header Badge
+        _headerBadge = new VisualElement();
+        _headerBadge.name = "SpeakerHeaderBadge";
+        _headerBadge.AddToClassList("dialogue-header-badge");
+
+        _avatarImage = new VisualElement();
+        _avatarImage.name = "SpeakerAvatar";
+        _avatarImage.AddToClassList("dialogue-speaker-avatar");
+        _avatarImage.style.display = DisplayStyle.None;
+        _headerBadge.Add(_avatarImage);
+
+        _speakerLabel = new Label();
+        _speakerLabel.name = "SpeakerName";
+        _speakerLabel.AddToClassList("dialogue-speaker-name");
+        _speakerLabel.text = defaultSpeakerName.ToUpper();
+        _headerBadge.Add(_speakerLabel);
+        _scrim.Add(_headerBadge);
+
+        // Main dialogue line label
         _lineLabel = new Label();
         _lineLabel.name = "DialogueLine";
         _lineLabel.AddToClassList("dialogue-line");
@@ -133,21 +190,51 @@ public class DialogueBubble : MonoBehaviour
         if (!_themed) _lineLabel.style.fontSize = lineFontSize;
         _lineLabel.style.whiteSpace = WhiteSpace.Normal;
         _lineLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-        _lineLabel.style.marginBottom = 12f;
         _scrim.Add(_lineLabel);
 
-        // Y/N choice prompt.
-        _choiceLabel = new Label();
-        _choiceLabel.name = "DialogueChoice";
-        _choiceLabel.AddToClassList("dialogue-choice");
-        if (!_themed) _choiceLabel.style.color = choiceColor;
-        if (!_themed) _choiceLabel.style.fontSize = choiceFontSize;
-        _choiceLabel.style.whiteSpace = WhiteSpace.Normal;
-        _choiceLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-        _choiceLabel.style.display = DisplayStyle.None;
-        _scrim.Add(_choiceLabel);
+        // Interactive Choice Buttons Container
+        _choiceContainer = new VisualElement();
+        _choiceContainer.name = "ChoiceContainer";
+        _choiceContainer.AddToClassList("dialogue-choice-container");
+        _choiceContainer.style.display = DisplayStyle.None;
+        _scrim.Add(_choiceContainer);
 
-        // Optional hint shown under the choice (helps answer NPC questions).
+        // [Y] Agree Button
+        _btnYes = new Button(() => OnChoiceButtonClicked(true));
+        _btnYes.name = "BtnYes";
+        _btnYes.AddToClassList("dialogue-choice-btn");
+
+        _keyBadgeYes = new Label("[ Y ]");
+        _keyBadgeYes.AddToClassList("dialogue-key-badge");
+        _btnYes.Add(_keyBadgeYes);
+
+        _btnTextYes = new Label("ĐỒNG Ý");
+        _btnTextYes.AddToClassList("dialogue-btn-text");
+        _btnYes.Add(_btnTextYes);
+
+        _choiceContainer.Add(_btnYes);
+
+        // [N] Decline Button
+        _btnNo = new Button(() => OnChoiceButtonClicked(false));
+        _btnNo.name = "BtnNo";
+        _btnNo.AddToClassList("dialogue-choice-btn");
+
+        _keyBadgeNo = new Label("[ N ]");
+        _keyBadgeNo.AddToClassList("dialogue-key-badge");
+        _btnNo.Add(_keyBadgeNo);
+
+        _btnTextNo = new Label("TỪ CHỐI");
+        _btnTextNo.AddToClassList("dialogue-btn-text");
+        _btnNo.Add(_btnTextNo);
+
+        _choiceContainer.Add(_btnNo);
+
+        // Hint Box Container
+        _hintBox = new VisualElement();
+        _hintBox.name = "HintBox";
+        _hintBox.AddToClassList("dialogue-hint-box");
+        _hintBox.style.display = DisplayStyle.None;
+
         _hintLabel = new Label();
         _hintLabel.name = "DialogueHint";
         _hintLabel.AddToClassList("dialogue-hint");
@@ -155,41 +242,90 @@ public class DialogueBubble : MonoBehaviour
         if (!_themed) _hintLabel.style.fontSize = hintFontSize;
         _hintLabel.style.whiteSpace = WhiteSpace.Normal;
         _hintLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-        _hintLabel.style.marginTop = 14f;
-        _hintLabel.style.display = DisplayStyle.None;
-        _scrim.Add(_hintLabel);
+        _hintBox.Add(_hintLabel);
+        _scrim.Add(_hintBox);
 
         _doc.rootVisualElement.Add(_root);
+    }
+
+    /// <summary>Sets the speaker name and optional avatar icon.</summary>
+    public void SetSpeaker(string speakerName, Sprite avatar = null)
+    {
+        if (_speakerLabel != null)
+        {
+            _speakerLabel.text = string.IsNullOrEmpty(speakerName) ? defaultSpeakerName.ToUpper() : speakerName.ToUpper();
+        }
+        if (_avatarImage != null)
+        {
+            if (avatar != null)
+            {
+                _avatarImage.style.backgroundImage = new StyleBackground(avatar);
+                _avatarImage.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _avatarImage.style.backgroundImage = StyleKeyword.Null;
+                _avatarImage.style.display = DisplayStyle.None;
+            }
+        }
     }
 
     private void Update()
     {
         if (!_choiceActive) return;
 
-        // Read Y/N via the Input System (Keyboard.current) when available,
-        // falling back to the legacy Input Manager. The project uses "Input
-        // System Package Only" mode, so Input.GetKeyDown does NOT work.
-        bool yPressed, nPressed;
+        bool yPressed = false, nPressed = false, skipPressed = false;
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (kb != null)
         {
-            yPressed = kb.yKey.wasPressedThisFrame;
-            nPressed = kb.nKey.wasPressedThisFrame;
+            yPressed = kb.yKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame;
+            nPressed = kb.nKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame;
+            skipPressed = yPressed || nPressed || kb.spaceKey.wasPressedThisFrame || kb.eKey.wasPressedThisFrame;
         }
         else
         {
-            yPressed = Input.GetKeyDown(KeyCode.Y);
-            nPressed = Input.GetKeyDown(KeyCode.N);
+            yPressed = Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Return);
+            nPressed = Input.GetKeyDown(KeyCode.N) || Input.GetKeyDown(KeyCode.Escape);
+            skipPressed = yPressed || nPressed || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.E);
         }
+
+        // If typewriter is active, any keypress completes text (skip typewriter)
+        if (_isTyping)
+        {
+            if (skipPressed)
+            {
+                SkipTypewriter();
+            }
+            return;
+        }
+
+        // Only allow choice selection if typewriter finished AND debounce duration passed
+        if (Time.unscaledTime - _lastSkipTime < 0.15f) return;
 
         if (yPressed)
         {
+            PlayClickSound();
             ResolveChoice(true);
         }
         else if (nPressed)
         {
+            PlayClickSound();
             ResolveChoice(false);
         }
+    }
+
+    private void OnChoiceButtonClicked(bool accepted)
+    {
+        if (_isTyping)
+        {
+            SkipTypewriter();
+            return;
+        }
+
+        if (Time.unscaledTime - _lastSkipTime < 0.15f) return;
+
+        PlayClickSound();
+        ResolveChoice(accepted);
     }
 
     // ---- Speech mode ----
@@ -199,57 +335,111 @@ public class DialogueBubble : MonoBehaviour
         ShowSpeech(line, speechHoldDuration);
     }
 
-    /// <summary>Show a single speech line that auto-hides after <paramref name="holdDuration"/> seconds (fade-in not included).</summary>
     public void ShowSpeech(string line, float holdDuration)
     {
-        if (_lineLabel != null) _lineLabel.text = line;
-        if (_choiceLabel != null) _choiceLabel.style.display = DisplayStyle.None;
-        if (_hintLabel != null) _hintLabel.style.display = DisplayStyle.None;
-        // Speech/small-talk lines do NOT pause the game — the player can keep
-        // moving and fighting while the bubble fades on its own timer.
+        ShowSpeech(defaultSpeakerName, line, holdDuration);
+    }
+
+    public void ShowSpeech(string speakerName, string line, float holdDuration)
+    {
+        SetSpeaker(speakerName, defaultSpeakerAvatar);
+        if (_choiceContainer != null) _choiceContainer.style.display = DisplayStyle.None;
+        if (_hintBox != null) _hintBox.style.display = DisplayStyle.None;
+
+        StartTypewriter(line);
         Show(pauseGame: false);
+
         if (_routine != null) StopCoroutine(_routine);
-        _routine = StartCoroutine(HideAfter(fadeIn + holdDuration));
+        _routine = StartCoroutine(HideAfter(fadeIn + holdDuration + (line.Length * typewriterSpeed)));
     }
 
     // ---- Choice mode ----
 
     public void ShowChoice(string line, System.Action<bool> onChoice)
     {
-        ShowChoice(line, null, onChoice);
+        ShowChoice(defaultSpeakerName, line, null, onChoice);
     }
 
-    /// <summary>
-    /// Show a Y/N choice with an optional hint line under it. The hint helps the
-    /// player answer NPC questions correctly (e.g. "Gợi ý: ...").
-    /// </summary>
     public void ShowChoice(string line, string hint, System.Action<bool> onChoice)
     {
-        if (_lineLabel != null) _lineLabel.text = line;
-        if (_choiceLabel != null)
+        ShowChoice(defaultSpeakerName, line, hint, onChoice);
+    }
+
+    public void ShowChoice(string speakerName, string line, string hint, System.Action<bool> onChoice)
+    {
+        SetSpeaker(speakerName, defaultSpeakerAvatar);
+
+        if (_choiceContainer != null)
         {
-            _choiceLabel.text = "Nhấn [Y] để đồng ý   |   Nhấn [N] để từ chối";
-            _choiceLabel.style.display = DisplayStyle.Flex;
+            _choiceContainer.style.display = DisplayStyle.Flex;
         }
-        if (_hintLabel != null)
+
+        if (_hintBox != null)
         {
             if (!string.IsNullOrEmpty(hint))
             {
                 _hintLabel.text = hint;
-                _hintLabel.style.display = DisplayStyle.Flex;
+                _hintBox.style.display = DisplayStyle.Flex;
             }
             else
             {
                 _hintLabel.text = "";
-                _hintLabel.style.display = DisplayStyle.None;
+                _hintBox.style.display = DisplayStyle.None;
             }
         }
+
         _choiceCallback = onChoice;
         _choiceActive = true;
-        // Choices freeze the game so zombies can't attack while the player is
-        // answering the NPC's question.
+
+        StartTypewriter(line);
         Show(pauseGame: true);
+
         if (_routine != null) StopCoroutine(_routine);
+    }
+
+    // ---- Typewriter Control ----
+
+    private void StartTypewriter(string fullText)
+    {
+        if (_typewriterRoutine != null)
+        {
+            StopCoroutine(_typewriterRoutine);
+            _typewriterRoutine = null;
+        }
+        _fullText = fullText ?? "";
+        _typewriterRoutine = StartCoroutine(TypewriterCoroutine(_fullText));
+    }
+
+    private IEnumerator TypewriterCoroutine(string targetText)
+    {
+        _isTyping = true;
+        if (_lineLabel != null) _lineLabel.text = "";
+
+        for (int i = 0; i < targetText.Length; i++)
+        {
+            if (_lineLabel != null)
+            {
+                _lineLabel.text = targetText.Substring(0, i + 1);
+            }
+            PlayTypeSound();
+            yield return new WaitForSecondsRealtime(typewriterSpeed);
+        }
+
+        _isTyping = false;
+        _typewriterRoutine = null;
+    }
+
+    private void SkipTypewriter()
+    {
+        if (!_isTyping) return;
+        if (_typewriterRoutine != null)
+        {
+            StopCoroutine(_typewriterRoutine);
+            _typewriterRoutine = null;
+        }
+        _isTyping = false;
+        if (_lineLabel != null) _lineLabel.text = _fullText;
+        _lastSkipTime = Time.unscaledTime;
     }
 
     private void ResolveChoice(bool accepted)
@@ -270,35 +460,64 @@ public class DialogueBubble : MonoBehaviour
             _root.style.display = DisplayStyle.Flex;
             _root.style.opacity = 1f;
         }
-        // Only choice mode pauses the game (so zombies don't attack the player
-        // while they're reading / choosing). Speech/small-talk lines never
-        // pause. Skip if the pause menu or game-over screen is already open
-        // (they manage timeScale themselves).
+
+        if (_scrim != null)
+        {
+            _scrim.RemoveFromClassList("dialogue-hidden");
+            _scrim.AddToClassList("dialogue-visible");
+        }
+
         bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
         bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-        if (pauseGame && !pauseOpen && !gameOver && Time.timeScale > 0f)
+
+        if (pauseGame)
         {
-            // Only capture prevTimeScale once — nested Show() calls must not
-            // overwrite the original value, otherwise ForceHide → Hide would
-            // restore 0 instead of the correct pre-dialogue timeScale.
-            if (!_didPause)
+            // Choice Mode: capture cursor and pause game
+            _root.pickingMode = PickingMode.Position;
+
+            if (PanelManager.Instance != null)
             {
-                _prevTimeScale = Time.timeScale;
-                _didPause = true;
+                PanelManager.Instance.RegisterPanelActive("DialogueBubble", true, () => ResolveChoice(false));
             }
-            Time.timeScale = 0f;
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            if (cowsins.PlayerControl.instance != null)
+            {
+                cowsins.PlayerControl.instance.LoseControl();
+            }
+
+            if (!pauseOpen && !gameOver && Time.timeScale > 0f)
+            {
+                if (!_didPause)
+                {
+                    _prevTimeScale = Time.timeScale;
+                    _didPause = true;
+                }
+                Time.timeScale = 0f;
+            }
+        }
+        else
+        {
+            // Speech Mode: non-intrusive
+            _root.pickingMode = PickingMode.Ignore;
         }
     }
 
-    /// <summary>Public wrapper so dialogue triggers can close the bubble on downed/revive.</summary>
     public void ForceHide()
     {
-        // Cancel any pending auto-hide coroutine.
         if (_routine != null)
         {
             StopCoroutine(_routine);
             _routine = null;
         }
+        if (_typewriterRoutine != null)
+        {
+            StopCoroutine(_typewriterRoutine);
+            _typewriterRoutine = null;
+        }
+        _isTyping = false;
         _choiceActive = false;
         _choiceCallback = null;
         Hide();
@@ -306,22 +525,51 @@ public class DialogueBubble : MonoBehaviour
 
     private void Hide()
     {
+        if (_scrim != null)
+        {
+            _scrim.RemoveFromClassList("dialogue-visible");
+            _scrim.AddToClassList("dialogue-hidden");
+        }
+
         if (_root != null)
         {
             _root.style.opacity = 0f;
-            // Also hide display so the full-screen overlay doesn't intercept
-            // layout/input even after fading out. Combined with pickingMode =
-            // Ignore this guarantees the bubble never blocks other UI.
             _root.style.display = DisplayStyle.None;
+            _root.pickingMode = PickingMode.Ignore;
         }
-        // Restore timeScale — but only if we were the one who paused it,
-        // and the pause menu / game-over screen isn't currently open.
-        bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
-        bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
+
+        if (PanelManager.Instance != null)
+        {
+            PanelManager.Instance.RegisterPanelActive("DialogueBubble", false);
+        }
+
+        RestoreGameplayState();
+    }
+
+    private void RestoreGameplayState()
+    {
+        bool pauseOpen = false;
+        bool gameOver = false;
+        try
+        {
+            pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
+            gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
+        }
+        catch (System.NullReferenceException) { }
+
         if (_didPause && !pauseOpen && !gameOver)
         {
             _didPause = false;
             Time.timeScale = _prevTimeScale > 0f ? _prevTimeScale : 1f;
+
+            if (cowsins.UIController.Instance != null)
+            {
+                cowsins.UIController.Instance.LockMouse();
+            }
+            if (cowsins.PlayerControl.instance != null)
+            {
+                cowsins.PlayerControl.instance.GrantControl();
+            }
         }
     }
 
@@ -332,24 +580,27 @@ public class DialogueBubble : MonoBehaviour
         _routine = null;
     }
 
+    private void PlayTypeSound()
+    {
+        if (Time.unscaledTime - _lastSoundTime < 0.05f) return;
+        _lastSoundTime = Time.unscaledTime;
+        if (UISoundManager.Instance != null)
+        {
+            UISoundManager.Instance.PlayTick();
+        }
+    }
+
+    private void PlayClickSound()
+    {
+        if (UISoundManager.Instance != null)
+        {
+            UISoundManager.Instance.PlayButtonClick();
+        }
+    }
+
     private void OnDestroy()
     {
-        // Safety: if the dialogue is destroyed while still visible (e.g. scene
-        // unload), restore timeScale so the game doesn't stay frozen.
-        // Must guard against Managers destroyed in the same frame (scene unload).
-        if (_didPause)
-        {
-            bool pauseOpen = false;
-            bool gameOver = false;
-            try
-            {
-                pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
-                gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-            }
-            catch (System.NullReferenceException) { }
-            if (!pauseOpen && !gameOver)
-                Time.timeScale = _prevTimeScale > 0f ? _prevTimeScale : 1f;
-        }
+        CleanupState();
         if (_panelGO != null && _panelGO)
         {
             if (_doc != null && _doc.rootVisualElement != null)
@@ -358,3 +609,4 @@ public class DialogueBubble : MonoBehaviour
         }
     }
 }
+

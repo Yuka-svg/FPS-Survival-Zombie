@@ -69,6 +69,7 @@ public class CleaningStaffDialogueTrigger : Interactable
     private void Awake()
     {
         _bubble = GetComponent<DialogueBubble>();
+        if (_bubble != null) _bubble.defaultSpeakerName = "Nhân Viên Vệ Sinh";
         _ai = GetComponent<CompanionAI>();
         interactable = true;
         var field = typeof(Interactable).GetField("instantInteraction",
