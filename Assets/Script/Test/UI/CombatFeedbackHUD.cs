@@ -219,6 +219,8 @@ public class CombatFeedbackHUD : MonoBehaviour
         k.killerLabel.text = kName;
         k.victimLabel.text = vName;
 
+        k.killerIcon.style.display = DisplayStyle.None;
+
         var (weaponSvg, weaponSprite) = GetWeaponVectorImage(wName);
         SetIcon(k.weaponIcon, weaponSvg, weaponSprite);
         SetIcon(k.zombieIcon, iconZombie, spriteZombie);
@@ -394,14 +396,16 @@ public class CombatFeedbackHUD : MonoBehaviour
         if (string.IsNullOrEmpty(weaponName)) return (iconSkull, spriteSkull);
         string lower = weaponName.ToLowerInvariant();
 
-        if (lower.Contains("rifle") || lower.Contains("ak") || lower.Contains("m4") || lower.Contains("assault") || lower.Contains("smg"))
+        if (lower.Contains("rifle") || lower.Contains("ak") || lower.Contains("m4") || lower.Contains("assault") || lower.Contains("smg") || lower.Contains("mp5") || lower.Contains("burst"))
             return (iconWeaponRifle, spriteWeaponRifle);
         if (lower.Contains("pistol") || lower.Contains("glock") || lower.Contains("revolver") || lower.Contains("handgun"))
             return (iconWeaponPistol, spriteWeaponPistol);
-        if (lower.Contains("shotgun") || lower.Contains("pump") || lower.Contains("gauge"))
+        if (lower.Contains("shotgun") || lower.Contains("pump") || lower.Contains("gauge") || lower.Contains("trench"))
             return (iconWeaponShotgun, spriteWeaponShotgun);
-        if (lower.Contains("knife") || lower.Contains("melee") || lower.Contains("blade") || lower.Contains("sword"))
+        if (lower.Contains("knife") || lower.Contains("melee") || lower.Contains("blade") || lower.Contains("sword") || lower.Contains("katana"))
             return (iconWeaponMelee, spriteWeaponMelee);
+        if (lower.Contains("rocket") || lower.Contains("launcher") || lower.Contains("grenade") || lower.Contains("explosive"))
+            return (iconSkull, spriteSkull);
 
         return (iconSkull, spriteSkull);
     }
