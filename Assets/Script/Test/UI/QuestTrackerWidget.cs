@@ -246,6 +246,14 @@ public class QuestTrackerWidget : MonoBehaviour
                 UpdateMainQuestMarkerAndArrow();
             }
 
+            // Tint adjustment to prevent daytime solar overexposure glare on minimap
+            if (_minimapImage != null)
+            {
+                float dayWeight = DayNightCycle.Instance != null ? DayNightCycle.Instance.CurrentDayWeight : 0f;
+                float factor = Mathf.Lerp(1.0f, 0.72f, dayWeight);
+                _minimapImage.style.unityBackgroundImageTintColor = new Color(factor, factor, factor, 1.0f);
+            }
+
             // 2. Dual-Rate System: 10 FPS timer tick for Zombie, Journal, and Side Quest Blips
             _markerUpdateTimer += Time.deltaTime;
             if (_markerUpdateTimer >= 0.1f)
@@ -391,10 +399,8 @@ public class QuestTrackerWidget : MonoBehaviour
         float uiDX = (worldPos.x - playerPos.x) * scale;
         float uiDY = -(worldPos.z - playerPos.z) * scale;
 
-        float distUI = Mathf.Sqrt(uiDX * uiDX + uiDY * uiDY);
-        float safeDist = Mathf.Max(distUI, 0.001f);
-
-        bool isOutside = distUI > 130f;
+        float edgeLimit = 130f;
+        bool isOutside = Mathf.Abs(uiDX) > edgeLimit || Mathf.Abs(uiDY) > edgeLimit;
 
         if (!isOutside)
         {
@@ -407,12 +413,15 @@ public class QuestTrackerWidget : MonoBehaviour
         }
         else
         {
-            // Outside Minimap bounds: show Edge Arrow smoothly clamped at 128px radius
+            // Outside Minimap bounds: show Edge Arrow smoothly clamped to square boundary
             _minimapQuestMarker.style.display = DisplayStyle.None;
             _minimapEdgeArrow.style.display = DisplayStyle.Flex;
 
-            float clampDX = (uiDX / safeDist) * 128f;
-            float clampDY = (uiDY / safeDist) * 128f;
+            float maxCoord = Mathf.Max(Mathf.Abs(uiDX), Mathf.Abs(uiDY));
+            float scaleFactor = edgeLimit / maxCoord;
+
+            float clampDX = uiDX * scaleFactor;
+            float clampDY = uiDY * scaleFactor;
 
             _minimapEdgeArrow.style.left = 146f + clampDX - 8f;
             _minimapEdgeArrow.style.top = 146f + clampDY - 8f;
@@ -431,6 +440,8 @@ public class QuestTrackerWidget : MonoBehaviour
         if (orthoSize < 0.1f) orthoSize = 22f;
         float scale = 146f / orthoSize;
 
+        float edgeLimit = 130f;
+
         // 1. Zombie Blips (up to 20, excluding companion allies)
         int zCount = 0;
         for (int i = EnemyRegistry.ActiveEnemies.Count - 1; i >= 0; i--)
@@ -445,9 +456,8 @@ public class QuestTrackerWidget : MonoBehaviour
 
             float dx = (pos.x - playerPos.x) * scale;
             float dz = -(pos.z - playerPos.z) * scale;
-            float distUI = Mathf.Sqrt(dx * dx + dz * dz);
 
-            if (distUI <= 128f)
+            if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
             {
                 var blip = _zombieBlips[zCount];
                 blip.style.left = 146f + dx - 3f;
@@ -472,9 +482,8 @@ public class QuestTrackerWidget : MonoBehaviour
 
             float dx = (pos.x - playerPos.x) * scale;
             float dz = -(pos.z - playerPos.z) * scale;
-            float distUI = Mathf.Sqrt(dx * dx + dz * dz);
 
-            if (distUI <= 128f)
+            if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
             {
                 var blip = _journalBlips[jCount];
                 blip.style.left = 146f + dx - 4f;
@@ -500,9 +509,8 @@ public class QuestTrackerWidget : MonoBehaviour
                 Vector3 pos = b.transform.position;
                 float dx = (pos.x - playerPos.x) * scale;
                 float dz = -(pos.z - playerPos.z) * scale;
-                float distUI = Mathf.Sqrt(dx * dx + dz * dz);
 
-                if (distUI <= 128f)
+                if (Mathf.Abs(dx) <= edgeLimit && Mathf.Abs(dz) <= edgeLimit)
                 {
                     var blip = _sideQuestBlips[sCount];
                     blip.style.left = 146f + dx - 5f;

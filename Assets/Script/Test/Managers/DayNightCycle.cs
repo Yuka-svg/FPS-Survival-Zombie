@@ -128,6 +128,8 @@ public class DayNightCycle : MonoBehaviour
     [Header("Post Processing Support")]
     public PostProcessResources postProcessResources;
 
+    public float CurrentDayWeight { get; private set; } = 1.0f;
+
     private bool _blending;
     private float _blendFromTime;
     private float _blendToTime;
@@ -221,6 +223,8 @@ public class DayNightCycle : MonoBehaviour
         }
 
         _skyBlock = new MaterialPropertyBlock();
+
+        ApplyEvaluatedState(Evaluate(timeOfDay));
     }
 
     private void OnDestroy()
@@ -514,6 +518,7 @@ public class DayNightCycle : MonoBehaviour
         }
 
         float dayFactor = s.dayVolumeWeight;
+        CurrentDayWeight = dayFactor;
 
         if (fillLight != null)
         {
