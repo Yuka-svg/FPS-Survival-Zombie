@@ -51,6 +51,46 @@ public class SkillTreeWidget : MonoBehaviour
     public bool IsTransitioning => Time.realtimeSinceStartup < _transitionEndTime;
     public bool IsOpenOrTransitioning => _open || IsTransitioning;
 
+    private readonly bool[,] _hoveredNodes = new bool[Trees, NodesPerTree];
+    private readonly Coroutine[,] _shakeCoroutines = new Coroutine[Trees, NodesPerTree];
+    private readonly Coroutine[,] _popCoroutines = new Coroutine[Trees, NodesPerTree];
+
+    private void ResetNodeInlineStyles(VisualElement node)
+    {
+        if (node == null) return;
+        node.style.borderTopColor = StyleKeyword.Null;
+        node.style.borderRightColor = StyleKeyword.Null;
+        node.style.borderBottomColor = StyleKeyword.Null;
+        node.style.borderLeftColor = StyleKeyword.Null;
+        node.style.backgroundColor = StyleKeyword.Null;
+    }
+
+    private void ResetLineInlineStyles(VisualElement line)
+    {
+        if (line == null) return;
+        line.style.backgroundColor = StyleKeyword.Null;
+    }
+
+    private void StopAndResetNodeAnimations(int t, int n)
+    {
+        if (_nodes[t, n] != null)
+        {
+            _nodes[t, n].RemoveFromClassList("pop");
+            _nodes[t, n].RemoveFromClassList("shake-left");
+            _nodes[t, n].RemoveFromClassList("shake-right");
+        }
+        if (_shakeCoroutines[t, n] != null)
+        {
+            StopCoroutine(_shakeCoroutines[t, n]);
+            _shakeCoroutines[t, n] = null;
+        }
+        if (_popCoroutines[t, n] != null)
+        {
+            StopCoroutine(_popCoroutines[t, n]);
+            _popCoroutines[t, n] = null;
+        }
+    }
+
     private void OnEnable()
     {
         if (!_initialized) Initialize();
@@ -60,6 +100,10 @@ public class SkillTreeWidget : MonoBehaviour
     {
         if (_open) Close();
         _initialized = false;
+        System.Array.Clear(_hoveredNodes, 0, _hoveredNodes.Length);
+        for (int t = 0; t < Trees; t++)
+            for (int n = 0; n < NodesPerTree; n++)
+                StopAndResetNodeAnimations(t, n);
     }
 
     private void OnDestroy()
@@ -165,12 +209,21 @@ public class SkillTreeWidget : MonoBehaviour
                 var icon = new VisualElement();
                 icon.AddToClassList("node-icon");
                 icon.AddToClassList($"node-icon-{t}-{n}");
+                icon.pickingMode = PickingMode.Ignore;
                 node.Add(icon);
 
                 int ti = t;
                 int ni = n;
-                node.RegisterCallback<MouseEnterEvent>(_ => OnNodeHover(ti, ni));
-                node.RegisterCallback<MouseLeaveEvent>(_ => OnNodeLeave(ti, ni));
+                node.RegisterCallback<MouseEnterEvent>(_ => {
+                    _hoveredNodes[ti, ni] = true;
+                    ResetNodeInlineStyles(_nodes[ti, ni]);
+                    OnNodeHover(ti, ni);
+                });
+                node.RegisterCallback<MouseLeaveEvent>(_ => {
+                    _hoveredNodes[ti, ni] = false;
+                    ResetNodeInlineStyles(_nodes[ti, ni]);
+                    OnNodeLeave(ti, ni);
+                });
                 node.RegisterCallback<ClickEvent>(_ => TryUpgrade(ti, ni));
 
                 if (n < NodesPerTree - 1)
@@ -243,6 +296,11 @@ public class SkillTreeWidget : MonoBehaviour
                     var node = _nodes[t, n];
                     if (node != null && node.ClassListContains("available"))
                     {
+                        if (_hoveredNodes[t, n])
+                        {
+                            ResetNodeInlineStyles(node);
+                            continue;
+                        }
                         node.style.borderTopColor = borderColor;
                         node.style.borderRightColor = borderColor;
                         node.style.borderBottomColor = borderColor;
@@ -259,6 +317,7 @@ public class SkillTreeWidget : MonoBehaviour
         if (!_initialized || IsTransitioning) return;
         _open = true;
         _transitionEndTime = Time.realtimeSinceStartup + PanelManager.PanelTransitionDuration;
+        System.Array.Clear(_hoveredNodes, 0, _hoveredNodes.Length);
 
         if (PanelManager.Instance != null)
         {
@@ -272,6 +331,10 @@ public class SkillTreeWidget : MonoBehaviour
         if (!_open || IsTransitioning) return;
         _open = false;
         _transitionEndTime = Time.realtimeSinceStartup + PanelManager.PanelTransitionDuration;
+        System.Array.Clear(_hoveredNodes, 0, _hoveredNodes.Length);
+        for (int t = 0; t < Trees; t++)
+            for (int n = 0; n < NodesPerTree; n++)
+                StopAndResetNodeAnimations(t, n);
 
         if (PanelManager.Instance != null)
         {
@@ -406,6 +469,9 @@ public class SkillTreeWidget : MonoBehaviour
         bool canAfford = !maxed && _mgr.CurrentSkillPoints >= cost;
         bool isNext = nodeIndex == lvl && !maxed;
 
+        // Silent return if already unlocked
+        if (nodeIndex < lvl) return;
+
         var node = _nodes[tree, nodeIndex];
 
         if (isNext && canAfford)
@@ -417,13 +483,15 @@ public class SkillTreeWidget : MonoBehaviour
                 {
                     cowsins.SoundManager.Instance.PlaySound(purchaseSFX, 0f, 0f, false);
                 }
-                if (node != null)
-                {
-                    node.AddToClassList("pop");
-                    StartCoroutine(RemoveAnimationClassAfterDelay(node, "pop", 0.15f));
-                }
                 Refresh();
                 _lastSp = _mgr.CurrentSkillPoints;
+                if (node != null)
+                {
+                    StopAndResetNodeAnimations(tree, nodeIndex);
+                    node.AddToClassList("pop");
+                    _popCoroutines[tree, nodeIndex] = StartCoroutine(RemoveAnimationClassAfterDelay(node, "pop", 0.15f, tree, nodeIndex));
+                }
+                OnNodeHover(tree, nodeIndex);
             }
         }
         else
@@ -434,12 +502,13 @@ public class SkillTreeWidget : MonoBehaviour
             }
             if (node != null)
             {
-                StartCoroutine(ShakeNode(node));
+                StopAndResetNodeAnimations(tree, nodeIndex);
+                _shakeCoroutines[tree, nodeIndex] = StartCoroutine(ShakeNode(node, tree, nodeIndex));
             }
         }
     }
 
-    private IEnumerator ShakeNode(VisualElement node)
+    private IEnumerator ShakeNode(VisualElement node, int tree, int nodeIndex)
     {
         if (node == null) yield break;
         node.AddToClassList("shake-left");
@@ -451,12 +520,14 @@ public class SkillTreeWidget : MonoBehaviour
         node.AddToClassList("shake-left");
         yield return new WaitForSecondsRealtime(0.06f);
         node.RemoveFromClassList("shake-left");
+        _shakeCoroutines[tree, nodeIndex] = null;
     }
 
-    private IEnumerator RemoveAnimationClassAfterDelay(VisualElement element, string className, float delay)
+    private IEnumerator RemoveAnimationClassAfterDelay(VisualElement element, string className, float delay, int tree, int nodeIndex)
     {
         yield return new WaitForSecondsRealtime(delay);
         element?.RemoveFromClassList(className);
+        _popCoroutines[tree, nodeIndex] = null;
     }
 
     private void RefreshIfDirty()
@@ -485,8 +556,12 @@ public class SkillTreeWidget : MonoBehaviour
                 bool unlocked = n < lvl;
                 bool isNext = n == lvl && !maxed;
 
-                node.ClearClassList();
-                node.AddToClassList("skill-node");
+                ResetNodeInlineStyles(node);
+
+                node.RemoveFromClassList("unlocked");
+                node.RemoveFromClassList("available");
+                node.RemoveFromClassList("locked");
+
                 if (unlocked)
                     node.AddToClassList("unlocked");
                 else if (isNext && canAfford)
@@ -494,7 +569,7 @@ public class SkillTreeWidget : MonoBehaviour
                 else
                     node.AddToClassList("locked");
 
-                node.SetEnabled(isNext && canAfford);
+                node.SetEnabled(true);
             }
 
             for (int n = 0; n < NodesPerTree - 1; n++)
@@ -503,14 +578,21 @@ public class SkillTreeWidget : MonoBehaviour
                 bool upperUnlocked = (n + 1) < lvl;
                 bool upperIsNext = (n + 1) == lvl && !maxed;
 
+                ResetLineInlineStyles(line);
+
+                line.RemoveFromClassList("line-unlocked");
+                line.RemoveFromClassList("line-available");
+                line.RemoveFromClassList("line-next-locked");
+                line.RemoveFromClassList("line-locked");
+
                 if (upperUnlocked)
-                    line.style.backgroundColor = new StyleColor(new Color(230f / 255f, 80f / 255f, 40f / 255f, 1f));
+                    line.AddToClassList("line-unlocked");
                 else if (upperIsNext && canAfford)
-                    line.style.backgroundColor = new StyleColor(new Color(230f / 255f, 80f / 255f, 40f / 255f, 0.6f));
+                    line.AddToClassList("line-available");
                 else if (upperIsNext)
-                    line.style.backgroundColor = new StyleColor(new Color(230f / 255f, 80f / 255f, 40f / 255f, 0.2f));
+                    line.AddToClassList("line-next-locked");
                 else
-                    line.style.backgroundColor = new StyleColor(new Color(230f / 255f, 80f / 255f, 40f / 255f, 0.08f));
+                    line.AddToClassList("line-locked");
             }
 
             var costLabel = _cost[t];

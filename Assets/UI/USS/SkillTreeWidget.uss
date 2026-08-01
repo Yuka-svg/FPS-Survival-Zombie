@@ -261,6 +261,18 @@
     background-color: rgba(230, 80, 40, 0.08);
     transition: background-color var(--transition-medium, 0.22s);
 }
+.skill-line.line-unlocked {
+    background-color: rgb(230, 80, 40);
+}
+.skill-line.line-available {
+    background-color: rgba(230, 80, 40, 0.6);
+}
+.skill-line.line-next-locked {
+    background-color: rgba(230, 80, 40, 0.2);
+}
+.skill-line.line-locked {
+    background-color: rgba(230, 80, 40, 0.08);
+}
 
 /* Next-node description */
 .next-desc {
