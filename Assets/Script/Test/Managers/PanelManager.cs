@@ -30,6 +30,12 @@ public class PanelManager : MonoBehaviour
     private static readonly Dictionary<string, bool> _hudActiveState = new Dictionary<string, bool>();
     private readonly Dictionary<string, bool> _desiredActiveStates = new Dictionary<string, bool>();
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        _hudActiveState.Clear();
+    }
+
     private float _blackOverlayClearTime = 0f;
     private bool _hudCurrentlyVisibleState = true;
     private bool _firstFrameSet = false;

@@ -34,6 +34,12 @@ public class IntroOverlayWidget : MonoBehaviour
     private bool _shown;
     private static bool _introShownThisSession;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetSessionFlag()
+    {
+        _introShownThisSession = false;
+    }
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
