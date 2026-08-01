@@ -113,7 +113,7 @@ public class CompassWidget : MonoBehaviour
         for (int i = 0; i < _dirNames.Length; i++)
         {
             var label = new Label(_dirNames[i]);
-            label.style.position = Position.Absolute;
+            label.AddToClassList("compass-dir-label");
             
             bool isCardinal = _dirNames[i].Length == 1;
             label.style.fontSize = isCardinal ? 12 : 9;
@@ -125,7 +125,7 @@ public class CompassWidget : MonoBehaviour
                 : new Color(210f / 255f, 215f / 255f, 225f / 255f, 0.45f);
                 
             label.style.unityTextAlign = TextAnchor.MiddleCenter;
-            label.style.top = isCardinal ? 14f : 16f; // Positioned in lower half of 32px height
+            label.style.top = isCardinal ? 10f : 12f; // Positioned safely to prevent clipping at bottom
             
             if (fontDef.font != null || fontDef.fontAsset != null)
             {
@@ -305,7 +305,7 @@ public class CompassWidget : MonoBehaviour
             float maxDist = 120f;
             
             float minSize = 4f;   // Very small when far
-            float maxSize = 14f;  // Large when near
+            float maxSize = 10f;  // Compact when near to leave room for direction letters below
             
             float minOpacity = 0.25f; // Faded when far
             float maxOpacity = 0.95f; // Bright when near
@@ -316,11 +316,11 @@ public class CompassWidget : MonoBehaviour
 
             float angle = Vector2.SignedAngle(m.PlanarPosition - playerPos, fwd);
             
-            // Position blips dynamically near the top (top: 4px) to separate vertically from letters
+            // Position blips dynamically near top (top: 2px) to separate vertically from letters
             _blips[i].style.width = size;
             _blips[i].style.height = size;
             _blips[i].style.left = (angle / 360f * viewportWidth) + viewportWidth / 2f - size / 2f;
-            _blips[i].style.top = 4f;
+            _blips[i].style.top = 2f;
             _blips[i].style.opacity = opacity;
 
             if (m.icon != null)

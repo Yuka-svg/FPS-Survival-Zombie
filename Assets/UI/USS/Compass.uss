@@ -7,11 +7,19 @@
     left: 50%;
     margin-left: -180px;
     width: 360px;
-    height: 32px;
+    height: 34px;
     overflow: hidden;
     background-color: transparent;
     border-radius: 0;
     border-width: 0;
+}
+
+.compass-dir-label {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    height: 16px;
+    -unity-text-align: middle-center;
 }
 
 #CompassStrip {
