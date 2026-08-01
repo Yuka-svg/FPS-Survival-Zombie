@@ -69,14 +69,11 @@ public class EnemyHealthBar : MonoBehaviour
     private void Build()
     {
         // Create GameObject and set as child of zombie to keep Hierarchy clean.
-        // We create it without UIDocument first, and disable it before adding the component.
-        // This forces Unity to initialize UIDocument correctly in World Space on first activation.
         _barGO = new GameObject("HealthBarPanel");
         _barGO.transform.SetParent(transform, false);
         _barGO.transform.localPosition = new Vector3(0f, heightOffset, 0f);
         _barGO.transform.localRotation = Quaternion.identity;
         _barGO.transform.localScale = Vector3.one;
-        _barGO.SetActive(false);
 
         var doc = _barGO.AddComponent<UIDocument>();
         doc.sortingOrder = 100;
@@ -109,6 +106,9 @@ public class EnemyHealthBar : MonoBehaviour
         doc.visualTreeAsset = asset;
 
         _stretched = false;
+
+        // Keep _barGO active in hierarchy to guarantee UIDocument.OnDisable() is called by Unity Engine on teardown
+        _barGO.SetActive(true);
     }
 
     private void OnEnable()
@@ -128,9 +128,15 @@ public class EnemyHealthBar : MonoBehaviour
         _targetOpacity = 0f;
         _stretched = false;
 
+        // Prevent 1-frame ghost pop when GameObject is re-enabled from pooling/spawner
         if (_barGO != null && _barGO)
         {
-            _barGO.SetActive(false);
+            var doc = _barGO.GetComponent<UIDocument>();
+            if (doc != null && doc.rootVisualElement != null)
+            {
+                var root = doc.rootVisualElement.Q("HealthBarRoot");
+                if (root != null) root.style.display = DisplayStyle.None;
+            }
         }
     }
 
@@ -139,6 +145,7 @@ public class EnemyHealthBar : MonoBehaviour
         if (_barGO != null && _barGO)
         {
             Destroy(_barGO);
+            _barGO = null;
         }
         _fill = null;
         _zombie = null;
@@ -159,11 +166,6 @@ public class EnemyHealthBar : MonoBehaviour
 
         _targetOpacity = 1f;
         _hideTimer = ShowDuration;
-
-        if (_barGO != null && _barGO && !_barGO.activeSelf)
-        {
-            _barGO.SetActive(true);
-        }
     }
 
     private void LateUpdate()
@@ -178,8 +180,8 @@ public class EnemyHealthBar : MonoBehaviour
         var root = doc.rootVisualElement.Q("HealthBarRoot");
         if (root == null) return;
 
-        // Lazy-bind visual tree elements once they are initialized on active GameObject
-        if (!_stretched)
+        // 1. Resilient Live-Reload VisualElement Binding Guard (runs BEFORE early return so elements are bound on frame 1)
+        if (!_stretched || _fill == null || _fill.panel == null)
         {
             var container = root.parent;
             if (container != null)
@@ -231,31 +233,33 @@ public class EnemyHealthBar : MonoBehaviour
                 if (_fill != null)
                 {
                     _fill.usageHints = UsageHints.DynamicTransform;
+                    _stretched = true;
                 }
-                
-                _stretched = true;
             }
         }
 
+        // 2. ALWAYS update Billboard rotation FIRST so 3D orientation is aligned before fade-in
+        if (_cam == null && Camera.main != null) _cam = Camera.main.transform;
+        if (_cam != null) _barGO.transform.rotation = _cam.rotation;
+
+        // 3. Opacity & UI Toolkit Visibility Control
         root.style.opacity = _currentOpacity;
         if (_currentOpacity <= 0f)
         {
-            _barGO.SetActive(false);
-            _stretched = false; // Reset to allow re-binding cloned UXML on next activation
-            return;
+            root.style.display = DisplayStyle.None;
+            return; // Early return after billboard alignment
         }
 
-        _barGO.SetActive(true);
         root.style.display = DisplayStyle.Flex;
 
-        // Apply health fill changes
+        // 4. Apply health fill changes
         if (_fill != null)
         {
             _fill.style.width = Length.Percent(Mathf.Clamp01(_healthFraction) * 100f);
             _fill.style.backgroundColor = Color.Lerp(_low, _full, _healthFraction);
         }
 
-        // Count down display timer
+        // 5. Count down display timer
         if (_targetOpacity > 0f)
         {
             _hideTimer -= Time.deltaTime;
@@ -265,18 +269,12 @@ public class EnemyHealthBar : MonoBehaviour
             }
         }
 
-        if (_cam == null)
+        // 6. Distance scaling: Adjust worldSpaceSize based on camera distance
+        if (_cam != null)
         {
-            if (Camera.main != null) _cam = Camera.main.transform;
-            else return;
+            float dist = Vector3.Distance(_cam.position, _barGO.transform.position);
+            float scale = Mathf.Clamp(12f / Mathf.Max(2f, dist), 0.4f, 1.1f);
+            doc.worldSpaceSize = new Vector2(barSize.x * worldScale * scale, barSize.y * worldScale * scale);
         }
-
-        // 1. Billboard: Align the 3D quad with the camera orientation
-        _barGO.transform.rotation = _cam.rotation;
-
-        // 2. Distance scaling: Adjust worldSpaceSize based on camera distance
-        float dist = Vector3.Distance(_cam.position, _barGO.transform.position);
-        float scale = Mathf.Clamp(12f / Mathf.Max(2f, dist), 0.4f, 1.1f);
-        doc.worldSpaceSize = new Vector2(barSize.x * worldScale * scale, barSize.y * worldScale * scale);
     }
 }
