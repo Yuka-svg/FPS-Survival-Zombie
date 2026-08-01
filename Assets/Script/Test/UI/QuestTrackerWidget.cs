@@ -1172,6 +1172,7 @@ public class QuestTrackerWidget : MonoBehaviour
         {
             if (_questGroup != null) _questGroup.style.display = DisplayStyle.None;
             if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.Flex;
+            MinimapController.Instance?.SetCameraActive(true);
         }
         else
         {
