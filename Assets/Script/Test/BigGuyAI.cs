@@ -28,9 +28,12 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
     public EnemyType EnemyType { get { return EnemyType.Special; } }
     public event System.Action<float> OnHealthChanged;
 
+    protected bool lastHitWasHeadshot;
+
     private void OnEnable()
     {
         EnemyRegistry.Register(this);
+        lastHitWasHeadshot = false;
     }
 
     private void OnDestroy()
@@ -618,6 +621,8 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
     public void Damage(float damage, bool isHeadshot)
     {
+        lastHitWasHeadshot = isHeadshot;
+
         if (CombatFeedbackHUD.Instance != null)
             CombatFeedbackHUD.Instance.ShowHit(transform.position, damage, isHeadshot);
 
@@ -634,19 +639,17 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
         if (PlayerStatsTracker.Instance != null)
             PlayerStatsTracker.Instance.RegisterDamageDealt(damage);
 
-        if (OnHealthChanged != null)
-            OnHealthChanged(HealthFraction);
-
-        // Provoke on hit: if still dazed, scream immediately and chase
-        if (state == BigGuyState.Dazed && !hasScreamed)
-        {
-            StartScream();
-        }
+        // Provoke if dazed
+        if (state == BigGuyState.Dazed)
+            Provoke();
 
         if (currentHealth <= 0)
         {
             Die();
         }
+
+        if (OnHealthChanged != null)
+            OnHealthChanged(HealthFraction);
     }
 
     //==================================================
@@ -666,8 +669,16 @@ public class BigGuyAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
         attackDamageTimerActive = false;
         attackResetTimerActive = false;
 
-        if (CombatFeedbackHUD.Instance != null)
-            CombatFeedbackHUD.Instance.ShowKill("Big Guy");
+        var report = new KillReport
+        {
+            enemyInstanceID = gameObject.GetInstanceID(),
+            killerName = "Player",
+            victimName = "Big Guy",
+            weaponName = string.Empty,
+            isHeadshot = lastHitWasHeadshot
+        };
+        UIEvents.onEnemyKilledDetailed?.Invoke(report);
+        UIEvents.onEnemyKilled?.Invoke("Big Guy");
 
         if (AIDirector.Instance != null)
             AIDirector.Instance.RegisterKill();

@@ -30,7 +30,19 @@ namespace cowsins
 
             if (enemyStatusContainer != null) enemyStatusContainer.gameObject.SetActive(false);
 
-            if (showKillFeed) UIEvents.onEnemyKilled.Invoke(_name);
+            if (showKillFeed)
+            {
+                var report = new KillReport
+                {
+                    enemyInstanceID = gameObject.GetInstanceID(),
+                    killerName = "Player",
+                    victimName = _name,
+                    weaponName = string.Empty,
+                    isHeadshot = lastHitWasHeadshot
+                };
+                UIEvents.onEnemyKilledDetailed?.Invoke(report);
+                UIEvents.onEnemyKilled?.Invoke(_name);
+            }
 
             if (compassElement != null) compassElement.Remove();
 

@@ -932,8 +932,16 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
 
         isDead = true;
 
-        if (CombatFeedbackHUD.Instance != null)
-            CombatFeedbackHUD.Instance.ShowKill("Zombie");
+        var report = new KillReport
+        {
+            enemyInstanceID = gameObject.GetInstanceID(),
+            killerName = "Player",
+            victimName = "Zombie",
+            weaponName = string.Empty,
+            isHeadshot = lastHitWasHeadshot
+        };
+        UIEvents.onEnemyKilledDetailed?.Invoke(report);
+        UIEvents.onEnemyKilled?.Invoke("Zombie");
 
         if (AIDirector.Instance != null)
             AIDirector.Instance.RegisterKill();

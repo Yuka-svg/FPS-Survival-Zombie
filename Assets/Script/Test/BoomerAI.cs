@@ -7,8 +7,13 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
     [Header("Player")]
     public Transform target;
 
-    [Header("Health")]
-    public int maxHealth = 100;
+    protected bool lastHitWasHeadshot;
+
+    private void OnEnable()
+    {
+        EnemyRegistry.Register(this);
+        lastHitWasHeadshot = false;
+    }
     public int currentHealth;
 
     [Header("Detection")]
@@ -602,6 +607,8 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
         bool isHeadshot
     )
     {
+        lastHitWasHeadshot = isHeadshot;
+
         if (CombatFeedbackHUD.Instance != null)
             CombatFeedbackHUD.Instance.ShowHit(transform.position, damage, isHeadshot);
 
@@ -613,7 +620,7 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
     public void TakeDamage(int damage)
     {
         // Once it has begun screaming/exploding, further hits no longer matter.
-        if (isDead || hasStartedExplosion)
+        if (isDead || state == BoomerState.ScreamExplode || state == BoomerState.Dead)
             return;
 
         currentHealth -= damage;
@@ -646,8 +653,16 @@ public class BoomerAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthR
 
         rewardsGranted = true;
 
-        if (CombatFeedbackHUD.Instance != null)
-            CombatFeedbackHUD.Instance.ShowKill("Boomer");
+        var report = new KillReport
+        {
+            enemyInstanceID = gameObject.GetInstanceID(),
+            killerName = "Player",
+            victimName = "Boomer",
+            weaponName = string.Empty,
+            isHeadshot = lastHitWasHeadshot
+        };
+        UIEvents.onEnemyKilledDetailed?.Invoke(report);
+        UIEvents.onEnemyKilled?.Invoke("Boomer");
 
         if (AIDirector.Instance != null)
             AIDirector.Instance.RegisterKill();

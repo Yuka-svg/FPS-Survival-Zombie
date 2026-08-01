@@ -1,4 +1,4 @@
-﻿/// <summary>
+/// <summary>
 /// This script belongs to cowsins™ as a part of the cowsins´ FPS Engine. All rights reserved. 
 /// </summary>
 #if UNITY_EDITOR
@@ -66,6 +66,7 @@ namespace cowsins
         public Events events;
 
         protected bool isDead;
+        protected bool lastHitWasHeadshot;
 
         public bool IsDead => isDead;
 
@@ -74,6 +75,10 @@ namespace cowsins
         public Image HealthSlider => healthBar;
         public Image ShieldSlider => shieldBar;
 
+        protected virtual void OnEnable()
+        {
+            lastHitWasHeadshot = false;
+        }
 
         public virtual void Start()
         {
@@ -95,6 +100,8 @@ namespace cowsins
         public virtual void Damage(float _damage, bool isHeadshot)
         {
             if (isDead) return;
+
+            lastHitWasHeadshot = isHeadshot;
 
             float damage = Mathf.Abs(_damage);
             float oldDmg = damage;
@@ -148,7 +155,16 @@ namespace cowsins
             // Does it display killfeed on death? 
             if (showKillFeed)
             {
-                UIEvents.onEnemyKilled.Invoke(_name);
+                var report = new KillReport
+                {
+                    enemyInstanceID = gameObject.GetInstanceID(),
+                    killerName = "Player",
+                    victimName = _name,
+                    weaponName = string.Empty,
+                    isHeadshot = lastHitWasHeadshot
+                };
+                UIEvents.onEnemyKilledDetailed?.Invoke(report);
+                UIEvents.onEnemyKilled?.Invoke(_name);
             }
             if (deathEffect) Instantiate(deathEffect, transform.position, Quaternion.identity);
 

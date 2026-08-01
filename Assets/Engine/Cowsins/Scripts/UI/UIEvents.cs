@@ -17,6 +17,16 @@ namespace cowsins
         public static Action<int, bool> onCoinsChange;
         public static Action<bool> onExperienceCollected;
         public static Action<string> onEnemyKilled;
+        public static Action<KillReport> onEnemyKilledDetailed;
         public static Action<bool, bool, Vector3, float> onEnemyHit;
+    }
+
+    public struct KillReport
+    {
+        public int enemyInstanceID;
+        public string killerName;
+        public string victimName;
+        public string weaponName;
+        public bool isHeadshot;
     }
 }

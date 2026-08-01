@@ -1,5 +1,5 @@
-/// <summary>
-/// This script belongs to cowsins™ as a part of the cowsins´ FPS Engine. All rights reserved. 
+ï»¿/// <summary>
+/// This script belongs to cowsinsï¿½ as a part of the cowsinsï¿½ FPS Engine. All rights reserved. 
 /// </summary>
 using UnityEngine;
 using System;
@@ -26,7 +26,7 @@ namespace cowsins
         [Tooltip("Slider that will display the health on screen"), SerializeField] private Slider healthSlider;
         [Tooltip("Slider that will display the shield on screen"), SerializeField] private Slider shieldSlider;
         [SerializeField, Tooltip("UI Element ( TMPro text ) that displays current and maximum health.")] private TextMeshProUGUI healthTextDisplay;
-        [SerializeField, Tooltip("UI Element ( TMPro te¡xt ) that displays current and maximum shield.")] private TextMeshProUGUI shieldTextDisplay;
+        [SerializeField, Tooltip("UI Element ( TMPro teï¿½xt ) that displays current and maximum shield.")] private TextMeshProUGUI shieldTextDisplay;
         [Tooltip("This image shows damage and heal states visually on your screen, you can change the image" +
                 "to any you like, but note that color will be overriden by the script"), SerializeField] private Image healthStatesEffect;
         [Tooltip(" Color of healthStatesEffect on different actions such as being hurt or healed"), SerializeField] private Color damageColor, healColor, coinCollectColor, xpCollectColor;
@@ -623,7 +623,7 @@ namespace cowsins
             if (barHealthDisplay) healthDisplayMethod += BarHealthDisplayMethod;
             if (numericHealthDisplay) healthDisplayMethod += NumericHealthDisplayMethod;
             UIEvents.onEnemyHit += Hitmarker;
-            UIEvents.onEnemyKilled += AddKillfeed;
+            if (killfeedContainer != null) killfeedContainer.SetActive(false);
             UIEvents.onCoinsChange += UpdateCoins;
 
             if(interactUI != null) interactUI.SetActive(false);
@@ -635,7 +635,7 @@ namespace cowsins
         {
             healthDisplayMethod = null;
             UIEvents.onEnemyHit -= Hitmarker;
-            UIEvents.onEnemyKilled -= AddKillfeed;
+            // UIEvents.onEnemyKilled -= AddKillfeed;
             UIEvents.onCoinsChange -= UpdateCoins;
             UIEvents.onExperienceCollected -= UpdateXP;
 

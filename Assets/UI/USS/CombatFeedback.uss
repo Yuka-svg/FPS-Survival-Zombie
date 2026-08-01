@@ -94,38 +94,99 @@
     right: auto;
     width: 320px;
     height: auto;
-    max-height: 240px;
+    max-height: 252px;
     margin-top: 10px;
     flex-direction: column;
     align-items: flex-end;
+    overflow: hidden;
 }
 
 .killfeed-entry {
-    width: 240px; /* Slimmer tactical look */
     height: 34px;
+    margin-bottom: 8px;
+    opacity: 1;
+    overflow: hidden;
     background-color: var(--color-bg-root, rgba(9, 13, 19, 0.85));
     flex-shrink: 0;
-    opacity: 0.9;
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    padding-right: var(--space-m, 12px);
-    margin-bottom: var(--space-s, 8px);
+    padding-left: 8px;
+    padding-right: 12px;
     border-right-width: 3.5px;
     border-right-color: var(--color-accent-red, rgb(229, 72, 60));
     border-radius: var(--radius-xs, 4px);
-    transition: opacity 0.4s ease-out;
+    transition-property: opacity, translate, scale, height, margin-bottom;
+    transition-duration: 0.35s;
+    transition-timing-function: ease-out;
+}
+
+.killfeed-entry--entering {
+    height: 0px;
+    margin-bottom: 0px;
+    opacity: 0;
+    translate: 30px 0px;
+    scale: 0.8;
+}
+
+.killfeed-entry--exiting {
+    height: 0px;
+    margin-bottom: 0px;
+    opacity: 0;
+    translate: -20px 0px;
+    scale: 0.9;
 }
 
 .killfeed-entry--hidden {
     display: none;
 }
 
-.killfeed-entry-label {
+.killfeed-label {
     -unity-font-definition: var(--font-body-sdf, resource("Fonts/Outfit-SemiBold SDF"));
     -unity-text-align: middle-right;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-secondary, rgb(210, 215, 225));
     letter-spacing: 0.5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    max-width: 120px;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -unity-text-wrap: nowrap;
+}
+
+.killfeed-icon--avatar {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.killfeed-icon--weapon {
+    width: 40px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.killfeed-icon--badge {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.killfeed-icon--victim {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    -unity-background-scale-mode: scale-to-fit;
 }

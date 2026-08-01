@@ -83,6 +83,21 @@ namespace cowsins
 
             col.enabled = false;
             SoundManager.Instance.PlaySound(dieSFX, 0, 0, false);
+
+            if (showKillFeed)
+            {
+                var report = new KillReport
+                {
+                    enemyInstanceID = gameObject.GetInstanceID(),
+                    killerName = "Player",
+                    victimName = _name,
+                    weaponName = string.Empty,
+                    isHeadshot = lastHitWasHeadshot
+                };
+                UIEvents.onEnemyKilledDetailed?.Invoke(report);
+                UIEvents.onEnemyKilled?.Invoke(_name);
+            }
+
             // Invoke revive method
             Invoke("Revive", timeToRevive);
         }

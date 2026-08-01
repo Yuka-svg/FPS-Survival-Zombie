@@ -27,9 +27,12 @@ public class WitchAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthRe
     public EnemyType EnemyType { get { return EnemyType.Special; } }
     public event System.Action<float> OnHealthChanged;
 
+    protected bool lastHitWasHeadshot;
+
     private void OnEnable()
     {
         EnemyRegistry.Register(this);
+        lastHitWasHeadshot = false;
     }
 
     private void OnDestroy()
@@ -702,6 +705,8 @@ public class WitchAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthRe
 
     public void Damage(float damage, bool isHeadshot)
     {
+        lastHitWasHeadshot = isHeadshot;
+
         if (CombatFeedbackHUD.Instance != null)
             CombatFeedbackHUD.Instance.ShowHit(transform.position, damage, isHeadshot);
 
@@ -753,8 +758,16 @@ public class WitchAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealthRe
         attackDamageTimerActive = false;
         attackResetTimerActive = false;
 
-        if (CombatFeedbackHUD.Instance != null)
-            CombatFeedbackHUD.Instance.ShowKill("Witch");
+        var report = new KillReport
+        {
+            enemyInstanceID = gameObject.GetInstanceID(),
+            killerName = "Player",
+            victimName = "Witch",
+            weaponName = string.Empty,
+            isHeadshot = lastHitWasHeadshot
+        };
+        UIEvents.onEnemyKilledDetailed?.Invoke(report);
+        UIEvents.onEnemyKilled?.Invoke("Witch");
 
         if (AIDirector.Instance != null)
             AIDirector.Instance.RegisterKill();

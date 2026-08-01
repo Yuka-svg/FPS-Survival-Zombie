@@ -9,9 +9,12 @@ public class TankBossAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealt
     public float HealthFraction => Mathf.Clamp01((float)currentHealth / maxHealth);
     public EnemyType EnemyType => EnemyType.Boss;
 
+    protected bool lastHitWasHeadshot;
+
     private void OnEnable()
     {
         EnemyRegistry.Register(this);
+        lastHitWasHeadshot = false;
     }
 
     private void OnDestroy()
@@ -686,6 +689,11 @@ public class TankBossAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealt
         bool isHeadshot
     )
     {
+        lastHitWasHeadshot = isHeadshot;
+
+        if (CombatFeedbackHUD.Instance != null)
+            CombatFeedbackHUD.Instance.ShowHit(transform.position, damage, isHeadshot);
+
         TakeDamage(
             Mathf.RoundToInt(Mathf.Abs(damage))
         );
@@ -724,8 +732,16 @@ public class TankBossAI : MonoBehaviour, IDamageable, ISpecialEnemy, IEnemyHealt
 
         CancelInvoke();
 
-        if (CombatFeedbackHUD.Instance != null)
-            CombatFeedbackHUD.Instance.ShowKill("Tank");
+        var report = new KillReport
+        {
+            enemyInstanceID = gameObject.GetInstanceID(),
+            killerName = "Player",
+            victimName = "Tank",
+            weaponName = string.Empty,
+            isHeadshot = lastHitWasHeadshot
+        };
+        UIEvents.onEnemyKilledDetailed?.Invoke(report);
+        UIEvents.onEnemyKilled?.Invoke("Tank");
 
         if (AIDirector.Instance != null)
             AIDirector.Instance.RegisterKill();

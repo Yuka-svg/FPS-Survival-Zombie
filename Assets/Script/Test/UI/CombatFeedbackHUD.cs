@@ -1,12 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using cowsins;
 
 public class CombatFeedbackHUD : MonoBehaviour
 {
     public static CombatFeedbackHUD Instance;
 
     public Camera worldCamera;
+
+    [Header("SVG Vector Icons")]
+    [SerializeField] private VectorImage iconZombie;
+    [SerializeField] private VectorImage iconHeadshot;
+    [SerializeField] private VectorImage iconWeaponRifle;
+    [SerializeField] private VectorImage iconWeaponPistol;
+    [SerializeField] private VectorImage iconWeaponShotgun;
+    [SerializeField] private VectorImage iconWeaponMelee;
+    [SerializeField] private VectorImage iconSkull;
+
+    [Header("Sprite Fallbacks")]
+    [SerializeField] private Sprite spriteZombie;
+    [SerializeField] private Sprite spriteHeadshot;
+    [SerializeField] private Sprite spriteWeaponRifle;
+    [SerializeField] private Sprite spriteWeaponPistol;
+    [SerializeField] private Sprite spriteWeaponShotgun;
+    [SerializeField] private Sprite spriteWeaponMelee;
+    [SerializeField] private Sprite spriteSkull;
 
     private static readonly string[] _numberStrings = new string[1000];
     private static string GetDamageString(int dmg, bool crit)
@@ -33,23 +52,69 @@ public class CombatFeedbackHUD : MonoBehaviour
     private const int PoolSize = 28;
     private float _dmgLife = 1.0f;
 
-    private class Kill { public VisualElement entry; public Label label; public float life; public bool active; }
-    private readonly List<Kill> _kills = new List<Kill>();
+    public enum KillState { Pooled, Active, Exiting }
+    private class Kill
+    {
+        public VisualElement entry;
+        public Label killerLabel;
+        public VisualElement killerIcon;
+        public VisualElement weaponIcon;
+        public VisualElement headshotBadge;
+        public Label victimLabel;
+        public VisualElement zombieIcon;
+        public KillState state = KillState.Pooled;
+        public int generation;
+        public float spawnTime;
+        public IVisualElementScheduledItem entranceSchedule;
+        public IVisualElementScheduledItem exitSchedule;
+        public EventCallback<TransitionEndEvent> transEndCb;
+    }
+
+    private readonly List<Kill> _activeKills = new List<Kill>();
+    private readonly List<Kill> _exitingKills = new List<Kill>();
     private readonly List<Kill> _killPool = new List<Kill>();
-    private float _killLife = 4f;
+    private readonly Queue<KillReport> _pendingKillQueue = new Queue<KillReport>();
+    private IVisualElementScheduledItem _queuePumpSchedule;
+    private float _lastKillTime;
 
     private void Awake()
     {
         Instance = this;
+        LoadIconResourcesFallback();
     }
 
-    private void OnDestroy() { if (Instance == this) Instance = null; }
+    private void LoadIconResourcesFallback()
+    {
+        if (iconZombie == null) iconZombie = Resources.Load<VectorImage>("Icons/icon_zombie");
+        if (iconHeadshot == null) iconHeadshot = Resources.Load<VectorImage>("Icons/icon_headshot");
+        if (iconWeaponRifle == null) iconWeaponRifle = Resources.Load<VectorImage>("Icons/icon_weapon_rifle");
+        if (iconWeaponPistol == null) iconWeaponPistol = Resources.Load<VectorImage>("Icons/icon_weapon_pistol");
+        if (iconWeaponShotgun == null) iconWeaponShotgun = Resources.Load<VectorImage>("Icons/icon_weapon_shotgun");
+        if (iconWeaponMelee == null) iconWeaponMelee = Resources.Load<VectorImage>("Icons/icon_weapon_melee");
+        if (iconSkull == null) iconSkull = Resources.Load<VectorImage>("Icons/icon_skull");
+
+        if (spriteZombie == null) spriteZombie = Resources.Load<Sprite>("Icons/icon_zombie");
+        if (spriteHeadshot == null) spriteHeadshot = Resources.Load<Sprite>("Icons/icon_headshot");
+        if (spriteWeaponRifle == null) spriteWeaponRifle = Resources.Load<Sprite>("Icons/icon_weapon_rifle");
+        if (spriteWeaponPistol == null) spriteWeaponPistol = Resources.Load<Sprite>("Icons/icon_weapon_pistol");
+        if (spriteWeaponShotgun == null) spriteWeaponShotgun = Resources.Load<Sprite>("Icons/icon_weapon_shotgun");
+        if (spriteWeaponMelee == null) spriteWeaponMelee = Resources.Load<Sprite>("Icons/icon_weapon_melee");
+        if (spriteSkull == null) spriteSkull = Resources.Load<Sprite>("Icons/icon_skull");
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        UIEvents.onEnemyKilledDetailed -= OnEnemyKilledDetailed;
+        _queuePumpSchedule?.Pause();
+        _queuePumpSchedule = null;
+    }
 
     private void OnEnable()
     {
         var doc = GetComponent<UIDocument>();
         if (doc == null) return;
-        _root = doc.rootVisualElement.Q("CombatFeedbackHUD");
+        _root = doc.rootVisualElement != null ? doc.rootVisualElement.Q("CombatFeedbackHUD") : null;
         if (_root == null) return;
         _hitmarker = _root.Q("Hitmarker");
         _dmgContainer = _root.Q("DamageNumbers");
@@ -57,11 +122,35 @@ public class CombatFeedbackHUD : MonoBehaviour
 
         BuildHitmarkerBars();
         BuildDamagePool();
+
+        UIEvents.onEnemyKilledDetailed += OnEnemyKilledDetailed;
+        _queuePumpSchedule = _root.schedule.Execute(ProcessPendingKillQueue).Every(30);
+    }
+
+    private void OnDisable()
+    {
+        UIEvents.onEnemyKilledDetailed -= OnEnemyKilledDetailed;
+        _queuePumpSchedule?.Pause();
+        _queuePumpSchedule = null;
+        PurgeAllKillsToPool();
+    }
+
+    private void PurgeAllKillsToPool()
+    {
+        for (int i = _activeKills.Count - 1; i >= 0; i--)
+            ReturnToPool(_activeKills[i]);
+        _activeKills.Clear();
+
+        for (int i = _exitingKills.Count - 1; i >= 0; i--)
+            ReturnToPool(_exitingKills[i]);
+        _exitingKills.Clear();
+
+        _pendingKillQueue.Clear();
     }
 
     private void BuildHitmarkerBars()
     {
-        if (_hitmarker.childCount > 0) return;
+        if (_hitmarker == null || _hitmarker.childCount > 0) return;
         string[] classes = { "hm-tl", "hm-tr", "hm-bl", "hm-br" };
         for (int i = 0; i < 4; i++)
         {
@@ -76,7 +165,7 @@ public class CombatFeedbackHUD : MonoBehaviour
 
     private void BuildDamagePool()
     {
-        if (_dmgContainer.childCount > 0) return;
+        if (_dmgContainer == null || _dmgContainer.childCount > 0) return;
         for (int i = 0; i < PoolSize; i++)
         {
             var ve = new VisualElement();
@@ -90,31 +179,278 @@ public class CombatFeedbackHUD : MonoBehaviour
         }
     }
 
+    private void OnEnemyKilledDetailed(KillReport report)
+    {
+        _pendingKillQueue.Enqueue(report);
+    }
+
+    private void ProcessPendingKillQueue()
+    {
+        if (_pendingKillQueue.Count == 0) return;
+        float interval = _pendingKillQueue.Count > 5 ? 0.08f : 0.18f;
+        if (Time.unscaledTime - _lastKillTime < interval) return;
+
+        var report = _pendingKillQueue.Dequeue();
+        _lastKillTime = Time.unscaledTime;
+        SpawnKillEntry(report);
+    }
+
+    private void SpawnKillEntry(KillReport report)
+    {
+        if (_killContainer == null)
+        {
+            var doc = GetComponent<UIDocument>();
+            if (doc != null && doc.rootVisualElement != null)
+                _killContainer = doc.rootVisualElement.Q("Killfeed");
+        }
+        if (_killContainer == null) return;
+
+        Kill k = GetPooledKill();
+
+        k.state = KillState.Active;
+        k.spawnTime = Time.unscaledTime;
+        int currentGen = ++k.generation;
+
+        string kName = string.IsNullOrEmpty(report.killerName) ? "Player" : report.killerName;
+        string vName = string.IsNullOrEmpty(report.victimName) ? "Zombie" : report.victimName;
+        string wName = string.IsNullOrEmpty(report.weaponName) ? GetActivePlayerWeaponName() : report.weaponName;
+
+        k.killerLabel.text = kName;
+        k.victimLabel.text = vName;
+
+        var (weaponSvg, weaponSprite) = GetWeaponVectorImage(wName);
+        SetIcon(k.weaponIcon, weaponSvg, weaponSprite);
+        SetIcon(k.zombieIcon, iconZombie, spriteZombie);
+
+        if (report.isHeadshot)
+        {
+            k.headshotBadge.style.display = DisplayStyle.Flex;
+            SetIcon(k.headshotBadge, iconHeadshot, spriteHeadshot);
+        }
+        else
+        {
+            k.headshotBadge.style.display = DisplayStyle.None;
+        }
+
+        k.entry.style.display = DisplayStyle.Flex;
+        k.entry.RemoveFromClassList("killfeed-entry--exiting");
+        k.entry.AddToClassList("killfeed-entry--entering");
+        k.entry.RemoveFromHierarchy();
+
+        _killContainer.Insert(0, k.entry);
+        _activeKills.Add(k);
+
+        k.entranceSchedule = k.entry.schedule.Execute(() =>
+        {
+            if (k.generation == currentGen && k.state == KillState.Active)
+            {
+                k.entry.RemoveFromClassList("killfeed-entry--entering");
+            }
+        }).StartingIn(16);
+
+        CheckEvictionLimits();
+    }
+
+    private string GetActivePlayerWeaponName()
+    {
+        var wc = Object.FindFirstObjectByType<WeaponController>();
+        if (wc != null && wc.Weapon != null && !string.IsNullOrEmpty(wc.Weapon._name))
+            return wc.Weapon._name;
+        return "Rifle";
+    }
+
+    private void CheckEvictionLimits()
+    {
+        while (_activeKills.Count >= 5)
+        {
+            var oldest = _activeKills[0];
+            _activeKills.RemoveAt(0);
+            TransitionToExiting(oldest);
+        }
+
+        while (_exitingKills.Count >= 3)
+        {
+            var oldestExit = _exitingKills[0];
+            _exitingKills.RemoveAt(0);
+            ReturnToPool(oldestExit);
+        }
+    }
+
+    private void TransitionToExiting(Kill k)
+    {
+        if (k.state != KillState.Active) return;
+        k.state = KillState.Exiting;
+        _exitingKills.Add(k);
+        int currentGen = k.generation;
+
+        k.entry.AddToClassList("killfeed-entry--exiting");
+
+        k.transEndCb = evt =>
+        {
+            if (k.generation == currentGen && k.state == KillState.Exiting && evt.target == k.entry && evt.propertyName == "height")
+            {
+                _exitingKills.Remove(k);
+                ReturnToPool(k);
+            }
+        };
+        k.entry.RegisterCallback(k.transEndCb);
+
+        k.exitSchedule = k.entry.schedule.Execute(() =>
+        {
+            if (k.generation == currentGen && k.state == KillState.Exiting)
+            {
+                _exitingKills.Remove(k);
+                ReturnToPool(k);
+            }
+        }).StartingIn(400);
+    }
+
+    private void ReturnToPool(Kill k)
+    {
+        k.entranceSchedule?.Pause();
+        k.entranceSchedule = null;
+
+        k.exitSchedule?.Pause();
+        k.exitSchedule = null;
+
+        if (k.transEndCb != null)
+        {
+            k.entry.UnregisterCallback(k.transEndCb);
+            k.transEndCb = null;
+        }
+
+        k.entry.style.display = DisplayStyle.None;
+        k.entry.style.translate = new StyleTranslate(StyleKeyword.Null);
+        k.entry.style.scale = new StyleScale(StyleKeyword.Null);
+        k.entry.style.height = StyleKeyword.Null;
+        k.entry.style.marginBottom = StyleKeyword.Null;
+        k.entry.style.opacity = StyleKeyword.Null;
+        k.entry.style.transitionDuration = StyleKeyword.Null;
+        k.entry.style.backgroundImage = StyleKeyword.Null;
+
+        k.entry.RemoveFromClassList("killfeed-entry--entering");
+        k.entry.RemoveFromClassList("killfeed-entry--exiting");
+        k.entry.RemoveFromHierarchy();
+
+        k.state = KillState.Pooled;
+        k.generation++;
+    }
+
+    private Kill GetPooledKill()
+    {
+        for (int i = 0; i < _killPool.Count; i++)
+        {
+            if (_killPool[i].state == KillState.Pooled)
+                return _killPool[i];
+        }
+
+        var entry = new VisualElement();
+        entry.AddToClassList("killfeed-entry");
+        entry.usageHints = UsageHints.DynamicTransform;
+
+        var killerLabel = new Label();
+        killerLabel.AddToClassList("killfeed-label");
+
+        var killerIcon = new VisualElement();
+        killerIcon.AddToClassList("killfeed-icon--avatar");
+
+        var weaponIcon = new VisualElement();
+        weaponIcon.AddToClassList("killfeed-icon--weapon");
+
+        var headshotBadge = new VisualElement();
+        headshotBadge.AddToClassList("killfeed-icon--badge");
+
+        var victimLabel = new Label();
+        victimLabel.AddToClassList("killfeed-label");
+
+        var zombieIcon = new VisualElement();
+        zombieIcon.AddToClassList("killfeed-icon--victim");
+
+        entry.Add(killerLabel);
+        entry.Add(killerIcon);
+        entry.Add(weaponIcon);
+        entry.Add(headshotBadge);
+        entry.Add(victimLabel);
+        entry.Add(zombieIcon);
+
+        var k = new Kill
+        {
+            entry = entry,
+            killerLabel = killerLabel,
+            killerIcon = killerIcon,
+            weaponIcon = weaponIcon,
+            headshotBadge = headshotBadge,
+            victimLabel = victimLabel,
+            zombieIcon = zombieIcon,
+            state = KillState.Pooled
+        };
+        _killPool.Add(k);
+        return k;
+    }
+
+    private (VectorImage svg, Sprite sprite) GetWeaponVectorImage(string weaponName)
+    {
+        if (string.IsNullOrEmpty(weaponName)) return (iconSkull, spriteSkull);
+        string lower = weaponName.ToLowerInvariant();
+
+        if (lower.Contains("rifle") || lower.Contains("ak") || lower.Contains("m4") || lower.Contains("assault") || lower.Contains("smg"))
+            return (iconWeaponRifle, spriteWeaponRifle);
+        if (lower.Contains("pistol") || lower.Contains("glock") || lower.Contains("revolver") || lower.Contains("handgun"))
+            return (iconWeaponPistol, spriteWeaponPistol);
+        if (lower.Contains("shotgun") || lower.Contains("pump") || lower.Contains("gauge"))
+            return (iconWeaponShotgun, spriteWeaponShotgun);
+        if (lower.Contains("knife") || lower.Contains("melee") || lower.Contains("blade") || lower.Contains("sword"))
+            return (iconWeaponMelee, spriteWeaponMelee);
+
+        return (iconSkull, spriteSkull);
+    }
+
+    private void SetIcon(VisualElement element, VectorImage vectorSvg, Sprite spriteImg)
+    {
+        if (element == null) return;
+        if (vectorSvg != null)
+        {
+            element.style.display = DisplayStyle.Flex;
+            element.style.backgroundImage = Background.FromVectorImage(vectorSvg);
+        }
+        else if (spriteImg != null)
+        {
+            element.style.display = DisplayStyle.Flex;
+            element.style.backgroundImage = Background.FromSprite(spriteImg);
+        }
+        else
+        {
+            element.style.backgroundImage = StyleKeyword.Null;
+            element.style.display = DisplayStyle.None;
+        }
+    }
+
     public void ShowHit(Vector3 worldPos, float damage, bool headshot)
     {
         bool crit = _critPending && Time.frameCount == _critFrame;
         _critPending = false;
 
         _hitTimer = _hitDuration;
-        _hitmarker.EnableInClassList("hitmarker--visible", true);
-        float scale = crit ? 1.6f : headshot ? 1.4f : 1f;
-        _hitmarker.style.scale = new Scale(Vector2.one * scale);
-        foreach (var bar in _hitBars)
+        if (_hitmarker != null)
         {
-            bar.EnableInClassList("hitmarker-bar--kill", headshot);
-            bar.EnableInClassList("hitmarker-bar--crit", crit);
+            _hitmarker.EnableInClassList("hitmarker--visible", true);
+            float scale = crit ? 1.6f : headshot ? 1.4f : 1f;
+            _hitmarker.style.scale = new Scale(Vector2.one * scale);
+            foreach (var bar in _hitBars)
+            {
+                bar.EnableInClassList("hitmarker-bar--kill", headshot);
+                bar.EnableInClassList("hitmarker-bar--crit", crit);
+            }
         }
 
         var d = GetDmg();
         if (d == null) return;
 
-        // Initialize 3D physics parameters
-        d.worldPos = worldPos + Vector3.up * 1.5f; // Start at chest/head level
+        d.worldPos = worldPos + Vector3.up * 1.5f;
         
-        // Random 3D launch velocity
         float angle = Random.Range(0f, Mathf.PI * 2f);
-        float planarSpeed = Random.Range(1.5f, 3.5f); // horizontal spread
-        float upwardSpeed = Random.Range(4.5f, 7.0f);  // snappy vertical bounce
+        float planarSpeed = Random.Range(1.5f, 3.5f);
+        float upwardSpeed = Random.Range(4.5f, 7.0f);
         d.worldVel = new Vector3(Mathf.Cos(angle) * planarSpeed, upwardSpeed, Mathf.Sin(angle) * planarSpeed);
 
         d.scaleMultiplier = (crit || headshot) ? 1.5f : 1.0f;
@@ -123,13 +459,11 @@ public class CombatFeedbackHUD : MonoBehaviour
         int dmgInt = Mathf.Max(1, Mathf.RoundToInt(damage));
         d.label.text = GetDamageString(dmgInt, crit);
         
-        // Apply styling classes to both parent VE and Label
         d.ve.EnableInClassList("dmg-number--kill", headshot);
         d.ve.EnableInClassList("dmg-number--crit", crit);
         d.label.EnableInClassList("dmg-number--kill", headshot);
         d.label.EnableInClassList("dmg-number--crit", crit);
 
-        // Pre-position on the very first frame to avoid any 1-frame (0,0) flickering
         var cam = worldCamera != null ? worldCamera : Camera.main;
         if (cam != null)
         {
@@ -147,7 +481,7 @@ public class CombatFeedbackHUD : MonoBehaviour
 
                     float dist = Vector3.Distance(cam.transform.position, d.worldPos);
                     dist = Mathf.Max(2f, dist);
-                    float distanceScale = 12f / dist; // 12m reference distance
+                    float distanceScale = 12f / dist;
                     distanceScale = Mathf.Clamp(distanceScale, 0.4f, 2.5f);
                     float finalScale = d.scaleMultiplier * distanceScale;
 
@@ -163,54 +497,14 @@ public class CombatFeedbackHUD : MonoBehaviour
 
     public void ShowKill(string name)
     {
-        if (_killContainer == null)
+        UIEvents.onEnemyKilledDetailed?.Invoke(new KillReport
         {
-            var doc = GetComponent<UIDocument>();
-            if (doc != null && doc.rootVisualElement != null)
-                _killContainer = doc.rootVisualElement.Q("Killfeed");
-        }
-        if (_killContainer == null) return;
-
-        Kill k = null;
-        for (int i = 0; i < _killPool.Count; i++)
-        {
-            if (!_killPool[i].active)
-            {
-                k = _killPool[i];
-                break;
-            }
-        }
-
-        if (k == null)
-        {
-            var entry = new VisualElement();
-            entry.AddToClassList("killfeed-entry");
-            entry.usageHints = UsageHints.DynamicTransform;
-            var label = new Label();
-            label.AddToClassList("killfeed-entry-label");
-            entry.Add(label);
-            k = new Kill { entry = entry, label = label, active = true };
-            _killPool.Add(k);
-        }
-        else
-        {
-            k.active = true;
-        }
-
-        k.entry.RemoveFromClassList("killfeed-entry--hidden");
-        k.entry.RemoveFromHierarchy();
-        _killContainer.Insert(0, k.entry);
-        k.label.text = "Killed  " + (string.IsNullOrEmpty(name) ? "Zombie" : name);
-        k.life = _killLife;
-        _kills.Add(k);
-
-        while (_kills.Count > 6)
-        {
-            var oldest = _kills[0];
-            _kills.RemoveAt(0);
-            oldest.active = false;
-            oldest.entry.AddToClassList("killfeed-entry--hidden");
-        }
+            enemyInstanceID = 0,
+            killerName = "Player",
+            victimName = name,
+            weaponName = GetActivePlayerWeaponName(),
+            isHeadshot = false
+        });
     }
 
     private Dmg GetDmg()
@@ -234,7 +528,7 @@ public class CombatFeedbackHUD : MonoBehaviour
         if (_hitTimer > 0f)
         {
             _hitTimer -= dt;
-            if (_hitTimer <= 0f) _hitmarker.EnableInClassList("hitmarker--visible", false);
+            if (_hitTimer <= 0f && _hitmarker != null) _hitmarker.EnableInClassList("hitmarker--visible", false);
         }
 
         var cam = worldCamera != null ? worldCamera : Camera.main;
@@ -253,11 +547,9 @@ public class CombatFeedbackHUD : MonoBehaviour
                 continue;
             }
 
-            // Apply 3D arcade gravity (15 m/s^2)
             d.worldVel += Vector3.down * 15f * dt;
             d.worldPos += d.worldVel * dt;
 
-            // Project 3D position to 2D Screen and convert to UITK Panel Space
             Vector3 sp = cam.WorldToScreenPoint(d.worldPos);
             if (sp.z < 0f)
             {
@@ -270,29 +562,25 @@ public class CombatFeedbackHUD : MonoBehaviour
             d.ve.style.left = panelPos.x;
             d.ve.style.top = panelPos.y;
 
-            // Calculate scale based on distance to World Camera
             float dist = Vector3.Distance(cam.transform.position, d.worldPos);
             dist = Mathf.Max(2f, dist);
-            float distanceScale = 12f / dist; // 12m reference distance
+            float distanceScale = 12f / dist;
             distanceScale = Mathf.Clamp(distanceScale, 0.4f, 2.5f);
             float finalScale = d.scaleMultiplier * distanceScale;
 
-            // Fade out smoothly over life
             float alpha = Mathf.Clamp01(d.life / _dmgLife);
 
             d.ve.style.scale = new Scale(Vector2.one * finalScale);
             d.ve.style.opacity = alpha;
         }
 
-        for (int i = _kills.Count - 1; i >= 0; i--)
+        for (int i = _activeKills.Count - 1; i >= 0; i--)
         {
-            var k = _kills[i];
-            k.life -= dt;
-            if (k.life <= 0f)
+            var k = _activeKills[i];
+            if (Time.unscaledTime - k.spawnTime >= 1.5f)
             {
-                _kills.RemoveAt(i);
-                k.active = false;
-                k.entry.AddToClassList("killfeed-entry--hidden");
+                _activeKills.RemoveAt(i);
+                TransitionToExiting(k);
             }
         }
     }
