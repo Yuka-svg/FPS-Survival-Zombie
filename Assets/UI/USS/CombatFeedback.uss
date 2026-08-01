@@ -111,9 +111,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    padding-left: 8px;
-    padding-right: 12px;
-    border-right-width: 3.5px;
+    column-gap: 6px;
+    padding-left: 10px;
+    padding-right: 7px;
+    border-right-width: 3px;
     border-right-color: var(--color-accent-red, rgb(229, 72, 60));
     border-radius: var(--radius-xs, 4px);
     transition-property: opacity, translate, scale, height, margin-bottom;
@@ -154,14 +155,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     -unity-text-wrap: nowrap;
+    margin: 0;
 }
 
 .killfeed-icon--avatar {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    margin-left: 6px;
-    margin-right: 6px;
+    margin: 0;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -169,8 +170,7 @@
     width: 40px;
     height: 20px;
     flex-shrink: 0;
-    margin-left: 6px;
-    margin-right: 6px;
+    margin: 0;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -178,8 +178,7 @@
     width: 18px;
     height: 18px;
     flex-shrink: 0;
-    margin-left: 4px;
-    margin-right: 4px;
+    margin: 0;
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -187,6 +186,6 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    margin-left: 6px;
+    margin: 0;
     -unity-background-scale-mode: scale-to-fit;
 }
