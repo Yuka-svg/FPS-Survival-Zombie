@@ -25,6 +25,11 @@
     margin: 0;
 }
 
+.quest-group {
+    flex-direction: column;
+    width: 100%;
+}
+
 #Chapter {
     color: var(--color-accent-gold, rgb(217, 199, 115)); /* Gold accent for chapter heading */
     font-size: 11px;

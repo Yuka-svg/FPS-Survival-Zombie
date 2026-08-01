@@ -10,6 +10,19 @@ public class QuestTrackerWidget : MonoBehaviour
     [Header("Layout")]
     public int maxSideQuestLines = 6;
 
+    [Header("Audio SFX")]
+    public AudioClip toggleSFX;
+
+#if UNITY_EDITOR
+    private void Reset() => AutoAssignSFX();
+    private void OnValidate() => AutoAssignSFX();
+    private void AutoAssignSFX()
+    {
+        if (toggleSFX == null)
+            toggleSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Engine/Cowsins/SFX/UI/UIHover_SFX.wav");
+    }
+#endif
+
     private VisualElement _container;
     private VisualElement _mainPanel;
     private Label _chapter;
@@ -30,6 +43,13 @@ public class QuestTrackerWidget : MonoBehaviour
     private VisualElement _minimapQuestMarker;
     private VisualElement _minimapEdgeArrow;
     private bool _isMinimapMode = false;
+
+    private VisualElement _questGroup;
+    private bool _isTransitioning = false;
+    private Coroutine _transitionCoroutine;
+    private float _cachedQuestHeight = 0f;
+    private float _currentMinimapOpacity = 0f;
+    private float _currentQuestOpacity = 1f;
 
     // Fixed pre-instantiated VisualElement Pools for zero-GC blips rendering across 6 categories
     private readonly List<VisualElement> _zombieBlips = new List<VisualElement>();
@@ -65,10 +85,28 @@ public class QuestTrackerWidget : MonoBehaviour
         _minimapQuestMarker = root.Q("MinimapQuestMarker");
         _minimapEdgeArrow = root.Q("MinimapEdgeArrow");
 
+        if (_questGroup == null)
+        {
+            _questGroup = new VisualElement { name = "QuestGroup" };
+            _questGroup.AddToClassList("quest-group");
+
+            if (_mainPanel != null && _mainPanel.parent != null) _mainPanel.RemoveFromHierarchy();
+            if (_divider != null && _divider.parent != null) _divider.RemoveFromHierarchy();
+            if (_sidePanel != null && _sidePanel.parent != null) _sidePanel.RemoveFromHierarchy();
+
+            if (_mainPanel != null) _questGroup.Add(_mainPanel);
+            if (_divider != null) _questGroup.Add(_divider);
+            if (_sidePanel != null) _questGroup.Add(_sidePanel);
+
+            if (_container != null) _container.Add(_questGroup);
+        }
+
         bool isEndless = (StoryManager.Instance == null) && (GameModeManager.CurrentMode == GameMode.Endless);
         if (isEndless)
         {
             _isMinimapMode = true;
+            _currentMinimapOpacity = 1f;
+            _currentQuestOpacity = 0f;
         }
 
         if (_chapter == null || _title == null || _objective == null || _sideLinesContainer == null)
@@ -187,6 +225,10 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void OnGeometryChanged(GeometryChangedEvent evt)
     {
+        if (!_isTransitioning && !_isMinimapMode && _container != null && _container.layout.height > 0)
+        {
+            _cachedQuestHeight = _container.layout.height;
+        }
         _container?.MarkDirtyRepaint();
     }
 
@@ -206,6 +248,8 @@ public class QuestTrackerWidget : MonoBehaviour
         if (GameModeManager.CurrentMode == GameMode.Endless)
         {
             _isMinimapMode = true;
+            _currentMinimapOpacity = 1f;
+            _currentQuestOpacity = 0f;
         }
 
         SubscribeToManagers();
@@ -248,10 +292,14 @@ public class QuestTrackerWidget : MonoBehaviour
             _minimapEdgeArrow.generateVisualContent -= OnDrawEdgeArrow;
         }
 
-        if (MinimapController.Instance != null)
+        if (_transitionCoroutine != null)
         {
-            MinimapController.Instance.SetCameraActive(false);
+            StopCoroutine(_transitionCoroutine);
+            _transitionCoroutine = null;
         }
+
+        _isTransitioning = false;
+        ApplyFinalModeState(_isMinimapMode);
 
         if (_minimapImage != null)
         {
@@ -304,9 +352,12 @@ public class QuestTrackerWidget : MonoBehaviour
 
                 if (!pauseActive && !gameOver && !panelActive && !journalActive && !skillTreeActive)
                 {
-                    _isMinimapMode = !_isMinimapMode;
-                    Debug.Log($"[QuestTrackerWidget] M Key Pressed! Toggle _isMinimapMode = {_isMinimapMode}");
-                    UpdateDisplay();
+                    bool targetIsMinimap = !_isMinimapMode;
+                    if (cowsins.SoundManager.Instance != null && toggleSFX != null)
+                    {
+                        try { cowsins.SoundManager.Instance.PlaySound(toggleSFX, 0f, 0f, false); } catch {}
+                    }
+                    StartTransition(targetIsMinimap);
                 }
             }
         }
@@ -314,7 +365,7 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_isMinimapMode)
+        if (_isMinimapMode || _isTransitioning)
         {
             Transform pTrans = MinimapController.Instance != null && MinimapController.Instance.PlayerTransform != null
                 ? MinimapController.Instance.PlayerTransform
@@ -361,7 +412,7 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void ApplyMinimapPulseEffects()
     {
-        if (!_isMinimapMode) return;
+        if (!_isMinimapMode && !_isTransitioning) return;
 
         float pulseAngle = Time.unscaledTime * 4f;
         float opacityPulse = 0.85f + 0.15f * Mathf.Sin(pulseAngle);
@@ -861,6 +912,157 @@ public class QuestTrackerWidget : MonoBehaviour
         _collectibles.text = $"Journals: {cm.Count}/{cm.Total}";
     }
 
+    private void StartTransition(bool targetIsMinimap)
+    {
+        _isMinimapMode = targetIsMinimap;
+        if (_transitionCoroutine != null)
+        {
+            StopCoroutine(_transitionCoroutine);
+            _transitionCoroutine = null;
+        }
+        _transitionCoroutine = StartCoroutine(AnimateToggleMode(targetIsMinimap));
+    }
+
+    private IEnumerator AnimateToggleMode(bool targetIsMinimap)
+    {
+        _isTransitioning = true;
+        if (targetIsMinimap)
+        {
+            MinimapController.Instance?.SetCameraActive(true);
+        }
+
+        if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.Flex;
+        if (_questGroup != null) _questGroup.style.display = DisplayStyle.Flex;
+        if (_container != null) _container.style.overflow = Overflow.Hidden;
+
+        if (_minimapContainer != null)
+        {
+            _minimapContainer.style.position = Position.Absolute;
+            _minimapContainer.style.top = 0f;
+            _minimapContainer.style.left = 0f;
+            _minimapContainer.style.width = 292f;
+        }
+
+        if (_questGroup != null)
+        {
+            _questGroup.style.position = Position.Absolute;
+            _questGroup.style.top = 0f;
+            _questGroup.style.left = 0f;
+            _questGroup.style.width = 292f;
+        }
+
+        if (_minimapImage != null && MinimapController.Instance != null)
+        {
+            var tex = MinimapController.Instance.MinimapTexture;
+            if (tex != null)
+            {
+                _minimapImage.style.backgroundImage = Background.FromRenderTexture(tex);
+            }
+        }
+
+        UpdateStoryContent();
+        UpdateSideContent();
+
+        float startMinimapOpacity = _currentMinimapOpacity;
+        float startQuestOpacity = _currentQuestOpacity;
+
+        float targetMinimapOpacity = targetIsMinimap ? 1f : 0f;
+        float targetQuestOpacity = targetIsMinimap ? 0f : 1f;
+
+        float H_quest_target = Mathf.Max(144f, _cachedQuestHeight > 0 ? _cachedQuestHeight : 180f);
+        float startHeight = _container != null && _container.layout.height > 0 ? _container.layout.height : (targetIsMinimap ? H_quest_target : 316f);
+        float targetHeight = targetIsMinimap ? 316f : H_quest_target;
+
+        float elapsed = 0f;
+        float duration = 0.20f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float smoothT = t * t * (3f - 2f * t);
+
+            _currentMinimapOpacity = Mathf.Lerp(startMinimapOpacity, targetMinimapOpacity, smoothT);
+            _currentQuestOpacity = Mathf.Lerp(startQuestOpacity, targetQuestOpacity, smoothT);
+            float curHeight = Mathf.Lerp(startHeight, targetHeight, smoothT);
+
+            if (_minimapContainer != null)
+            {
+                _minimapContainer.style.opacity = _currentMinimapOpacity;
+                _minimapContainer.style.scale = new StyleScale(new Scale(new Vector3(0.96f + 0.04f * _currentMinimapOpacity, 0.96f + 0.04f * _currentMinimapOpacity, 1f)));
+            }
+
+            if (_questGroup != null)
+            {
+                _questGroup.style.opacity = _currentQuestOpacity;
+                _questGroup.style.scale = new StyleScale(new Scale(new Vector3(0.96f + 0.04f * _currentQuestOpacity, 0.96f + 0.04f * _currentQuestOpacity, 1f)));
+            }
+
+            if (_container != null)
+            {
+                _container.style.height = Length.Pixels(curHeight);
+                _container.MarkDirtyRepaint();
+            }
+
+            yield return null;
+        }
+
+        _isTransitioning = false;
+        _transitionCoroutine = null;
+        ApplyFinalModeState(targetIsMinimap);
+    }
+
+    private void ApplyFinalModeState(bool isMinimap)
+    {
+        _currentMinimapOpacity = isMinimap ? 1f : 0f;
+        _currentQuestOpacity = isMinimap ? 0f : 1f;
+
+        if (isMinimap)
+        {
+            if (_questGroup != null) _questGroup.style.display = DisplayStyle.None;
+            if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            if (_minimapContainer != null) _minimapContainer.style.display = DisplayStyle.None;
+            if (_questGroup != null) _questGroup.style.display = DisplayStyle.Flex;
+            HideAllBlipPools();
+            MinimapController.Instance?.SetCameraActive(false);
+        }
+
+        ResetTransitionInlineStyles();
+        _container?.MarkDirtyRepaint();
+    }
+
+    private void ResetTransitionInlineStyles()
+    {
+        if (_minimapContainer != null)
+        {
+            _minimapContainer.style.position = StyleKeyword.Null;
+            _minimapContainer.style.top = StyleKeyword.Null;
+            _minimapContainer.style.left = StyleKeyword.Null;
+            _minimapContainer.style.width = StyleKeyword.Null;
+            _minimapContainer.style.scale = StyleKeyword.Null;
+            _minimapContainer.style.opacity = StyleKeyword.Null;
+        }
+
+        if (_questGroup != null)
+        {
+            _questGroup.style.position = StyleKeyword.Null;
+            _questGroup.style.top = StyleKeyword.Null;
+            _questGroup.style.left = StyleKeyword.Null;
+            _questGroup.style.width = StyleKeyword.Null;
+            _questGroup.style.scale = StyleKeyword.Null;
+            _questGroup.style.opacity = StyleKeyword.Null;
+        }
+
+        if (_container != null)
+        {
+            _container.style.height = StyleKeyword.Null;
+            _container.style.overflow = StyleKeyword.Null;
+        }
+    }
+
     private void UpdateDisplay()
     {
         if (_chapter == null || _title == null || _objective == null) return;
@@ -871,22 +1073,10 @@ public class QuestTrackerWidget : MonoBehaviour
             _isMinimapMode = true;
         }
 
-        if (MinimapController.Instance != null)
-        {
-            MinimapController.Instance.SetCameraActive(_isMinimapMode);
-        }
-
-        if (_minimapContainer != null)
-        {
-            _minimapContainer.style.display = _isMinimapMode ? DisplayStyle.Flex : DisplayStyle.None;
-        }
+        ApplyFinalModeState(_isMinimapMode);
 
         if (_isMinimapMode)
         {
-            if (_mainPanel != null) _mainPanel.style.display = DisplayStyle.None;
-            if (_sidePanel != null) _sidePanel.style.display = DisplayStyle.None;
-            if (_divider != null) _divider.style.display = DisplayStyle.None;
-
             if (_minimapImage != null && MinimapController.Instance != null)
             {
                 var tex = MinimapController.Instance.MinimapTexture;
@@ -898,8 +1088,6 @@ public class QuestTrackerWidget : MonoBehaviour
         }
         else
         {
-            if (_mainPanel != null) _mainPanel.style.display = DisplayStyle.Flex;
-
             UpdateStoryContent();
             UpdateSideContent();
         }
@@ -1049,6 +1237,24 @@ public class QuestTrackerWidget : MonoBehaviour
         painter.Fill();
     }
 
+    private void DrawRivet(Painter2D painter, Vector2 center)
+    {
+        painter.fillColor = new Color(16f / 255f, 14f / 255f, 14f / 255f, 0.6f);
+        painter.BeginPath();
+        painter.Arc(center + new Vector2(0.5f, 0.5f), 2.5f, 0f, 360f);
+        painter.Fill();
+
+        painter.fillColor = new Color(175f / 255f, 150f / 255f, 90f / 255f, 1.0f);
+        painter.BeginPath();
+        painter.Arc(center, 2.0f, 0f, 360f);
+        painter.Fill();
+
+        painter.fillColor = Color.white;
+        painter.BeginPath();
+        painter.Arc(center - new Vector2(0.6f, 0.6f), 0.4f, 0f, 360f);
+        painter.Fill();
+    }
+
     private void OnGenerateCardBackground(MeshGenerationContext mgc)
     {
         var targetElement = mgc.visualElement;
@@ -1130,28 +1336,10 @@ public class QuestTrackerWidget : MonoBehaviour
         }
 
         // 5. Draw 4 3D metallic gold corner rivets (screws)
-        System.Action<Vector2> drawRivet = center =>
-        {
-            painter.fillColor = new Color(16f / 255f, 14f / 255f, 14f / 255f, 0.6f);
-            painter.BeginPath();
-            painter.Arc(center + new Vector2(0.5f, 0.5f), 2.5f, 0f, 360f);
-            painter.Fill();
-
-            painter.fillColor = new Color(175f / 255f, 150f / 255f, 90f / 255f, 1.0f);
-            painter.BeginPath();
-            painter.Arc(center, 2.0f, 0f, 360f);
-            painter.Fill();
-
-            painter.fillColor = Color.white;
-            painter.BeginPath();
-            painter.Arc(center - new Vector2(0.6f, 0.6f), 0.4f, 0f, 360f);
-            painter.Fill();
-        };
-
         float rOffset = 8f;
-        drawRivet(new Vector2(rOffset, rOffset));
-        drawRivet(new Vector2(rect.width - rOffset, rOffset));
-        drawRivet(new Vector2(rect.width - rOffset, rect.height - rOffset));
-        drawRivet(new Vector2(rOffset, rect.height - rOffset));
+        DrawRivet(painter, new Vector2(rOffset, rOffset));
+        DrawRivet(painter, new Vector2(rect.width - rOffset, rOffset));
+        DrawRivet(painter, new Vector2(rect.width - rOffset, rect.height - rOffset));
+        DrawRivet(painter, new Vector2(rOffset, rect.height - rOffset));
     }
 }

@@ -158,8 +158,14 @@ public class MinimapController : MonoBehaviour
     {
         if (_minimapCamera != null && cam == _minimapCamera)
         {
-            RenderSettings.fog = _previousFogState;
-            RestoreShadowDistance();
+            try
+            {
+            }
+            finally
+            {
+                RenderSettings.fog = _previousFogState;
+                RestoreShadowDistance();
+            }
         }
     }
 
