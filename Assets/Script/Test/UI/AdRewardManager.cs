@@ -17,12 +17,14 @@ public class AdRewardManager : MonoBehaviour
         }
     }
 
-    private UIDocument _doc;
+    private VisualElement _doc;
     private VisualElement _panel;
     private VisualElement _card;
     private Label _titleLabel;
     private Label _timerLabel;
     private Label _rewardLabel;
+    private VisualElement _rewardBadge;
+    private VisualElement _rewardIcon;
     private VisualElement _adContainer;
     private VisualElement _adPlayingOverlay;
     private Button _watchButton;
@@ -73,20 +75,29 @@ public class AdRewardManager : MonoBehaviour
     {
         if (_watchButton != null) _watchButton.clicked -= StartAd;
         if (_closeButton != null) _closeButton.clicked -= ClosePanel;
+        if (_card != null) _card.generateVisualContent -= OnGenerateCardBackground;
         DestroyAd();
     }
 
     private void SetupUI()
     {
-        if (_doc == null) _doc = GetComponent<UIDocument>();
+        if (_doc == null)
+        {
+            var docComp = GetComponent<UIDocument>();
+            if (docComp != null) _doc = docComp.rootVisualElement;
+        }
         if (_doc == null)
         {
             var go = GameObject.Find("GameUICanvas");
-            if (go != null) _doc = go.GetComponent<UIDocument>();
+            if (go != null)
+            {
+                var docComp = go.GetComponent<UIDocument>();
+                if (docComp != null) _doc = docComp.rootVisualElement;
+            }
         }
-        if (_doc == null || _doc.rootVisualElement == null) return;
+        if (_doc == null) return;
 
-        var root = _doc.rootVisualElement;
+        var root = _doc;
         _panel = root.Q("AdRewardPanel");
         if (_panel == null) return;
 
@@ -94,12 +105,20 @@ public class AdRewardManager : MonoBehaviour
         _titleLabel = _panel.Q<Label>("AdTitle");
         _timerLabel = _panel.Q<Label>("AdTimer");
         _rewardLabel = _panel.Q<Label>("AdRewardText");
+        _rewardBadge = _panel.Q("AdRewardBadge");
+        _rewardIcon = _panel.Q("AdRewardIcon");
         _adContainer = _panel.Q("AdContent");
         _adPlayingOverlay = _panel.Q("AdPlayingOverlay");
         _watchButton = _panel.Q<Button>("WatchAdButton");
         _closeButton = _panel.Q<Button>("AdCloseButton");
 
         _panel.style.display = DisplayStyle.None;
+
+        if (_card != null)
+        {
+            _card.generateVisualContent -= OnGenerateCardBackground;
+            _card.generateVisualContent += OnGenerateCardBackground;
+        }
 
         if (_watchButton != null)
         {
@@ -233,6 +252,12 @@ public class AdRewardManager : MonoBehaviour
                 _timerLabel.text = "Đang tải quảng cáo...";
         }
         if (_rewardLabel != null) _rewardLabel.text = "";
+        if (_rewardBadge != null) _rewardBadge.style.display = DisplayStyle.None;
+        ClearRewardIconClasses();
+
+        var placeholder = _panel != null ? _panel.Q("ad-placeholder") : null;
+        if (placeholder != null) placeholder.style.display = DisplayStyle.Flex;
+
         if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
         if (_closeButton != null) _closeButton.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
@@ -241,6 +266,15 @@ public class AdRewardManager : MonoBehaviour
         // Auto-play ad
         StartAd();
         return true;
+    }
+
+    private void ClearRewardIconClasses()
+    {
+        if (_rewardIcon == null) return;
+        _rewardIcon.RemoveFromClassList("reward-icon-coin");
+        _rewardIcon.RemoveFromClassList("reward-icon-exp");
+        _rewardIcon.RemoveFromClassList("reward-icon-ammo");
+        _rewardIcon.RemoveFromClassList("reward-icon-health");
     }
 
     private void StartAd()
@@ -328,27 +362,32 @@ public class AdRewardManager : MonoBehaviour
         string[] rewards = { "Coin", "Exp", "Ammo", "Health" };
         string selected = rewards[Random.Range(0, rewards.Length)];
 
+        ClearRewardIconClasses();
+
         switch (selected)
         {
             case "Coin":
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-coin");
                 if (CoinManager.Instance != null)
                 {
                     CoinManager.Instance.AddCoins(coinAmount, false);
                     if (_rewardLabel != null)
-                        _rewardLabel.text = $"+{coinAmount} Coins!";
+                        _rewardLabel.text = $"+{coinAmount} COINS";
                 }
                 break;
 
             case "Exp":
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-exp");
                 if (ExperienceManager.Instance != null)
                 {
                     ExperienceManager.Instance.AddExperience(expAmount);
                     if (_rewardLabel != null)
-                        _rewardLabel.text = $"+{expAmount} EXP!";
+                        _rewardLabel.text = $"+{expAmount} EXP";
                 }
                 break;
 
             case "Ammo":
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-ammo");
                 if (_currentPlayer != null)
                 {
                     var wRef = _currentPlayer.GetComponent<IWeaponReferenceProvider>();
@@ -360,12 +399,13 @@ public class AdRewardManager : MonoBehaviour
                         if (wEvents != null && wEvents.Events != null)
                             wEvents.Events.OnAmmoChanged?.Invoke(false);
                         if (_rewardLabel != null)
-                            _rewardLabel.text = $"+{amount} đạn!";
+                            _rewardLabel.text = $"+{amount} ĐẠN";
                     }
                 }
                 break;
 
             case "Health":
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-health");
                 if (_currentPlayer != null)
                 {
                     var stats = _currentPlayer.GetComponent<PlayerStats>();
@@ -373,11 +413,15 @@ public class AdRewardManager : MonoBehaviour
                     {
                         stats.Heal(healthAmount);
                         if (_rewardLabel != null)
-                            _rewardLabel.text = $"+{healthAmount} HP!";
+                            _rewardLabel.text = $"+{healthAmount} HP";
                     }
                 }
                 break;
         }
+
+        if (_rewardBadge != null) _rewardBadge.style.display = DisplayStyle.Flex;
+        var placeholder = _panel != null ? _panel.Q("ad-placeholder") : null;
+        if (placeholder != null) placeholder.style.display = DisplayStyle.None;
 
         LoadRewardedAd();
     }
@@ -424,5 +468,62 @@ public class AdRewardManager : MonoBehaviour
             _rewardedAd = null;
         }
         _isAdReady = false;
+    }
+
+    private void OnGenerateCardBackground(MeshGenerationContext mgc)
+    {
+        var targetElement = mgc.visualElement;
+        if (targetElement == null) return;
+        var rect = targetElement.layout;
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        var painter = mgc.painter2D;
+        float chamferSize = 32f;
+
+        // 1. Draw solid dark blue-gray translucent background shape
+        Color fillCol = new Color(9f / 255f, 13f / 255f, 19f / 255f, 0.9f);
+        painter.fillColor = fillCol;
+        painter.BeginPath();
+        painter.MoveTo(new Vector2(chamferSize, 0));
+        painter.LineTo(new Vector2(rect.width, 0));
+        painter.LineTo(new Vector2(rect.width, rect.height - chamferSize));
+        painter.LineTo(new Vector2(rect.width - chamferSize, rect.height));
+        painter.LineTo(new Vector2(0, rect.height));
+        painter.LineTo(new Vector2(0, chamferSize));
+        painter.ClosePath();
+        painter.Fill();
+
+        // 2. Draw outer border with gold breathing glow
+        float pulse = 0.35f + Mathf.PingPong(Time.realtimeSinceStartup * 1.5f, 0.45f);
+        Color strokeCol = new Color(217f / 255f, 199f / 255f, 115f / 255f, pulse);
+        painter.strokeColor = strokeCol;
+        painter.lineWidth = 1.5f;
+        painter.BeginPath();
+        painter.MoveTo(new Vector2(chamferSize, 0));
+        painter.LineTo(new Vector2(rect.width, 0));
+        painter.LineTo(new Vector2(rect.width, rect.height - chamferSize));
+        painter.LineTo(new Vector2(rect.width - chamferSize, rect.height));
+        painter.LineTo(new Vector2(0, rect.height));
+        painter.LineTo(new Vector2(0, chamferSize));
+        painter.ClosePath();
+        painter.Stroke();
+
+        // 3. Draw inner offset double-line border
+        float d = 3.5f;
+        if (rect.width > d * 2 && rect.height > d * 2)
+        {
+            Color innerCol = new Color(217f / 255f, 199f / 255f, 115f / 255f, 0.15f);
+            painter.strokeColor = innerCol;
+            painter.lineWidth = 1.0f;
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(chamferSize, d));
+            painter.LineTo(new Vector2(rect.width - d, d));
+            painter.LineTo(new Vector2(rect.width - d, rect.height - chamferSize));
+            painter.LineTo(new Vector2(rect.width - chamferSize, rect.height - d));
+            painter.LineTo(new Vector2(d, rect.height - d));
+            painter.LineTo(new Vector2(d, chamferSize));
+            painter.ClosePath();
+            painter.Stroke();
+        }
     }
 }

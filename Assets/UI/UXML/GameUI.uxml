@@ -454,6 +454,7 @@
             <ui:VisualElement name="AdCard" class="ui-panel-card">
                 <ui:VisualElement name="AdCardShadow" class="card-shadow" picking-mode="Ignore" />
                 <ui:VisualElement name="AdTopAccent" class="ui-panel-accent" />
+                <ui:VisualElement name="AdIcon" />
                 <ui:Label name="AdTitle" text="QUẢNG CÁO" />
                 <ui:VisualElement name="AdDivider" />
                 <ui:VisualElement name="AdContent">
@@ -465,11 +466,14 @@
                         <ui:VisualElement class="ad-placeholder-icon" />
                         <ui:Label class="ad-placeholder-label" text="ĐANG PHÁT QUẢNG CÁO..." />
                     </ui:VisualElement>
-                    <ui:Label name="AdRewardText" text="" />
+                    <ui:VisualElement name="AdRewardBadge" style="display: none;">
+                        <ui:VisualElement name="AdRewardIcon" />
+                        <ui:Label name="AdRewardText" text="" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="AdFooter" class="ad-footer">
-                    <ui:Button name="WatchAdButton" text="XEM QUẢNG CÁO" class="gameover-button" />
-                    <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="gameover-button" style="display: none;" />
+                    <ui:Button name="WatchAdButton" text="XEM QUẢNG CÁO" class="ad-button" />
+                    <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="ad-button" style="display: none;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -1,7 +1,7 @@
-/* ===== AdRewardPanel.uss ===== */
+/* ===== AdRewardPanel.uss — Sci-Fi Gold Tactical Ad Theme ===== */
 @import url("Shared.uss");
 
-#AdRewardPanel {
+#GameUIRoot #AdRewardPanel {
     position: absolute;
     left: 0;
     right: 0;
@@ -10,6 +10,16 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#GameUIRoot #AdRewardPanel.visible {
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 1;
 }
 
 #AdRewardPanel #AdVignette {
@@ -20,51 +30,87 @@
     bottom: 0;
     background-image: resource("Images/ui_vignette");
     -unity-background-scale-mode: scale-and-crop;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in-out;
+}
+
+#AdRewardPanel.visible #AdVignette {
+    opacity: 1;
 }
 
 #AdRewardPanel #AdCard {
+    position: absolute;
+    left: 50%;
+    top: 50%;
     width: 760px;
     height: 520px;
     max-height: 95%;
     max-width: 95%;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    padding-top: 32px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    opacity: 0;
+    scale: 0;
+    translate: -50% -50%;
+    transition-property: opacity, scale, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-in, ease-in, ease-in-out;
+}
+
+#AdRewardPanel.visible #AdCard {
+    opacity: 1;
+    scale: 1;
+    translate: -50% -50%;
+    transition-property: opacity, scale, translate;
+    transition-duration: var(--premium-panel-transition-duration, 1.5s);
+    transition-timing-function: ease-out-back, ease-out-back, ease-in-out;
 }
 
 #AdRewardPanel #AdCardShadow {
-    position: absolute;
-    left: -20px;
-    top: -20px;
-    right: -20px;
-    bottom: -20px;
-    pointer-events: none;
+    display: none;
 }
 
 #AdRewardPanel #AdTopAccent {
-    background-color: var(--color-accent-cyan);
+    display: none;
+}
+
+#AdRewardPanel #AdIcon {
+    width: 58px;
+    height: 58px;
+    margin-top: 0;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+    -unity-background-image-tint-color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 #AdRewardPanel #AdTitle {
-    font-size: var(--fs-display);
+    font-size: var(--fs-display, 48px);
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
-    letter-spacing: 6px;
+    letter-spacing: 8px;
     width: 100%;
-    max-width: 720px;
-    height: 90px;
-    margin-top: var(--space-l);
+    height: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
     flex-shrink: 0;
-    color: var(--color-accent-cyan-light);
-    -unity-text-outline-color: var(--shadow-color-default);
-    -unity-text-outline-width: var(--shadow-text-md);
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-outline-color: var(--color-text-shadow, rgba(0, 0, 0, 0.8));
+    -unity-text-outline-width: var(--shadow-text-md, 2px);
 }
 
 #AdRewardPanel #AdDivider {
     width: 620px;
     height: 2px;
     flex-shrink: 0;
-    margin-top: var(--space-s);
-    background-color: var(--color-divider);
+    margin-top: 4px;
+    margin-bottom: 8px;
+    background-color: rgba(217, 199, 115, 0.2);
 }
 
 #AdRewardPanel #AdContent {
@@ -74,36 +120,8 @@
     align-items: center;
     justify-content: center;
     margin: var(--space-m) 0;
-    background-color: var(--color-surface-mid);
+    background-color: transparent;
     border-radius: var(--radius-s);
-    transition: background-color var(--transition-medium) ease-out;
-}
-
-#AdRewardPanel #AdContent.ad-playing {
-    background-color: var(--color-surface-hover);
-}
-
-#AdRewardPanel #AdContent.ad-playing .ad-placeholder-icon {
-    opacity: 0.5;
-    transition: opacity 1.2s ease-in-out;
-}
-
-#AdRewardPanel #AdContent.ad-playing .ad-playing-overlay {
-    display: flex;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0,0,0,0.6);
-    border-radius: var(--radius-s);
-}
-
-#AdRewardPanel #AdContent.ad-playing .ad-playing-overlay .ad-placeholder-label {
-    color: var(--color-accent-cyan-light);
 }
 
 #AdRewardPanel .ad-placeholder {
@@ -118,39 +136,91 @@
     width: 56px;
     height: 56px;
     -unity-background-scale-mode: scale-to-fit;
-    background-image: url("project://database/Assets/UI/Resources/Icons/icon_ad.svg");
-    -unity-background-image-tint-color: var(--color-accent-cyan);
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
+    -unity-background-image-tint-color: var(--color-accent-gold, rgb(217, 199, 115));
     margin-bottom: var(--space-s);
 }
 
 #AdRewardPanel .ad-placeholder-label {
-    font-size: var(--fs-l);
+    font-size: var(--fs-l, 22px);
     -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
     color: var(--color-text-muted);
     -unity-text-align: middle-center;
+    letter-spacing: 2px;
+}
+
+#AdRewardPanel #AdPlayingOverlay {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 14, 20, 0.85);
+    border-radius: var(--radius-s);
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.2);
 }
 
 #AdRewardPanel #AdTimer {
-    font-size: var(--fs-xl);
+    font-size: var(--fs-xl, 28px);
     -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
-    color: var(--color-text-primary);
+    color: var(--color-accent-gold, rgb(217, 199, 115));
     -unity-text-align: middle-center;
     width: 100%;
     height: 36px;
     margin-top: var(--space-xs);
+    letter-spacing: 2px;
+}
+
+/* === Gold Reward Badge === */
+#AdRewardPanel #AdRewardBadge {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(217, 199, 115, 0.08);
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.4);
+    border-radius: 8px;
+    padding: 12px 28px;
+    margin-top: 10px;
+}
+
+#AdRewardPanel #AdRewardIcon {
+    width: 52px;
+    height: 52px;
+    margin-right: 16px;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(217, 199, 115);
+}
+
+#AdRewardPanel .reward-icon-coin {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_coin.svg");
+}
+
+#AdRewardPanel .reward-icon-exp {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp1.svg");
+}
+
+#AdRewardPanel .reward-icon-ammo {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_weapon_rifle.svg");
+}
+
+#AdRewardPanel .reward-icon-health {
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
 }
 
 #AdRewardPanel #AdRewardText {
-    font-size: var(--fs-hero);
+    font-size: 36px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
-    letter-spacing: 2px;
-    width: 100%;
-    height: 60px;
-    margin-top: var(--space-s);
-    color: var(--color-accent-gold);
-    -unity-text-outline-color: var(--shadow-color-default);
-    -unity-text-outline-width: var(--shadow-text-md);
+    letter-spacing: 3px;
+    color: rgb(217, 199, 115);
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    -unity-text-outline-width: 2px;
 }
 
 #AdRewardPanel #AdFooter {
@@ -161,5 +231,39 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-bottom: var(--space-m);
+    margin-bottom: 24px;
+}
+
+/* === Ad Buttons (Sci-Fi Gold Tactical Theme) === */
+#AdRewardPanel .ad-button {
+    width: 540px;
+    height: 84px;
+    margin: 0 auto;
+    align-self: center;
+    background-color: rgba(16, 22, 30, 0.9);
+    background-image: none;
+    border-width: 1px;
+    border-color: rgba(217, 199, 115, 0.3);
+    border-radius: 4px;
+    font-size: 30px;
+    -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
+    color: rgb(217, 199, 115);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    letter-spacing: 8px;
+    transition-property: scale, background-color, border-color, color;
+    transition-duration: 0.15s, 0.15s, 0.15s, 0.15s;
+    transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+#AdRewardPanel .ad-button:hover {
+    scale: 1.05;
+    background-color: rgba(217, 199, 115, 0.15);
+    border-color: rgb(217, 199, 115);
+    color: rgb(217, 199, 115);
+}
+
+#AdRewardPanel .ad-button:active {
+    scale: 0.95;
+    background-color: rgba(217, 199, 115, 0.05);
 }
