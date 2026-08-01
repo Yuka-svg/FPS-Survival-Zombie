@@ -41,7 +41,7 @@ namespace cowsins
 
         private PlayerMovement playerMovement;
         private PlayerMovementEvents playerEvents;
-        private PlayerStats playerStats;
+        private IPlayerStatsProvider playerStats;
 
         private Vector3 initialSpawnPosition;
         private Quaternion initialSpawnRotation;
@@ -72,7 +72,7 @@ namespace cowsins
         private void Start()
         {
             playerMovement = GetComponent<PlayerMovement>();
-            playerStats = GetComponent<PlayerStats>();
+            playerStats = GetComponent<IPlayerStatsProvider>();
 
             var dependencies = GetComponent<PlayerDependencies>();
             if (dependencies != null)
