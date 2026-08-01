@@ -264,5 +264,24 @@ namespace cowsins
                 cameraHead.localPosition = new Vector3(cameraHead.localPosition.x, targetHeadY, cameraHead.localPosition.z);
             }
         }
+
+        public void ResetCrouchState()
+        {
+            if (playerMovement != null)
+            {
+                playerMovement.IsCrouching = false;
+                playerMovement.IsSliding = false;
+            }
+            isBoosting = false;
+            slideTimer = 0f;
+            slideBoostRemaining = 0f;
+            canUnCrouch = true;
+            if (context != null && context.Capsule != null)
+            {
+                context.Capsule.height = initialHeight;
+                context.Capsule.center = initialCenter;
+                UpdateHeadPosition(context.Capsule);
+            }
+        }
     }
 }

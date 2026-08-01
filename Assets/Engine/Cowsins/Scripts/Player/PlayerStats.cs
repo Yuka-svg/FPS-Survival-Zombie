@@ -94,6 +94,11 @@ namespace cowsins
         {
             GetAllReferences();
 
+            if (playerEvents != null && playerEvents.Events != null)
+            {
+                playerEvents.Events.OnRespawn.AddListener(HandleRespawnFallDamageReset);
+            }
+
             // Apply basic settings 
             maxHealth += PlayerUpgradeManager.Instance.bonusHealth;
             maxShield += PlayerUpgradeManager.Instance.bonusShield;
@@ -107,6 +112,19 @@ namespace cowsins
 
             if (enableShieldRegen)
                 InvokeRepeating(nameof(ManageShieldRegen), shieldRegenRate, shieldRegenRate);
+        }
+
+        private void OnDestroy()
+        {
+            if (playerEvents != null && playerEvents.Events != null)
+            {
+                playerEvents.Events.OnRespawn.RemoveListener(HandleRespawnFallDamageReset);
+            }
+        }
+
+        private void HandleRespawnFallDamageReset(Vector3 position, Quaternion rotation, bool resetStamina, bool resetDashes)
+        {
+            currentFallHeight = null;
         }
 
         private void Update()

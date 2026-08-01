@@ -100,6 +100,16 @@ public class CameraLookBehaviour
         orientation.UpdateOrientation(context.Rigidbody.transform.position, cameraYaw);
     }
 
+    public void SetRotation(Quaternion targetRotation)
+    {
+        Vector3 euler = targetRotation.eulerAngles;
+        cameraYaw = euler.y;
+        cameraPitch = euler.x > 180f ? euler.x - 360f : euler.x;
+        cameraPitch = Mathf.Clamp(cameraPitch, -playerSettings.maxCameraAngle, playerSettings.maxCameraAngle);
+        cameraRoll = 0f;
+        ApplyCameraRotation();
+    }
+
 
     private void CalculateCameraRoll()
     {

@@ -11,7 +11,7 @@ namespace cowsins
 {
     // Add a rigidbody if needed, PlayerMovement.cs requires a rigidbody to work 
     [RequireComponent(typeof(Rigidbody))]
-    //[RequireComponent(typeof(____))] Player Movement also requires a non trigger collider. Attach your preffered collider method
+    [RequireComponent(typeof(PlayerFallSafety))]
     public class PlayerMovement : MonoBehaviour, IPlayerMovementStateProvider, IPlayerMovementEventsProvider
     {
         #region Settings
@@ -278,8 +278,18 @@ namespace cowsins
         /// <param name="rotation"></param>
         public void TeleportPlayer(Vector3 position, Quaternion rotation, bool resetStamina, bool resetDashes)
         {
-            rb.position = position;
-            playerSettings.playerCam.rotation = rotation;
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.position = position;
+            }
+            transform.position = position;
+            Physics.SyncTransforms();
+
+            crouchSlideBehaviour?.ResetCrouchState();
+            grapplingHookBehaviour?.Exit();
+            cameraLookBehaviour?.SetRotation(rotation);
 
             if(resetStamina) staminaBehaviour?.ResetStamina();
             if(resetDashes) dashBehaviour?.ResetDashes();
