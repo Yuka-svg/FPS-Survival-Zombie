@@ -2,10 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// Draws a glowing "light zone" around a chapter's playable area so the player
-/// can always see where the current chapter's boundary is. Builds 4 translucent
-/// vertical glow panels along the boundary edges, 4 corner light pillars, and an
-/// optional soft ground glow. The visuals only render while this chapter is the
-/// current StoryManager chapter.
+/// can always see where the current chapter's boundary is. Builds 4 bright
+/// ground strips lying flat along the boundary edges (painted-line style),
+/// 4 corner point lights, and an optional soft ground glow.
+///
+/// The glow only appears once the player PHYSICALLY ARRIVES inside the chapter
+/// zone (presence check in Update) AND the story has reached that chapter. The
+/// zone lights up when you walk into it — not earlier. It turns off when the
+/// player leaves the area.
 ///
 /// Place this on the same GameObject as a <see cref="ChapterBoundary"/> (it reads
 /// the boundary's trigger collider to size the visuals). Visuals are created at
@@ -18,28 +22,15 @@ public class ChapterZoneHighlight : MonoBehaviour
     [Tooltip("Base color of the zone glow. Auto-picked per chapter in Reset() but overridable.")]
     public Color glowColor = new Color(0.4f, 0.9f, 0.6f, 0.35f);
 
-    [Header("Edge Panels")]
-    [Tooltip("Height of the 4 vertical glow panels (world units).")]
-    public float panelHeight = 6f;
-
-    [Tooltip("Thickness of the front/back panels (Z edges) - increased for better visibility.")]
-    public float panelThickness = 5f;
-    
-    [Tooltip("Thickness of the left/right panels (X edges) - increased for better visibility.")]
-    public float panelThicknessSide = 5f;
-
-    [Tooltip("Opacity multiplier for the edge panels.")]
-    [Range(0f, 1f)] public float panelAlpha = 0.35f;
-
     [Header("Corner Lights")]
     [Tooltip("Add a point light at each corner of the zone.")]
     public bool cornerLights = true;
 
     [Tooltip("Corner light intensity.")]
-    public float lightIntensity = 1.2f;
+    public float lightIntensity = 0.7f;
 
     [Tooltip("Corner light range.")]
-    public float lightRange = 8f;
+    public float lightRange = 6f;
 
     [Header("Ground Glow")]
     [Tooltip("Show a soft translucent glow on the ground over the whole zone.")]
@@ -47,6 +38,19 @@ public class ChapterZoneHighlight : MonoBehaviour
 
     [Tooltip("Ground glow opacity.")]
     [Range(0f, 1f)] public float groundAlpha = 0.12f;
+
+    [Header("Ground Edge Strips")]
+    [Tooltip("Show 4 bright strips lying flat on the ground along the 4 edges (painted-line style). Visible from any viewing angle — including straight along the X axis where the vertical front/back panels collapse to a thin line.")]
+    public bool showGroundStrips = true;
+
+    [Tooltip("Width of each ground edge strip (world units).")]
+    public float stripWidth = 2.5f;
+
+    [Tooltip("How high above the ground the strips are placed (world units).")]
+    public float stripHeight = 0.1f;
+
+    [Tooltip("Opacity of the ground edge strips.")]
+    [Range(0f, 1f)] public float stripAlpha = 0.4f;
 
     [Header("Anim")]
     [Tooltip("Pulse the glow panels.")]
@@ -62,11 +66,13 @@ public class ChapterZoneHighlight : MonoBehaviour
     private ChapterBoundary _boundary;
     private Collider _triggerCol;
     private GameObject _root;
-    private Material _panelMat;
     private Material _groundMat;
+    private Material _stripMat;
     private Light[] _cornerLights;
-    private MeshRenderer[] _panelRenderers;
     private float _animTime;
+    private bool _playerInside;
+    private float _presenceTimer;
+    private GameObject _cachedPlayer;
 
     private static Mesh _quadMesh;
     private static Mesh _doubleSidedQuadMesh;
@@ -103,8 +109,8 @@ public class ChapterZoneHighlight : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_panelMat != null) Destroy(_panelMat);
         if (_groundMat != null) Destroy(_groundMat);
+        if (_stripMat != null) Destroy(_stripMat);
     }
 
     private void Subscribe()
@@ -120,24 +126,42 @@ public class ChapterZoneHighlight : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolve whether this zone should be visible. A zone is lit only while it
-    /// is the CURRENT chapter — completed chapters go dark (the player already
-    /// knows them), future chapters stay dark (not reachable yet).
+    /// Resolve whether this zone should be visible. A zone is lit only while the
+    /// player has physically arrived inside this chapter's area AND the story
+    /// has reached this chapter. Completed/future chapters stay dark until the
+    /// player actually walks in.
     /// </summary>
     private void EvaluateVisibility()
     {
         bool visible = false;
         var sm = StoryManager.Instance;
-        if (sm != null && _boundary != null)
+        if (sm != null && _boundary != null && _playerInside)
             visible = sm.CurrentChapter == _boundary.chapter;
 
         if (_root != null && _root.activeSelf != visible) _root.SetActive(visible);
+    }
+
+    private GameObject GetPlayer()
+    {
+        if (_cachedPlayer == null)
+            _cachedPlayer = GameObject.FindGameObjectWithTag("Player");
+        return _cachedPlayer;
+    }
+
+    /// <summary>True while the player is inside this chapter's trigger collider.</summary>
+    private bool IsPlayerInside()
+    {
+        if (_triggerCol == null) return false;
+        var player = GetPlayer();
+        if (player == null) return false;
+        return _triggerCol.bounds.Contains(player.transform.position);
     }
 
     private void Start()
     {
         // Fallback: OnEnable may have run before StoryManager.Awake.
         Subscribe();
+        _playerInside = IsPlayerInside();
         EvaluateVisibility();
     }
 
@@ -210,11 +234,29 @@ public class ChapterZoneHighlight : MonoBehaviour
 
         if (_boundary == null || _triggerCol == null) return;
 
-        // Destroy existing root to stay idempotent.
+        // Destroy any previously created zone-glow root, INCLUDING visuals that
+        // were baked into the scene from a Play-mode save (5 baked "ZoneGlow"
+        // hierarchies were found in the scene — without this cleanup every
+        // chapter renders a duplicate glow set: baked + runtime).
         if (_root != null)
         {
             DestroyImmediate(_root);
             _root = null;
+        }
+        // Also clean up stray glow children that are not tracked by _root
+        // (baked scene objects or leftovers from a partial rebuild).
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            var child = transform.GetChild(i);
+            if (child == null) continue;
+            if (child.name == "ZoneGlow" ||
+                child.name.StartsWith("GlowPanel_") ||
+                child.name.StartsWith("GlowLight_") ||
+                child.name.StartsWith("GlowStrip_") ||
+                child.name == "GlowGround")
+            {
+                DestroyImmediate(child.gameObject);
+            }
         }
 
         _root = new GameObject("ZoneGlow");
@@ -238,60 +280,9 @@ public class ChapterZoneHighlight : MonoBehaviour
         Shader unlitShader = Shader.Find("Sprites/Default");
         if (unlitShader == null) unlitShader = Shader.Find("Unlit/Transparent");
 
-        // ---- 4 vertical edge glow panels ----
-        _panelRenderers = new MeshRenderer[4];
+        // ---- 4 corner point lights ----
         float halfX = size.x * 0.5f;
         float halfZ = size.z * 0.5f;
-        Vector3[] edgeCenters = {
-            new Vector3(center.x - halfX, 0f, center.z),   // X- (left edge, spans Z via scale)
-            new Vector3(center.x + halfX, 0f, center.z),   // X+ (right edge, spans Z via scale)
-            new Vector3(center.x, 0f, center.z - halfZ),   // Z- (back edge, spans X via scale)
-            new Vector3(center.x, 0f, center.z + halfZ),   // Z+ (front edge, spans X via scale)
-        };
-        Vector3[] edgeSizes = {
-            new Vector3(panelThicknessSide, panelHeight, size.z),  // X- (left): Z = boundary.z (spans full Z length)
-            new Vector3(panelThicknessSide, panelHeight, size.z),  // X+ (right): Z = boundary.z (spans full Z length)
-            new Vector3(size.x, panelHeight, panelThickness),       // Z- (back): X = boundary.x (spans full X width)
-            new Vector3(size.x, panelHeight, panelThickness),       // Z+ (front): X = boundary.x (spans full X width)
-        };
-        // Add proper rotations for each panel so they face outward from the zone
-        // Note: Unity's default quad has normal facing -Z (back), so we adjust accordingly
-        // These rotations ensure world normals point outward from the zone
-        Quaternion[] edgeRotations = {
-            Quaternion.Euler(0f, 90f, 0f),   // X- panel: rotate 90° so -Z normal faces left (-X)
-            Quaternion.Euler(0f, -90f, 0f),  // X+ panel: rotate -90° so -Z normal faces right (+X)
-            Quaternion.Euler(0f, 0f, 0f),    // Z- panel: no rotation, -Z normal faces back (-Z)
-            Quaternion.Euler(0f, 180f, 0f),  // Z+ panel: rotate 180° so -Z normal faces forward (+Z)
-        };
-
-        _panelMat = new Material(unlitShader) { name = "ZoneGlowPanel_Runtime" };
-        _panelMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, panelAlpha);
-        
-        // Enable double-sided rendering for visibility from all angles
-        _panelMat.SetFloat("_Cull", 0f); // 0 = off (double-sided), 1 = back, 2 = front
-        
-        // Enable double-sided rendering so panels are visible from both sides
-        _panelMat.SetFloat("_Mode", 3); // Transparent mode
-        _panelMat.SetFloat("_Cull", 0); // Disable culling (double-sided)
-
-        for (int i = 0; i < 4; i++)
-        {
-            var go = new GameObject($"GlowPanel_{i}");
-            go.transform.SetParent(_root.transform, false);
-            go.transform.localPosition = edgeCenters[i];
-            go.transform.localRotation = edgeRotations[i];
-            go.transform.localScale = edgeSizes[i];
-
-            var filter = go.AddComponent<MeshFilter>();
-            filter.sharedMesh = GetQuadMesh();
-            var renderer = go.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = _panelMat;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            _panelRenderers[i] = renderer;
-        }
-
-        // ---- 4 corner point lights ----
         _cornerLights = new Light[4];
         if (cornerLights)
         {
@@ -305,7 +296,7 @@ public class ChapterZoneHighlight : MonoBehaviour
             {
                 var lightGO = new GameObject($"GlowLight_{i}");
                 lightGO.transform.SetParent(_root.transform, false);
-                lightGO.transform.localPosition = cornerCenters[i] + Vector3.up * 2f;
+                lightGO.transform.localPosition = cornerCenters[i] + Vector3.up * 0.5f;
                 var light = lightGO.AddComponent<Light>();
                 light.type = LightType.Point;
                 light.color = new Color(glowColor.r, glowColor.g, glowColor.b, 1f);
@@ -334,18 +325,77 @@ public class ChapterZoneHighlight : MonoBehaviour
             gRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             gRenderer.receiveShadows = false;
         }
+
+        // ---- 4 ground edge strips (painted-line style) ----
+        // These lie flat on the ground along the 4 edges so the boundary stays
+        // visible from ANY viewing angle. Vertical panels collapse to a thin
+        // line when looking straight along the X axis, but a strip on the
+        // ground always shows its full edge length.
+        if (showGroundStrips)
+        {
+            Vector3[] stripCenters = {
+                new Vector3(center.x - halfX, stripHeight, center.z),   // X- edge, strip spans Z
+                new Vector3(center.x + halfX, stripHeight, center.z),   // X+ edge, strip spans Z
+                new Vector3(center.x, stripHeight, center.z - halfZ),   // Z- edge, strip spans X
+                new Vector3(center.x, stripHeight, center.z + halfZ),   // Z+ edge, strip spans X
+            };
+            Vector3[] stripSizes = {
+                new Vector3(stripWidth, size.z, 1f),   // X-: long along Z
+                new Vector3(stripWidth, size.z, 1f),   // X+: long along Z
+                new Vector3(size.x, stripWidth, 1f),   // Z-: long along X
+                new Vector3(size.x, stripWidth, 1f),   // Z+: long along X
+            };
+
+            _stripMat = new Material(unlitShader) { name = "ZoneGlowStrip_Runtime" };
+            _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, stripAlpha);
+            _stripMat.SetFloat("_Cull", 0f);
+            _stripMat.SetFloat("_Mode", 3);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var stripGO = new GameObject($"GlowStrip_{i}");
+                stripGO.transform.SetParent(_root.transform, false);
+                stripGO.transform.localPosition = stripCenters[i];
+                stripGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                stripGO.transform.localScale = stripSizes[i];
+
+                var sFilter = stripGO.AddComponent<MeshFilter>();
+                sFilter.sharedMesh = GetQuadMesh();
+                var sRenderer = stripGO.AddComponent<MeshRenderer>();
+                sRenderer.sharedMaterial = _stripMat;
+                sRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                sRenderer.receiveShadows = false;
+            }
+        }
     }
 
     private void Update()
     {
+        // Periodic presence check (mirrors ChapterBoundary.Update): the glow
+        // only turns on once the player physically walks into the zone, and
+        // turns off when they leave. A plain OnTriggerEnter is not enough —
+        // teleports (chapter transitions, respawns) bypass trigger events, so
+        // we poll the player's position every second.
+        _presenceTimer += Time.unscaledDeltaTime;
+        if (_presenceTimer >= 1f)
+        {
+            _presenceTimer = 0f;
+            bool inside = IsPlayerInside();
+            if (inside != _playerInside)
+            {
+                _playerInside = inside;
+                EvaluateVisibility();
+            }
+        }
+
         if (!pulse || _root == null || !_root.activeSelf) return;
 
         _animTime += Time.deltaTime * pulseSpeed;
         float pulseScale = 1f + Mathf.Sin(_animTime) * pulseAmount;
 
-        // Pulse panel alpha subtly.
-        if (_panelMat != null)
-            _panelMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, panelAlpha * pulseScale);
+        // Pulse ground strips so the painted edges breathe.
+        if (_stripMat != null)
+            _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, stripAlpha * pulseScale);
 
         // Pulse corner light intensity.
         if (_cornerLights != null)
