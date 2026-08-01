@@ -193,6 +193,7 @@
     background-color: #FFDD00;
     border-width: 1px;
     border-color: #FFFFFF;
+    transform-origin: 50% 50%;
 }
 
 .minimap-blip-sidequest {
@@ -203,6 +204,7 @@
     background-color: #00FF66;
     border-width: 1px;
     border-color: #FFFFFF;
+    transform-origin: 50% 50%;
 }
 
 #MinimapQuestMarker {

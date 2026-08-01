@@ -353,6 +353,59 @@ public class QuestTrackerWidget : MonoBehaviour
                 _markerUpdateTimer = 0f;
                 UpdateMinimapBlips(pTrans);
             }
+
+            // 3. Smooth frame-rate pulse effect for all active minimap blips & markers
+            ApplyMinimapPulseEffects();
+        }
+    }
+
+    private void ApplyMinimapPulseEffects()
+    {
+        if (!_isMinimapMode) return;
+
+        float pulseAngle = Time.unscaledTime * 4f;
+        float opacityPulse = 0.85f + 0.15f * Mathf.Sin(pulseAngle);
+        float scalePulse = 1.0f + 0.12f * Mathf.Sin(pulseAngle);
+
+        var scaleStyle = new StyleScale(new Scale(new Vector2(scalePulse, scalePulse)));
+
+        ApplyPoolPulse(_zombieBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_companionBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_specialBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_bossBlips, opacityPulse, false, scaleStyle);
+        ApplyPoolPulse(_journalBlips, opacityPulse, true, scaleStyle);
+        ApplyPoolPulse(_sideQuestBlips, opacityPulse, true, scaleStyle);
+
+        if (_minimapPlayerArrow != null && _minimapPlayerArrow.style.display == DisplayStyle.Flex)
+        {
+            _minimapPlayerArrow.style.opacity = opacityPulse;
+        }
+
+        if (_minimapQuestMarker != null && _minimapQuestMarker.style.display == DisplayStyle.Flex)
+        {
+            _minimapQuestMarker.style.opacity = opacityPulse;
+            _minimapQuestMarker.style.scale = scaleStyle;
+        }
+
+        if (_minimapEdgeArrow != null && _minimapEdgeArrow.style.display == DisplayStyle.Flex)
+        {
+            _minimapEdgeArrow.style.opacity = opacityPulse;
+        }
+    }
+
+    private void ApplyPoolPulse(List<VisualElement> pool, float opacity, bool isFixedMarker, StyleScale scaleStyle)
+    {
+        for (int i = 0; i < pool.Count; i++)
+        {
+            var blip = pool[i];
+            if (blip.style.display == DisplayStyle.Flex)
+            {
+                blip.style.opacity = opacity;
+                if (isFixedMarker)
+                {
+                    blip.style.scale = scaleStyle;
+                }
+            }
         }
     }
 
@@ -434,12 +487,19 @@ public class QuestTrackerWidget : MonoBehaviour
             }
         }
 
-        // Priority 4: Strict Main Story Fallback (active QuestBeacon not assigned to side quest)
-        for (int i = QuestBeacon.ActiveBeacons.Count - 1; i >= 0; i--)
+                var beacon = QuestBeacon.ActiveBeacons[i];
+                if (beacon != null && beacon.gameObject.activeInHierarchy && beacon.TargetQuest == activeQuest)
+                {
+                    return beacon.transform.position;
+                }
+            }
+        }
+
+        // Priority 2: Fallback to active save room or chapter objective position
+        var saveRoom = FindAnyObjectByType<CheckPointView>();
+        if (saveRoom != null && saveRoom.gameObject.activeInHierarchy)
         {
-            var b = QuestBeacon.ActiveBeacons[i];
-            if (b != null && b && b.gameObject.activeInHierarchy && b.IsActive && b.showOnSideQuest == null)
-                return b.transform.position;
+            return saveRoom.transform.position;
         }
 
         return null;
@@ -466,9 +526,13 @@ public class QuestTrackerWidget : MonoBehaviour
         float uiDX = (worldPos.x - playerPos.x) * scale;
         float uiDY = -(worldPos.z - playerPos.z) * scale;
 
-        float halfSize = 8.0f; // Main quest marker 16px
-        float edgeLimit = halfWidth - halfSize;
-        bool isOutside = Mathf.Abs(uiDX) > edgeLimit || Mathf.Abs(uiDY) > edgeLimit;
+        float markerElementHalf = 8.0f; // Main quest marker 16px element half-width
+        float arrowElementHalf = 8.0f;  // Edge arrow 16px element half-width
+        float arrowEdgeMargin = 11.5f;  // Safety margin preventing clipping at 45 deg angle (sqrt(8^2 + 8^2) = 11.31px)
+
+        float markerEdgeLimit = halfWidth - markerElementHalf;
+        float arrowEdgeLimit = halfWidth - arrowEdgeMargin;
+        bool isOutside = Mathf.Abs(uiDX) > markerEdgeLimit || Mathf.Abs(uiDY) > markerEdgeLimit;
 
         if (!isOutside)
         {
@@ -476,8 +540,8 @@ public class QuestTrackerWidget : MonoBehaviour
             if (_minimapQuestMarker != null)
             {
                 _minimapQuestMarker.style.display = DisplayStyle.Flex;
-                _minimapQuestMarker.style.left = halfWidth + uiDX - halfSize;
-                _minimapQuestMarker.style.top = halfWidth + uiDY - halfSize;
+                _minimapQuestMarker.style.left = halfWidth + uiDX - markerElementHalf;
+                _minimapQuestMarker.style.top = halfWidth + uiDY - markerElementHalf;
             }
             if (_minimapEdgeArrow != null) _minimapEdgeArrow.style.display = DisplayStyle.None;
         }
@@ -490,13 +554,13 @@ public class QuestTrackerWidget : MonoBehaviour
                 _minimapEdgeArrow.style.display = DisplayStyle.Flex;
 
                 float maxCoord = Mathf.Max(Mathf.Abs(uiDX), Mathf.Abs(uiDY));
-                float scaleFactor = edgeLimit / maxCoord;
+                float scaleFactor = arrowEdgeLimit / maxCoord;
 
                 float clampDX = uiDX * scaleFactor;
                 float clampDY = uiDY * scaleFactor;
 
-                _minimapEdgeArrow.style.left = halfWidth + clampDX - halfSize;
-                _minimapEdgeArrow.style.top = halfWidth + clampDY - halfSize;
+                _minimapEdgeArrow.style.left = halfWidth + clampDX - arrowElementHalf;
+                _minimapEdgeArrow.style.top = halfWidth + clampDY - arrowElementHalf;
 
                 float angle = Mathf.Atan2(uiDX, -uiDY) * Mathf.Rad2Deg;
                 _minimapEdgeArrow.style.rotate = new Rotate(Angle.Degrees(angle));
