@@ -106,7 +106,9 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
 
     [Header("Damage From Enemies")]
     [Tooltip("How often (seconds) nearby enemies deal damage to the companion.")]
-    public float enemyDamageTickInterval = 1f;
+    public float enemyDamageTickInterval = 3f;
+    [Tooltip("Khoảng thời gian tối thiểu (giây) giữa 2 lần NPC nhận sát thương.")]
+    public float damageCooldown = 3.0f;
     [Tooltip("Damage per tick per nearby enemy within enemyDamageRadius.")]
     public int enemyDamagePerTick = 10;
     public float enemyDamageRadius = 2f;
@@ -174,6 +176,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     private float _shootTimer;
     private float _repathTimer;
     private float _enemyDamageTimer;
+    private float _lastHitTime = -999f;
     private float _downedTimer;
     private float _shootStopTimer; // Stops movement while shooting (L4D2 style)
     private int _ammoRemaining; // Shots left before reload
@@ -272,6 +275,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     {
         if (!ActiveCompanions.Contains(this)) ActiveCompanions.Add(this);
         currentHealth = maxHealth;
+        _lastHitTime = Time.time;
         _agent.speed = followSpeed;
         _agent.acceleration = 8f; // Smooth acceleration (L4D2 style)
         _agent.angularSpeed = 360f; // Turn quickly to face enemies
@@ -850,6 +854,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     public void Revive(float healthFraction, bool byPlayer = false)
     {
         if (CurrentState != State.Downed) return;
+        _lastHitTime = Time.time;
         _rescueProgress = 0f;
         isBeingRescued = false;
         OnRescueProgressChanged?.Invoke(0f);
@@ -939,6 +944,8 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
     public void Damage(float damage, bool isHeadshot)
     {
         if (_state == State.Downed || _state == State.WalkingAway) return;
+        if (Time.time - _lastHitTime < damageCooldown) return;
+        _lastHitTime = Time.time;
         currentHealth -= Mathf.RoundToInt(damage);
         OnHealthChanged?.Invoke(HealthFraction);
 
@@ -994,6 +1001,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
 
     public void StartFollowing()
     {
+        _lastHitTime = Time.time;
         CurrentState = State.Following;
     }
 
