@@ -95,7 +95,7 @@ public class CleaningStaffDialogueTrigger : Interactable
         return 0f;
     }
 
-    public override bool InstantInteraction => (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) ? false : instantInteraction;
+    public override bool InstantInteraction => (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) ? false : base.InstantInteraction;
 
     public override void OnHoldProgressUpdate(float progress)
     {
@@ -312,7 +312,7 @@ public class CleaningStaffDialogueTrigger : Interactable
 
     public override bool IsForbiddenInteraction(IWeaponReferenceProvider weaponController)
     {
-        if (_ai != null && (_ai.CurrentState == CompanionAI.State.Dead || _ai.CurrentState == CompanionAI.State.WalkingAway)) return true;
+        if (_ai != null && (_ai.IsDead || _ai.CurrentState == CompanionAI.State.WalkingAway)) return true;
         return base.IsForbiddenInteraction(weaponController);
     }
 }

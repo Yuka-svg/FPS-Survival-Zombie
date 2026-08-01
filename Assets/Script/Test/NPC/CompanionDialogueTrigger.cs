@@ -70,6 +70,7 @@ public class CompanionDialogueTrigger : Interactable
     public int ActiveStage { get; set; } = 1;
 
     private DialogueBubble _bubble;
+    private CompanionAI _ai;
     private bool _consumed;
     private bool _permanentlyDisabled;
     private bool _smallTalkEnabled;   // When true and ActiveStage <= 0, E shows a random casual line.
@@ -88,6 +89,7 @@ public class CompanionDialogueTrigger : Interactable
     private void OnDisable()
     {
         if (_ai != null) _ai.OnStateChanged -= HandleStateChanged;
+        _player = null;
     }
 
     private void HandleStateChanged(CompanionAI.State newState)
@@ -108,7 +110,7 @@ public class CompanionDialogueTrigger : Interactable
         return 0f;
     }
 
-    public override bool InstantInteraction => (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) ? false : instantInteraction;
+    public override bool InstantInteraction => (_ai != null && _ai.CurrentState == CompanionAI.State.Downed) ? false : base.InstantInteraction;
 
     public override void OnHoldProgressUpdate(float progress)
     {
@@ -143,10 +145,6 @@ public class CompanionDialogueTrigger : Interactable
         Debug.Log("[CompanionDialogueTrigger] Companion rescued by player — next small talk will thank the player.");
     }
 
-    private void OnDisable()
-    {
-        _player = null;
-    }
 
     private void Start()
     {
@@ -246,7 +244,7 @@ public class CompanionDialogueTrigger : Interactable
     public override bool IsForbiddenInteraction(IWeaponReferenceProvider weaponController)
     {
         if (_permanentlyDisabled) return true;
-        if (_ai != null && (_ai.CurrentState == CompanionAI.State.Dead || _ai.CurrentState == CompanionAI.State.WalkingAway)) return true;
+        if (_ai != null && (_ai.IsDead || _ai.CurrentState == CompanionAI.State.WalkingAway)) return true;
         return base.IsForbiddenInteraction(weaponController);
     }
 

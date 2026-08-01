@@ -52,7 +52,6 @@ namespace cowsins
 
         [Tooltip("While Inspecting the weapon, if an attachment is dettached and this field is true, the attachment will be dropped."), SerializeField] private bool dropAttachmentOnDettachUI;
 
-        private bool isForbiddenInteraction = false;
         private float progressElapsed;
         private bool alreadyInteracted = false;
         private Interactable _currentHoldTarget;
@@ -161,13 +160,11 @@ namespace cowsins
                 {
                     if (interactableTarget.IsForbiddenInteraction(weaponReferences))
                     {
-                        isForbiddenInteraction = true;
                         Events.OnForbiddenInteraction?.Invoke();
                     }
                     else
                     {
                         EnableInteractionUI(interactableTarget);
-                        isForbiddenInteraction = false;
                     }
                     highlightedInteractable = interactableTarget;
                 }
