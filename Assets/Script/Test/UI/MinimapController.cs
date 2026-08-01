@@ -77,6 +77,7 @@ public class MinimapController : MonoBehaviour
         if (wLayer >= 0) cullingMask &= ~(1 << wLayer);
         
         _minimapCamera.cullingMask = cullingMask;
+        _minimapCamera.useOcclusionCulling = false;
         _minimapCamera.targetTexture = _minimapTexture;
         _minimapCamera.enabled = false; // Disabled by default until widget requests active view
     }
@@ -118,8 +119,41 @@ public class MinimapController : MonoBehaviour
         }
     }
 
+    private bool _previousFogState;
+
+    private void OnEnable()
+    {
+        Camera.onPreRender += OnCameraPreRender;
+        Camera.onPostRender += OnCameraPostRender;
+    }
+
+    private void OnDisable()
+    {
+        Camera.onPreRender -= OnCameraPreRender;
+        Camera.onPostRender -= OnCameraPostRender;
+    }
+
+    private void OnCameraPreRender(Camera cam)
+    {
+        if (_minimapCamera != null && cam == _minimapCamera)
+        {
+            _previousFogState = RenderSettings.fog;
+            RenderSettings.fog = false;
+        }
+    }
+
+    private void OnCameraPostRender(Camera cam)
+    {
+        if (_minimapCamera != null && cam == _minimapCamera)
+        {
+            RenderSettings.fog = _previousFogState;
+        }
+    }
+
     private void OnDestroy()
     {
+        OnDisable();
+
         if (_minimapTexture != null)
         {
             if (_minimapCamera != null)
