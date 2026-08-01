@@ -4,13 +4,12 @@ using cowsins;
 
 /// <summary>
 /// Fast travel (B6): while standing inside any SaveRoom, the player presses
-/// [T] to open a menu of every unlocked save room (chapters &lt;= current).
+/// [B] to open a menu of every unlocked save room (chapters &lt;= current).
 /// Choosing a destination teleports the player there (PlayerMovement
 /// TeleportPlayer) and sets it as the respawn checkpoint.
 ///
-/// Runtime-built UI like ChapterSummaryWidget/SimpleNotification: lazy
-/// singleton, borrows screen-space PanelSettings, loads FastTravel.uss.
-/// Story mode only.
+/// Runtime-built UI like SimpleNotification: lazy singleton, borrows
+/// screen-space PanelSettings, loads FastTravel.uss. Story mode only.
 /// </summary>
 public class FastTravelWidget : MonoBehaviour
 {
@@ -18,7 +17,7 @@ public class FastTravelWidget : MonoBehaviour
 
     [Header("Controls")]
     [Tooltip("Key that opens the fast travel menu while inside a save room.")]
-    public KeyCode toggleKey = KeyCode.T;
+    public KeyCode toggleKey = KeyCode.B;
 
     [Header("Content")]
     public string title = "DI CHUYỂN NHANH";
@@ -134,7 +133,7 @@ public class FastTravelWidget : MonoBehaviour
         if (!pressed)
         {
             var kb = UnityEngine.InputSystem.Keyboard.current;
-            if (kb != null && toggleKey == KeyCode.T && kb.tKey.wasPressedThisFrame) pressed = true;
+            if (kb != null && toggleKey == KeyCode.B && kb.bKey.wasPressedThisFrame) pressed = true;
         }
         if (pressed) Open();
     }

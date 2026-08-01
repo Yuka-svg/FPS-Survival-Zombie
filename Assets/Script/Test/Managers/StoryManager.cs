@@ -456,4 +456,7 @@ public class StoryManager : MonoBehaviour
 
     /// <summary>Total quests completed across all chapters.</summary>
     public int TotalQuestsCompleted => _completedQuests.Count;
+
+    /// <summary>All main story quests completed so far, in completion order.</summary>
+    public IReadOnlyList<QuestData> CompletedQuests => _completedQuests;
 }

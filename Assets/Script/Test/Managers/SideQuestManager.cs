@@ -57,6 +57,9 @@ public class SideQuestManager : MonoBehaviour
     /// <summary>Number of side quests completed across all chapters.</summary>
     public int TotalCompleted => _completed.Count;
 
+    /// <summary>All side quests completed so far (unsorted).</summary>
+    public IReadOnlyCollection<QuestData> CompletedQuests => _completed;
+
     /// <summary>Fired when a side quest is completed. (completedQuest)</summary>
     public event System.Action<QuestData> OnSideQuestCompleted;
 

@@ -67,6 +67,10 @@
     color: var(--color-text-gold, rgb(217, 199, 115));
 }
 
+.tutorial-history-body {
+    color: var(--color-text-green, rgb(120, 210, 140));
+}
+
 .tutorial-hint {
     -unity-font-definition: var(--font-body-sdf);
     font-size: 12px;

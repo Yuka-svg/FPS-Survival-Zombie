@@ -312,6 +312,8 @@
                     <ui:Label name="TutorialCombatBody" class="tutorial-body" text="" />
                     <ui:Label name="TutorialNpcHeader" class="tutorial-section-header" text="GIAO TIẾP NPC" />
                     <ui:Label name="TutorialNpcBody" class="tutorial-body" text="" />
+                    <ui:Label name="TutorialHistoryHeader" class="tutorial-section-header" text="NHIỆM VỤ ĐÃ LÀM" />
+                    <ui:Label name="TutorialHistoryBody" class="tutorial-body tutorial-history-body" text="" />
                     <ui:Label name="TutorialQuestHeader" class="tutorial-section-header" text="NHIỆM VỤ HIỆN TẠI" />
                     <ui:Label name="TutorialQuestBody" class="tutorial-body tutorial-quest-body" text="" />
                 </ui:ScrollView>

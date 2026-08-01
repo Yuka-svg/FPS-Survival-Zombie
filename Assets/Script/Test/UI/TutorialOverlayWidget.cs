@@ -1,11 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using cowsins;
 
 /// <summary>
 /// Help / tutorial overlay toggleable with [H]. Shows movement, combat and
-/// NPC-communication instructions plus the instructions of the currently
-/// active quest. Follows the PanelManager open/close pattern used by
+/// NPC-communication instructions, the list of quests already completed
+/// ("NHIỆM VỤ ĐÃ LÀM") and the instructions of the currently active quest.
+/// Follows the PanelManager open/close pattern used by
 /// SkillTreeWidget / StatsPanelUI so timeScale, mouse lock and HUD hiding
 /// are handled automatically.
 /// </summary>
@@ -24,7 +26,9 @@ public class TutorialOverlayWidget : MonoBehaviour
         "Left Shift — Chạy nhanh\n" +
         "Left Ctrl — Ngồi / Cúi\n" +
         "Middle Mouse — Dash (lướt nhanh)\n" +
-        "C — Grapple Hook (móc di chuyển)";
+        "C — Grapple Hook (móc di chuyển)\n" +
+        "M — Bật/tắt bản đồ nhỏ / danh sách nhiệm vụ\n" +
+        "B — Di chuyển nhanh (khi đứng trong nhà an toàn)";
 
     [Tooltip("Combat instructions.")]
     [TextArea(5, 12)]
@@ -54,6 +58,7 @@ public class TutorialOverlayWidget : MonoBehaviour
     private VisualElement _root;
     private VisualElement _card;
     private Label _questBody;
+    private Label _historyBody;
     private bool _open;
     private bool _initialized;
     private float _transitionEndTime = 0f;
@@ -96,6 +101,7 @@ public class TutorialOverlayWidget : MonoBehaviour
 
         _card = _root.Q("TutorialCard");
         _questBody = _root.Q<Label>("TutorialQuestBody");
+        _historyBody = _root.Q<Label>("TutorialHistoryBody");
 
         var movementBody = _root.Q<Label>("TutorialMovementBody");
         if (movementBody != null) movementBody.text = movementText;
@@ -120,6 +126,8 @@ public class TutorialOverlayWidget : MonoBehaviour
         {
             StoryManager.Instance.OnActiveQuestChanged -= HandleQuestChanged;
             StoryManager.Instance.OnActiveQuestChanged += HandleQuestChanged;
+            StoryManager.Instance.OnQuestCompleted -= HandleQuestCompleted;
+            StoryManager.Instance.OnQuestCompleted += HandleQuestCompleted;
         }
         if (SideQuestManager.Instance != null)
         {
@@ -135,6 +143,7 @@ public class TutorialOverlayWidget : MonoBehaviour
         if (StoryManager.Instance != null)
         {
             StoryManager.Instance.OnActiveQuestChanged -= HandleQuestChanged;
+            StoryManager.Instance.OnQuestCompleted -= HandleQuestCompleted;
         }
         if (SideQuestManager.Instance != null)
         {
@@ -144,6 +153,7 @@ public class TutorialOverlayWidget : MonoBehaviour
     }
 
     private void HandleQuestChanged(QuestData oldQuest, QuestData newQuest) => RefreshQuestSection();
+    private void HandleQuestCompleted(QuestData quest) => RefreshQuestSection();
     private void HandleSideQuestChanged(QuestData quest) => RefreshQuestSection();
 
     private void Update()
@@ -228,10 +238,12 @@ public class TutorialOverlayWidget : MonoBehaviour
 
     /// <summary>
     /// Refreshes the "NHIỆM VỤ HIỆN TẠI" section with the currently active
-    /// main quest (or first active side quest) including its instructions.
+    /// main quest (or first active side quest) including its instructions,
+    /// and the "NHIỆM VỤ ĐÃ LÀM" section with every quest completed so far.
     /// </summary>
     private void RefreshQuestSection()
     {
+        RefreshHistorySection();
         if (_questBody == null) return;
 
         string text = "";
@@ -260,5 +272,30 @@ public class TutorialOverlayWidget : MonoBehaviour
         }
 
         _questBody.text = text;
+    }
+
+    /// <summary>
+    /// Refreshes the "NHIỆM VỤ ĐÃ LÀM" section with the list of completed
+    /// main story quests (in order) followed by completed side quests.
+    /// </summary>
+    private void RefreshHistorySection()
+    {
+        if (_historyBody == null) return;
+
+        var lines = new List<string>();
+        var sm = StoryManager.Instance;
+        if (sm != null)
+        {
+            foreach (var q in sm.CompletedQuests)
+                lines.Add("• Chương " + q.chapter + ": " + q.title);
+        }
+        var sqm = SideQuestManager.Instance;
+        if (sqm != null)
+        {
+            foreach (var q in sqm.CompletedQuests)
+                lines.Add("• Nhiệm vụ phụ (Chương " + q.chapter + "): " + q.title);
+        }
+
+        _historyBody.text = lines.Count > 0 ? string.Join("\n", lines) : "Chưa hoàn thành nhiệm vụ nào.";
     }
 }
