@@ -787,7 +787,7 @@ public class CompanionAI : MonoBehaviour, IDamageable, IEnemyHealthReadout
         }
         if (attackers > 0)
         {
-            int dmg = enemyDamagePerTick * attackers;
+            int dmg = enemyDamagePerTick;
             Damage(dmg, false);
         }
     }
