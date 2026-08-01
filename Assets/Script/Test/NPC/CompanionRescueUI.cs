@@ -221,9 +221,19 @@ public class CompanionRescueUI : MonoBehaviour
         if (!_uiAttached)
             AttachVisualTree();
 
-        // No billboarding: world-space UIDocument renders on the +Z face, so
-        // keeping rotation = identity (set in BuildPanel) makes the text face
-        // the camera the same way CompanionHealthBar does. LookRotation here
-        // would flip the text backwards.
+        // 1. ALWAYS update Billboard rotation FIRST so 3D orientation is aligned with camera
+        if (_cam == null && Camera.main != null) _cam = Camera.main.transform;
+        if (_cam != null && _panelGO != null)
+        {
+            _panelGO.transform.rotation = _cam.rotation;
+
+            // 2. Distance scaling: Adjust worldSpaceSize based on camera distance (sync with CompanionHealthBar)
+            if (_doc != null)
+            {
+                float dist = Vector3.Distance(_cam.position, _panelGO.transform.position);
+                float scale = Mathf.Clamp(12f / Mathf.Max(2f, dist), 0.4f, 1.1f);
+                _doc.worldSpaceSize = new Vector2(panelSize.x * worldScale * scale, panelSize.y * worldScale * scale);
+            }
+        }
     }
 }

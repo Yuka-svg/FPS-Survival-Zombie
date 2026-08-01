@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 /// <summary>
 /// AAA Screen-space dialogue overlay for NPC interactions.
@@ -33,6 +34,31 @@ public class DialogueBubble : MonoBehaviour
     public float choiceFontSize = 16f;
     public Color hintColor = new Color(0.306f, 0.804f, 0.769f, 1f);
     public float hintFontSize = 14f;
+
+    [Header("Audio")]
+    public AudioClip typeSFX;
+    public AudioClip clickSFX;
+
+#if UNITY_EDITOR
+    private void Reset()
+    {
+        if (typeSFX == null) typeSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Engine/Cowsins/SFX/UI/UIHover_SFX.wav");
+        if (clickSFX == null) clickSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Engine/Cowsins/SFX/UI/clickSFX.wav");
+    }
+#endif
+
+    private cowsins.PlayerControl _playerControl;
+
+    private cowsins.PlayerControl GetPlayerControl()
+    {
+        if (_playerControl == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null) _playerControl = player.GetComponentInChildren<cowsins.PlayerControl>();
+            if (_playerControl == null) _playerControl = Object.FindFirstObjectByType<cowsins.PlayerControl>();
+        }
+        return _playerControl;
+    }
 
     private GameObject _panelGO;
     private UIDocument _doc;
@@ -483,9 +509,10 @@ public class DialogueBubble : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            if (cowsins.PlayerControl.instance != null)
+            var pc = GetPlayerControl();
+            if (pc != null)
             {
-                cowsins.PlayerControl.instance.LoseControl();
+                pc.LoseControl();
             }
 
             if (!pauseOpen && !gameOver && Time.timeScale > 0f)
@@ -562,13 +589,13 @@ public class DialogueBubble : MonoBehaviour
             _didPause = false;
             Time.timeScale = _prevTimeScale > 0f ? _prevTimeScale : 1f;
 
-            if (cowsins.UIController.Instance != null)
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            var pc = GetPlayerControl();
+            if (pc != null)
             {
-                cowsins.UIController.Instance.LockMouse();
-            }
-            if (cowsins.PlayerControl.instance != null)
-            {
-                cowsins.PlayerControl.instance.GrantControl();
+                pc.GrantControl();
             }
         }
     }
@@ -584,17 +611,17 @@ public class DialogueBubble : MonoBehaviour
     {
         if (Time.unscaledTime - _lastSoundTime < 0.05f) return;
         _lastSoundTime = Time.unscaledTime;
-        if (UISoundManager.Instance != null)
+        if (typeSFX != null && cowsins.SoundManager.Instance != null)
         {
-            UISoundManager.Instance.PlayTick();
+            cowsins.SoundManager.Instance.PlaySound(typeSFX, 0f, 0f, false);
         }
     }
 
     private void PlayClickSound()
     {
-        if (UISoundManager.Instance != null)
+        if (clickSFX != null && cowsins.SoundManager.Instance != null)
         {
-            UISoundManager.Instance.PlayButtonClick();
+            cowsins.SoundManager.Instance.PlaySound(clickSFX, 0f, 0f, false);
         }
     }
 
