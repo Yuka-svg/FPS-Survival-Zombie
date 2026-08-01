@@ -93,6 +93,20 @@ public class KillCountObjective : MonoBehaviour
         Debug.Log($"[KillCountObjective] Started. Need {targetCount} kill(s) from {_startKills}.");
     }
 
+    /// <summary>Kills counted so far for the active objective (0 if not listening).</summary>
+    public int Progress
+    {
+        get
+        {
+            if (!_listening) return 0;
+            int current = ScoreManager.Instance != null ? ScoreManager.Instance.kills : 0;
+            return Mathf.Max(0, current - _startKills);
+        }
+    }
+
+    /// <summary>Total kills required to complete the objective.</summary>
+    public int Target => targetCount;
+
     private void Update()
     {
         if (!_listening || _done) return;

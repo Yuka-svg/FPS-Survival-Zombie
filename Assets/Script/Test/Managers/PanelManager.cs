@@ -33,6 +33,9 @@ public class PanelManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStaticState()
     {
+        // DisableDomainReload: clear statics so a stale destroyed reference
+        // doesn't make the scene's PanelManager destroy itself in Awake.
+        Instance = null;
         _hudActiveState.Clear();
     }
 

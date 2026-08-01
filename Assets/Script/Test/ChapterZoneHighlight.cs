@@ -1,4 +1,6 @@
 using UnityEngine;
+using cowsins;
+using System.Collections.Generic;
 
 /// <summary>
 /// Draws a glowing "light zone" around a chapter's playable area so the player
@@ -44,6 +46,19 @@ public class ChapterZoneHighlight : MonoBehaviour
 
     [Tooltip("Ground glow opacity.")]
     [Range(0f, 1f)] public float groundAlpha = 0.12f;
+
+    [Header("Visual Size (Standalone)")]
+    [Tooltip("Visual footprint override, decoupled from the gameplay collider. " +
+             "Zero = size the visuals from the trigger collider (chapter-boundary mode). " +
+             "Used on save rooms so the glow is compact while the trigger stays big.")]
+    public Vector3 visualSize = Vector3.zero;
+
+    [Tooltip("Ground the glow visuals to the floor (raycast down), so strips/lights " +
+             "hug the ground instead of floating at the collider's mid height.")]
+    public bool stickToGround = true;
+
+    [Tooltip("Height of the glow visuals above the ground when stickToGround is on.")]
+    public float groundOffset = 0.08f;
 
     [Header("Ground Edge Strips")]
     [Tooltip("Show 4 bright strips lying flat on the ground along the 4 edges (painted-line style). Visible from any viewing angle — including straight along the X axis where the vertical front/back panels collapse to a thin line.")]
@@ -147,7 +162,62 @@ public class ChapterZoneHighlight : MonoBehaviour
             visible = sm.CurrentChapter == ch;
         }
 
-        if (_root != null && _root.activeSelf != visible) _root.SetActive(visible);
+        if (_root != null && _root.activeSelf != visible)
+        {
+            if (visible) SnapGlowToGround();
+            _root.SetActive(visible);
+        }
+    }
+
+    /// <summary>
+    /// Raycast straight down at the given world XZ and return the first solid
+    /// floor hit, skipping the player, save rooms and this zone's own children
+    /// (a standing player would otherwise occlude the ray and float the glow).
+    /// </summary>
+    private float RaycastGround(Vector3 xz)
+    {
+        Vector3 origin = new Vector3(xz.x, transform.position.y + 50f, xz.z);
+        RaycastHit[] hits = Physics.RaycastAll(origin, Vector3.down, 100f);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        float y = transform.position.y - 0.2f;
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider == null || hit.collider.isTrigger) continue;
+            var go = hit.collider.gameObject;
+            if (go.GetComponentInParent<PlayerMovement>() != null) continue;
+            if (go.GetComponentInParent<SaveRoom>() != null) continue;
+            if (go.transform.IsChildOf(transform)) continue;
+            y = hit.point.y;
+            break;
+        }
+        return y;
+    }
+
+    /// <summary>
+    /// Re-pin all glow visuals to the floor under the player's feet. Called the
+    /// first time the glow becomes visible (player physically inside the zone),
+    /// so large/uneven chapter zones — and elevated ones like Ch5's bridge at
+    /// y~24 — always have the glow hugging the exact ground the player walks on.
+    /// </summary>
+    private void SnapGlowToGround()
+    {
+        if (!stickToGround || _root == null) return;
+        var player = GetPlayer();
+        if (player == null) return;
+        float groundLocalY = RaycastGround(player.transform.position) - transform.position.y;
+        float stripY = groundLocalY + groundOffset;
+        float glowY = groundLocalY + 0.04f;
+        float lightY = groundLocalY + 1.1f;
+        foreach (Transform child in _root.transform)
+        {
+            Vector3 p = child.localPosition;
+            if (child.name == "GlowGround")
+                child.localPosition = new Vector3(p.x, glowY, p.z);
+            else if (child.name.StartsWith("GlowStrip_"))
+                child.localPosition = new Vector3(p.x, stripY, p.z);
+            else if (child.name.StartsWith("GlowLight_"))
+                child.localPosition = new Vector3(p.x, lightY, p.z);
+        }
     }
 
     private GameObject GetPlayer()
@@ -275,7 +345,19 @@ public class ChapterZoneHighlight : MonoBehaviour
         _root.transform.localRotation = Quaternion.identity;
 
         Vector3 center, size;
-        if (_triggerCol is BoxCollider bc)
+        if (visualSize != Vector3.zero)
+        {
+            // Standalone/save-room mode: compact visual footprint decoupled
+            // from the gameplay collider. X/Z are converted to LOCAL space
+            // (bounds.center is world; child positions below are local).
+            // Y is re-derived from the ground via raycast.
+            center = new Vector3(
+                _triggerCol.bounds.center.x - transform.position.x,
+                transform.position.y,
+                _triggerCol.bounds.center.z - transform.position.z);
+            size = new Vector3(visualSize.x, visualSize.y, visualSize.z);
+        }
+        else if (_triggerCol is BoxCollider bc)
         {
             center = bc.center;
             size = bc.size;
@@ -287,6 +369,50 @@ public class ChapterZoneHighlight : MonoBehaviour
             size = new Vector3(60f, 20f, 60f);
         }
 
+        // ---- Ground level (world Y of the floor under the zone center) ----
+        // Used to pin strips/lights/ground glow flat against the ground instead
+        // of floating at the collider's mid height (save rooms sit at y=1 with
+        // a 4-tall collider, so naive placement puts visuals ~1m in the air).
+        float groundWorldY = 0f;
+        if (stickToGround)
+        {
+            var player = GetPlayer();
+            if (player != null && _triggerCol.bounds.Contains(player.transform.position))
+            {
+                // Player is standing here right now (save rooms, chapter-1
+                // spawn) — snap straight to the floor under the player's feet.
+                groundWorldY = RaycastGround(player.transform.position);
+            }
+            else
+            {
+                // Player not here yet: sample the zone center + 4 edge
+                // midpoints and take the MEDIAN. A single center raycast can
+                // land on a building roof (Ch2's center is over a commercial
+                // block); the median of the edge samples pulls it back down to
+                // the street. (Re-snapped under the player on first arrival.)
+                Vector3 zoneCenter = _triggerCol.bounds.center;
+                Vector3 zoneSize = _triggerCol.bounds.size;
+                Vector3[] samples =
+                {
+                    new Vector3(zoneCenter.x, 0f, zoneCenter.z),
+                    new Vector3(zoneCenter.x - zoneSize.x * 0.45f, 0f, zoneCenter.z),
+                    new Vector3(zoneCenter.x + zoneSize.x * 0.45f, 0f, zoneCenter.z),
+                    new Vector3(zoneCenter.x, 0f, zoneCenter.z - zoneSize.z * 0.45f),
+                    new Vector3(zoneCenter.x, 0f, zoneCenter.z + zoneSize.z * 0.45f),
+                };
+                List<float> floorYs = new List<float>(samples.Length);
+                foreach (Vector3 sample in samples)
+                    floorYs.Add(RaycastGround(sample));
+                floorYs.Sort();
+                groundWorldY = floorYs[floorYs.Count / 2];
+            }
+        }
+        // Local Y (relative to this transform) of the ground, plus offsets.
+        float groundLocalY = groundWorldY - transform.position.y;
+        float stripY = groundLocalY + (stickToGround ? groundOffset : stripHeight);
+        float glowY = groundLocalY + 0.04f;
+        float lightY = groundLocalY + 1.1f;
+
         Shader unlitShader = Shader.Find("Sprites/Default");
         if (unlitShader == null) unlitShader = Shader.Find("Unlit/Transparent");
 
@@ -297,16 +423,16 @@ public class ChapterZoneHighlight : MonoBehaviour
         if (cornerLights)
         {
             Vector3[] cornerCenters = {
-                new Vector3(center.x - halfX, 0f, center.z - halfZ),
-                new Vector3(center.x + halfX, 0f, center.z - halfZ),
-                new Vector3(center.x - halfX, 0f, center.z + halfZ),
-                new Vector3(center.x + halfX, 0f, center.z + halfZ),
+                new Vector3(center.x - halfX, lightY, center.z - halfZ),
+                new Vector3(center.x + halfX, lightY, center.z - halfZ),
+                new Vector3(center.x - halfX, lightY, center.z + halfZ),
+                new Vector3(center.x + halfX, lightY, center.z + halfZ),
             };
             for (int i = 0; i < 4; i++)
             {
                 var lightGO = new GameObject($"GlowLight_{i}");
                 lightGO.transform.SetParent(_root.transform, false);
-                lightGO.transform.localPosition = cornerCenters[i] + Vector3.up * 0.5f;
+                lightGO.transform.localPosition = cornerCenters[i];
                 var light = lightGO.AddComponent<Light>();
                 light.type = LightType.Point;
                 light.color = new Color(glowColor.r, glowColor.g, glowColor.b, 1f);
@@ -322,7 +448,7 @@ public class ChapterZoneHighlight : MonoBehaviour
         {
             var groundGO = new GameObject("GlowGround");
             groundGO.transform.SetParent(_root.transform, false);
-            groundGO.transform.localPosition = new Vector3(center.x, -size.y * 0.5f + 0.05f, center.z);
+            groundGO.transform.localPosition = new Vector3(center.x, glowY, center.z);
             groundGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             groundGO.transform.localScale = new Vector3(size.x, size.z, 1f);
 
@@ -344,10 +470,10 @@ public class ChapterZoneHighlight : MonoBehaviour
         if (showGroundStrips)
         {
             Vector3[] stripCenters = {
-                new Vector3(center.x - halfX, stripHeight, center.z),   // X- edge, strip spans Z
-                new Vector3(center.x + halfX, stripHeight, center.z),   // X+ edge, strip spans Z
-                new Vector3(center.x, stripHeight, center.z - halfZ),   // Z- edge, strip spans X
-                new Vector3(center.x, stripHeight, center.z + halfZ),   // Z+ edge, strip spans X
+                new Vector3(center.x - halfX, stripY, center.z),   // X- edge, strip spans Z
+                new Vector3(center.x + halfX, stripY, center.z),   // X+ edge, strip spans Z
+                new Vector3(center.x, stripY, center.z - halfZ),   // Z- edge, strip spans X
+                new Vector3(center.x, stripY, center.z + halfZ),   // Z+ edge, strip spans X
             };
             Vector3[] stripSizes = {
                 new Vector3(stripWidth, size.z, 1f),   // X-: long along Z

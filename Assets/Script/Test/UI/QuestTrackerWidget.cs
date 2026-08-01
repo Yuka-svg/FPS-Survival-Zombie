@@ -928,6 +928,16 @@ public class QuestTrackerWidget : MonoBehaviour
                     _lastActiveChapter = curCh;
                     TriggerUpdateAnimation();
                 }
+                else
+                {
+                    // A1: live progress counters — refresh text only when numbers change.
+                    string curProgress = GetQuestProgressText();
+                    if (curProgress != _lastQuestProgress)
+                    {
+                        _lastQuestProgress = curProgress;
+                        RefreshObjectiveProgressText();
+                    }
+                }
             }
         }
     }
@@ -936,6 +946,7 @@ public class QuestTrackerWidget : MonoBehaviour
     private int _lastSideQuestCount = -1;
     private string _lastActiveQuestTitle = "__init__";
     private int _lastActiveChapter = -1;
+    private string _lastQuestProgress = "__init__";
 
     private void SyncPollCache()
     {
@@ -945,6 +956,7 @@ public class QuestTrackerWidget : MonoBehaviour
             _lastActiveQuestTitle = sm.ActiveQuest?.title;
             _lastActiveChapter = sm.CurrentChapter;
         }
+        _lastQuestProgress = "__init__";
         var sqm = SideQuestManager.Instance;
         if (sqm != null)
         {
@@ -1282,7 +1294,8 @@ public class QuestTrackerWidget : MonoBehaviour
         if (quest != null)
         {
             _title.text = (quest.title ?? "OBJECTIVE").ToUpper();
-            _objective.text = !string.IsNullOrEmpty(quest.objective) ? quest.objective : (quest.description ?? "");
+            _baseObjectiveText = !string.IsNullOrEmpty(quest.objective) ? quest.objective : (quest.description ?? "");
+            _objective.text = _baseObjectiveText + GetQuestProgressText();
             if (_instructions != null)
             {
                 _instructions.text = string.IsNullOrEmpty(quest.instructions) ? "" : quest.instructions;
@@ -1294,12 +1307,48 @@ public class QuestTrackerWidget : MonoBehaviour
             _title.text = (sqm != null && sqm.ActiveQuests != null && sqm.ActiveQuests.Count > 0)
                 ? "— DISCOVER SIDE QUESTS —"
                 : "—";
+            _baseObjectiveText = "";
             _objective.text = "";
             if (_instructions != null) _instructions.text = "";
         }
 
         UpdateCollectibleDisplay();
     }
+
+    /// <summary>
+    /// Returns " (cur/target)" for the active quest's kill/collectible objective
+    /// (A1: live progress counters), or "" when none applies.
+    /// </summary>
+    private string GetQuestProgressText()
+    {
+        var sm = StoryManager.Instance;
+        var quest = sm != null ? sm.ActiveQuest : null;
+        if (quest == null) return "";
+
+        for (int i = KillCountObjective.ActiveObjectives.Count - 1; i >= 0; i--)
+        {
+            var kco = KillCountObjective.ActiveObjectives[i];
+            if (kco != null && kco.targetQuest == quest && kco.Target > 0)
+                return $" ({Mathf.Min(kco.Progress, kco.Target)}/{kco.Target})";
+        }
+
+        for (int i = CollectibleQuestObjective.ActiveObjectives.Count - 1; i >= 0; i--)
+        {
+            var cqo = CollectibleQuestObjective.ActiveObjectives[i];
+            if (cqo != null && cqo.targetQuest == quest && cqo.RequiredCount > 0)
+                return $" ({Mathf.Min(cqo.PickedCount, cqo.RequiredCount)}/{cqo.RequiredCount})";
+        }
+
+        return "";
+    }
+
+    private void RefreshObjectiveProgressText()
+    {
+        if (_objective == null) return;
+        _objective.text = _baseObjectiveText + GetQuestProgressText();
+    }
+
+    private string _baseObjectiveText = "";
 
     private void UpdateSideContent()
     {

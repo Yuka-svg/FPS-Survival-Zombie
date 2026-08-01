@@ -70,11 +70,26 @@ public class SaveRoom : MonoBehaviour
     public static Vector3? LastCheckpoint { get; set; }
     public static Quaternion LastCheckpointRotation { get; set; }
 
+    /// <summary>
+    /// The save room the player is currently standing inside, or null.
+    /// Used by FastTravelWidget to gate the fast travel menu ([T]).
+    /// </summary>
+    public static SaveRoom CurrentRoom { get; set; }
+
     /// <summary>Reset checkpoint static state for a new game session.</summary>
     public static void ResetStaticState()
     {
         LastCheckpoint = null;
         LastCheckpointRotation = Quaternion.identity;
+        CurrentRoom = null;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticsOnDomainReload()
+    {
+        LastCheckpoint = null;
+        LastCheckpointRotation = Quaternion.identity;
+        CurrentRoom = null;
     }
 
     private void SaveCheckpoint()
@@ -99,6 +114,7 @@ public class SaveRoom : MonoBehaviour
     private void HandlePlayerEnter(GameObject playerObj)
     {
         _inside = true;
+        CurrentRoom = this;
         _playerStats = playerObj.GetComponentInParent<PlayerStats>();
         if (_playerStats == null) _playerStats = playerObj.GetComponentInChildren<PlayerStats>();
 
@@ -151,6 +167,7 @@ public class SaveRoom : MonoBehaviour
                     else
                     {
                         _inside = false;
+                        if (CurrentRoom == this) CurrentRoom = null;
                         SetSpawners(true);
                         if (restIndicator != null) restIndicator.SetActive(false);
                         Debug.Log($"[SaveRoom] Player left save room.");
@@ -210,6 +227,7 @@ public class SaveRoom : MonoBehaviour
         if (trigger != null && trigger.bounds.Contains(playerPosition))
         {
             _inside = true;
+            CurrentRoom = this;
             _playerStats = FindAnyObjectByType<PlayerStats>();
             SetSpawners(false);
             if (restIndicator != null) restIndicator.SetActive(true);

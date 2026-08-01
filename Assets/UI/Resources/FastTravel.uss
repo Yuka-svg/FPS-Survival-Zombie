@@ -1,0 +1,142 @@
+@import url("../USS/Theme.uss");
+@import url("../USS/Shared.uss");
+
+/* ============================================================
+   FastTravel.uss — fast travel menu (B6, story mode)
+   PanelManager toggles the "visible" class on panel + card.
+   ============================================================ */
+
+.fast-travel-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    justify-content: center;
+    align-items: center;
+    transition-property: opacity;
+    transition-duration: var(--transition-normal, 0.3s);
+    transition-timing-function: ease-in-out;
+    background-color: rgba(6, 8, 12, 0.82);
+}
+
+.fast-travel-panel.visible {
+    opacity: 1;
+}
+
+.fast-travel-card {
+    width: 560px;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    opacity: 0;
+    scale: 0.94;
+    transition-property: opacity, scale;
+    transition-duration: var(--transition-normal, 0.3s), var(--transition-normal, 0.3s);
+    transition-timing-function: ease-out, ease-out;
+    background-color: var(--color-surface-bottom, rgba(16, 20, 28, 0.97));
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgba(217, 199, 115, 0.55);
+    border-right-color: rgba(217, 199, 115, 0.55);
+    border-top-color: rgba(217, 199, 115, 0.55);
+    border-bottom-color: rgba(217, 199, 115, 0.55);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.75);
+}
+
+.fast-travel-panel.visible .fast-travel-card {
+    opacity: 1;
+    scale: 1;
+}
+
+.fast-travel-title {
+    -unity-font-definition: var(--font-display-sdf);
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: var(--color-accent-gold, rgb(217, 199, 115));
+    -unity-text-align: middle-center;
+    padding-top: 30px;
+    padding-bottom: 6px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 14px rgba(217, 199, 115, 0.35), 1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.fast-travel-subtitle {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 14px;
+    color: var(--color-text-secondary, rgb(210, 215, 225));
+    -unity-text-align: middle-center;
+    padding-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.fast-travel-list {
+    flex-direction: column;
+    width: 460px;
+    margin-bottom: 8px;
+}
+
+.fast-travel-dest {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    background-color: rgba(28, 34, 46, 0.9);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.fast-travel-dest:hover {
+    background-color: var(--color-accent-gold-dark, rgb(176, 156, 70));
+    scale: 1.02;
+}
+
+.fast-travel-dest:active {
+    scale: 0.98;
+}
+
+.fast-travel-dest:disabled {
+    background-color: rgba(20, 24, 32, 0.8);
+    opacity: 0.45;
+}
+
+.fast-travel-dest-name {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 18px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: var(--color-text-primary, rgba(245, 245, 245, 1));
+    -unity-text-align: middle-left;
+}
+
+.fast-travel-dest-sub {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 12px;
+    color: var(--color-text-muted, rgb(158, 168, 184));
+    -unity-text-align: middle-left;
+    padding-top: 2px;
+}
+
+.fast-travel-hint {
+    -unity-font-definition: var(--font-body-sdf);
+    font-size: 12px;
+    color: var(--color-text-muted, rgb(158, 168, 184));
+    -unity-text-align: middle-center;
+    padding-top: 10px;
+    padding-bottom: 18px;
+    letter-spacing: 1px;
+}
