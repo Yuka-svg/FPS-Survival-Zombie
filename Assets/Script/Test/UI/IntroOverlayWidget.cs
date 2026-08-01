@@ -89,9 +89,14 @@ public class IntroOverlayWidget : MonoBehaviour
 
     private IEnumerator ShowAfterBlackFade()
     {
-        // Give the opening black overlay (managed by GameplayHUDController)
-        // time to finish its fade-out before showing the intro.
-        yield return new WaitForSecondsRealtime(3.4f);
+        // Open the intro panel JUST BEFORE the black overlay fade-out finishes
+        // (BlackOverlayDuration = 3.0s). This is critical: GameplayHUDController's
+        // StartFadeOut checks IsAnyPanelActive() when its 3.0s wait ends and only
+        // then resumes timeScale to 1. If we open a fraction later (e.g. the old
+        // 3.4s), the character already starts moving for 0.4s before the intro
+        // panel appears. Opening at 2.85s keeps time frozen the whole time, so
+        // gameplay truly starts only when the player presses BẮT ĐẦU.
+        yield return new WaitForSecondsRealtime(PanelManager.BlackOverlayDuration - 0.15f);
         yield return null;
         Open();
     }
