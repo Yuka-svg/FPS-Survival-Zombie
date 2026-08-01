@@ -23,6 +23,12 @@
     flex-direction: column;
     padding: 0;
     margin: 0;
+    transition: opacity 0.15s ease-out;
+}
+
+.quest-title-glow {
+    background-color: rgba(217, 199, 115, 0.18);
+    translate: 4px 0;
 }
 
 .content-wrapper {
@@ -55,6 +61,7 @@
     margin-bottom: 4px;
     white-space: normal;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    transition: color 0.25s ease-out, background-color 0.25s ease-out, translate 0.25s ease-out;
 }
 
 #Objective {
@@ -120,6 +127,24 @@
     white-space: normal;
     margin-bottom: 2px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    transition: opacity 0.18s ease-out, height 0.18s ease-out, min-height 0.18s ease-out, margin-bottom 0.18s ease-out;
+}
+
+.side-line--exiting {
+    overflow: hidden;
+    opacity: 0;
+    min-height: 0px;
+    height: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.progress-flash-combo {
+    background-color: rgba(78, 205, 196, 0.25);
+    translate: 4px 0;
+    transition: background-color 0.25s ease-out, translate 0.25s ease-out;
 }
 
 #MinimapContainer {

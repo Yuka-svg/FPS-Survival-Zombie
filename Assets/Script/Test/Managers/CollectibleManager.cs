@@ -51,12 +51,15 @@ public class CollectibleManager : MonoBehaviour
         return 0;
     }
 
+    public static event System.Action<JournalData> OnJournalCollected;
+
     public void Collect(JournalData journal)
     {
         if (collected.Contains(journal))
             return;
 
         collected.Add(journal);
+        OnJournalCollected?.Invoke(journal);
 
         if (PlayerStatsTracker.Instance != null)
             PlayerStatsTracker.Instance.RegisterJournalCollected();

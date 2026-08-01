@@ -52,6 +52,14 @@ public class QuestTrackerWidget : MonoBehaviour
     private float _currentMinimapOpacity = 0f;
     private float _currentQuestOpacity = 1f;
 
+    private Coroutine _mainQuestTransitionCoroutine;
+    private IVisualElementScheduledItem _glowScheduledItem;
+    private bool _isQuestUpdating = false;
+    private bool _hasPendingQuestUpdate = false;
+    private bool _hasPendingReentryGlow = false;
+    private readonly List<Label> _exitingLabels = new();
+    private readonly List<string> _lastSideQuestTitles = new();
+
     // Fixed pre-instantiated VisualElement Pools for zero-GC blips rendering across 6 categories
     private readonly List<VisualElement> _zombieBlips = new List<VisualElement>();
     private readonly List<VisualElement> _companionBlips = new List<VisualElement>();
@@ -289,6 +297,21 @@ public class QuestTrackerWidget : MonoBehaviour
             SideQuestManager.Instance.OnSideQuestActivated -= HandleSideQuestChanged;
             SideQuestManager.Instance.OnSideQuestActivated += HandleSideQuestChanged;
         }
+        CollectibleManager.OnJournalCollected -= HandleCollectibleCollected;
+        CollectibleManager.OnJournalCollected += HandleCollectibleCollected;
+    }
+
+    private void ClearExitingLabels()
+    {
+        for (int i = _exitingLabels.Count - 1; i >= 0; i--)
+        {
+            var label = _exitingLabels[i];
+            if (label != null && label.parent != null)
+            {
+                label.RemoveFromHierarchy();
+            }
+        }
+        _exitingLabels.Clear();
     }
 
     private void OnDisable()
@@ -309,14 +332,32 @@ public class QuestTrackerWidget : MonoBehaviour
             _minimapEdgeArrow.generateVisualContent -= OnDrawEdgeArrow;
         }
 
+        _glowScheduledItem?.Pause();
+        _glowScheduledItem = null;
+
+        if (_mainPanel != null)
+        {
+            _mainPanel.RemoveFromClassList("quest-title-glow");
+            _mainPanel.style.opacity = StyleKeyword.Null;
+        }
+
         if (_transitionCoroutine != null)
         {
             StopCoroutine(_transitionCoroutine);
             _transitionCoroutine = null;
         }
 
+        if (_mainQuestTransitionCoroutine != null)
+        {
+            StopCoroutine(_mainQuestTransitionCoroutine);
+            _mainQuestTransitionCoroutine = null;
+        }
+
         _isTransitioning = false;
+        _isQuestUpdating = false;
+
         ApplyFinalModeState(_isMinimapMode);
+        ClearExitingLabels();
 
         if (_minimapImage != null)
         {
@@ -333,6 +374,7 @@ public class QuestTrackerWidget : MonoBehaviour
             SideQuestManager.Instance.OnSideQuestCompleted -= HandleSideQuestChanged;
             SideQuestManager.Instance.OnSideQuestActivated -= HandleSideQuestChanged;
         }
+        CollectibleManager.OnJournalCollected -= HandleCollectibleCollected;
         StopAllCoroutines();
     }
 
@@ -895,31 +937,114 @@ public class QuestTrackerWidget : MonoBehaviour
     private string _lastActiveQuestTitle = "__init__";
     private int _lastActiveChapter = -1;
 
-    private void HandleQuestChanged(QuestData oldQuest, QuestData newQuest) => TriggerUpdateAnimation();
-    private void HandleChapterChanged(int oldCh, int newCh) => TriggerUpdateAnimation();
-    private void HandleSideQuestChanged(QuestData quest) => TriggerUpdateAnimation();
+    private void SyncPollCache()
+    {
+        var sm = StoryManager.Instance;
+        if (sm != null)
+        {
+            _lastActiveQuestTitle = sm.ActiveQuest?.title;
+            _lastActiveChapter = sm.CurrentChapter;
+        }
+        var sqm = SideQuestManager.Instance;
+        if (sqm != null)
+        {
+            _lastSideQuestCount = sqm.ActiveQuests.Count;
+        }
+        var cm = CollectibleManager.Instance;
+        if (cm != null)
+        {
+            _lastCollectibleCount = cm.Count;
+        }
+    }
+
+    private void HandleQuestChanged(QuestData oldQuest, QuestData newQuest)
+    {
+        SyncPollCache();
+        TriggerUpdateAnimation();
+    }
+    private void HandleChapterChanged(int oldCh, int newCh)
+    {
+        SyncPollCache();
+        TriggerUpdateAnimation();
+    }
+    private void HandleSideQuestChanged(QuestData quest)
+    {
+        SyncPollCache();
+        TriggerUpdateAnimation();
+    }
+    private void HandleCollectibleCollected(JournalData journal)
+    {
+        SyncPollCache();
+        TriggerUpdateAnimation();
+    }
 
     private void TriggerUpdateAnimation()
     {
         if (_isMinimapMode)
         {
+            _hasPendingReentryGlow = true;
             UpdateDisplay();
             return;
         }
 
-        if (_container == null)
+        if (_container == null || _mainPanel == null)
         {
             UpdateDisplay();
             return;
         }
 
-        _container.AddToClassList("quest-updating");
-
-        _container.schedule.Execute(() =>
+        if (_isQuestUpdating)
         {
-            UpdateDisplay();
-            _container.RemoveFromClassList("quest-updating");
-        }).ExecuteLater(40);
+            _hasPendingQuestUpdate = true;
+            return;
+        }
+
+        if (_mainQuestTransitionCoroutine != null)
+        {
+            StopCoroutine(_mainQuestTransitionCoroutine);
+            _mainQuestTransitionCoroutine = null;
+        }
+
+        _mainQuestTransitionCoroutine = StartCoroutine(Run2PhaseQuestTransition());
+    }
+
+    private IEnumerator Run2PhaseQuestTransition()
+    {
+        _isQuestUpdating = true;
+
+        // Phase 1 (120ms): Fade out _mainPanel
+        if (_mainPanel != null)
+        {
+            _mainPanel.style.opacity = 0f;
+        }
+        yield return new WaitForSecondsRealtime(0.12f);
+
+        // Midpoint: Swap text strings into labels while opacity = 0
+        UpdateStoryContent();
+        UpdateSideContent();
+
+        // Phase 2 (200ms): Fade in _mainPanel + add gold title glow
+        if (_mainPanel != null)
+        {
+            _mainPanel.style.opacity = 1f;
+            _glowScheduledItem?.Pause();
+            _mainPanel.RemoveFromClassList("quest-title-glow");
+            _mainPanel.AddToClassList("quest-title-glow");
+            _glowScheduledItem = _mainPanel.schedule.Execute(() =>
+            {
+                _mainPanel?.RemoveFromClassList("quest-title-glow");
+            }).StartingIn(250);
+        }
+        yield return new WaitForSecondsRealtime(0.20f);
+
+        _isQuestUpdating = false;
+        _mainQuestTransitionCoroutine = null;
+
+        if (_hasPendingQuestUpdate)
+        {
+            _hasPendingQuestUpdate = false;
+            TriggerUpdateAnimation();
+        }
     }
 
     private void UpdateCollectibleDisplay()
@@ -1045,6 +1170,18 @@ public class QuestTrackerWidget : MonoBehaviour
             if (_questGroup != null) _questGroup.style.display = DisplayStyle.Flex;
             HideAllBlipPools();
             MinimapController.Instance?.SetCameraActive(false);
+
+            if (_hasPendingReentryGlow && _mainPanel != null)
+            {
+                _hasPendingReentryGlow = false;
+                _glowScheduledItem?.Pause();
+                _mainPanel.RemoveFromClassList("quest-title-glow");
+                _mainPanel.AddToClassList("quest-title-glow");
+                _glowScheduledItem = _mainPanel.schedule.Execute(() =>
+                {
+                    _mainPanel?.RemoveFromClassList("quest-title-glow");
+                }).StartingIn(250);
+            }
         }
 
         ResetTransitionInlineStyles();
@@ -1071,6 +1208,11 @@ public class QuestTrackerWidget : MonoBehaviour
             _questGroup.style.width = StyleKeyword.Null;
             _questGroup.style.scale = StyleKeyword.Null;
             _questGroup.style.opacity = StyleKeyword.Null;
+        }
+
+        if (_mainPanel != null)
+        {
+            _mainPanel.style.opacity = StyleKeyword.Null;
         }
 
         if (_container != null)
@@ -1163,7 +1305,9 @@ public class QuestTrackerWidget : MonoBehaviour
     {
         var sqm = SideQuestManager.Instance;
         var activeQuests = sqm != null ? sqm.ActiveQuests : null;
-        if (activeQuests == null || activeQuests.Count == 0 || _sideLinesContainer == null)
+        int activeCount = activeQuests != null ? activeQuests.Count : 0;
+
+        if ((activeCount == 0 && _exitingLabels.Count == 0) || _sideLinesContainer == null)
         {
             if (_sidePanel != null) _sidePanel.style.display = DisplayStyle.None;
             if (_divider != null) _divider.style.display = DisplayStyle.None;
@@ -1173,22 +1317,98 @@ public class QuestTrackerWidget : MonoBehaviour
         if (_sidePanel != null) _sidePanel.style.display = DisplayStyle.Flex;
         if (_divider != null) _divider.style.display = DisplayStyle.Flex;
 
-        _sideLinesContainer.Clear();
+        var newTitles = new List<string>();
+        if (activeQuests != null)
+        {
+            int c = Mathf.Min(activeQuests.Count, maxSideQuestLines);
+            for (int i = 0; i < c; i++)
+            {
+                if (activeQuests[i] != null && !string.IsNullOrEmpty(activeQuests[i].title))
+                    newTitles.Add($"• {activeQuests[i].title}");
+            }
+        }
+
+        for (int i = _sideLines.Count - 1; i >= 0; i--)
+        {
+            var label = _sideLines[i];
+            if (label != null && !newTitles.Contains(label.text))
+            {
+                AnimateSideQuestExit(label);
+            }
+        }
+
+        var toRemove = new List<VisualElement>();
+        for (int i = 0; i < _sideLinesContainer.childCount; i++)
+        {
+            var child = _sideLinesContainer[i];
+            if (child is Label l && !_exitingLabels.Contains(l))
+            {
+                toRemove.Add(child);
+            }
+        }
+        foreach (var el in toRemove)
+        {
+            el.RemoveFromHierarchy();
+        }
         _sideLines.Clear();
 
-        int count = Mathf.Min(activeQuests.Count, maxSideQuestLines);
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < newTitles.Count; i++)
         {
-            var q = activeQuests[i];
-            if (q == null) continue;
-
             var label = new Label
             {
-                text = $"• {q.title}"
+                text = newTitles[i]
             };
             label.AddToClassList("side-line");
             _sideLinesContainer.Add(label);
             _sideLines.Add(label);
+        }
+
+        _lastSideQuestTitles.Clear();
+        _lastSideQuestTitles.AddRange(newTitles);
+    }
+
+    private void AnimateSideQuestExit(Label label)
+    {
+        if (label == null || _exitingLabels.Contains(label)) return;
+        _exitingLabels.Add(label);
+
+        float startH = label.resolvedStyle.height > 0 ? label.resolvedStyle.height : (label.layout.height > 0 ? label.layout.height : 24f);
+        label.style.overflow = Overflow.Hidden;
+        label.AddToClassList("side-line--exiting");
+
+        StartCoroutine(RunSideQuestExitLerp(label, startH));
+    }
+
+    private IEnumerator RunSideQuestExitLerp(Label label, float startH)
+    {
+        float duration = 0.18f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float curH = Mathf.Lerp(startH, 0f, t);
+            float curOpacity = Mathf.Lerp(1f, 0f, t);
+
+            if (label != null)
+            {
+                label.style.height = Length.Pixels(curH);
+                label.style.opacity = curOpacity;
+            }
+            yield return null;
+        }
+
+        if (label != null)
+        {
+            label.RemoveFromHierarchy();
+            _exitingLabels.Remove(label);
+        }
+
+        if ((SideQuestManager.Instance == null || SideQuestManager.Instance.ActiveQuests.Count == 0) && _exitingLabels.Count == 0)
+        {
+            if (_sidePanel != null) _sidePanel.style.display = DisplayStyle.None;
+            if (_divider != null) _divider.style.display = DisplayStyle.None;
         }
     }
 
