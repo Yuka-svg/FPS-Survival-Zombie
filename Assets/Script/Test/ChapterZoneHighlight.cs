@@ -12,12 +12,18 @@ using UnityEngine;
 /// player leaves the area.
 ///
 /// Place this on the same GameObject as a <see cref="ChapterBoundary"/> (it reads
-/// the boundary's trigger collider to size the visuals). Visuals are created at
-/// runtime using unlit transparent materials — no scene art or prefabs needed.
+/// the boundary's trigger collider to size the visuals). It can also be placed
+/// standalone on any GameObject with a collider (e.g. a save room) — then use
+/// <see cref="chapter"/> directly. Visuals are created at runtime using unlit
+/// transparent materials — no scene art or prefabs needed.
 /// </summary>
-[RequireComponent(typeof(ChapterBoundary))]
 public class ChapterZoneHighlight : MonoBehaviour
 {
+    [Header("Chapter")]
+    [Tooltip("Chapter number this zone belongs to. Only used when no ChapterBoundary " +
+             "is present on this GameObject (standalone mode, e.g. save rooms).")]
+    public int chapter = 0;
+
     [Header("Glow Color")]
     [Tooltip("Base color of the zone glow. Auto-picked per chapter in Reset() but overridable.")]
     public Color glowColor = new Color(0.4f, 0.9f, 0.6f, 0.35f);
@@ -82,8 +88,8 @@ public class ChapterZoneHighlight : MonoBehaviour
     {
         // Auto-pick a per-chapter color so each zone reads distinctly.
         var cb = GetComponent<ChapterBoundary>();
-        if (cb == null) return;
-        switch (cb.chapter)
+        int ch = cb != null ? cb.chapter : chapter;
+        switch (ch)
         {
             case 1: glowColor = new Color(0.35f, 0.9f, 0.5f, 0.35f); break;  // green - safe camp
             case 2: glowColor = new Color(0.35f, 0.6f, 1f, 0.35f); break;    // blue - hospital
@@ -135,8 +141,11 @@ public class ChapterZoneHighlight : MonoBehaviour
     {
         bool visible = false;
         var sm = StoryManager.Instance;
-        if (sm != null && _boundary != null && _playerInside)
-            visible = sm.CurrentChapter == _boundary.chapter;
+        if (sm != null && _playerInside)
+        {
+            int ch = _boundary != null ? _boundary.chapter : chapter;
+            visible = sm.CurrentChapter == ch;
+        }
 
         if (_root != null && _root.activeSelf != visible) _root.SetActive(visible);
     }
@@ -232,7 +241,8 @@ public class ChapterZoneHighlight : MonoBehaviour
         _boundary = GetComponent<ChapterBoundary>();
         _triggerCol = GetComponent<Collider>();
 
-        if (_boundary == null || _triggerCol == null) return;
+        // Standalone mode (no ChapterBoundary) still needs a collider to size the visuals.
+        if (_triggerCol == null) return;
 
         // Destroy any previously created zone-glow root, INCLUDING visuals that
         // were baked into the scene from a Play-mode save (5 baked "ZoneGlow"
