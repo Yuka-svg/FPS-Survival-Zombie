@@ -7,6 +7,8 @@ public class GiftBox : Pickeable
     [Tooltip("Danh sách model Present Box, mỗi lần spawn sẽ chọn ngẫu nhiên 1 model.")]
     [SerializeField] private GameObject[] randomModels;
 
+    public override bool InstantInteraction => true;
+
     public override void Awake()
     {
         base.Awake();
