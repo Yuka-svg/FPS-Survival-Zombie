@@ -59,8 +59,27 @@ public class PanelManager : MonoBehaviour
                 if (gameUICanvas != null) _cachedCanvasGo = gameUICanvas;
                 else if (!_isQuitting && !_isDestroyed && gameObject.scene.isLoaded)
                 {
-                    var uiDoc = FindFirstObjectByType<UIDocument>();
-                    if (uiDoc != null) _cachedCanvasGo = uiDoc.gameObject;
+                    var go = GameObject.Find("GameUICanvas");
+                    if (go != null)
+                    {
+                        _cachedCanvasGo = go;
+                    }
+                    else
+                    {
+                        var docs = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+                        foreach (var doc in docs)
+                        {
+                            if (doc != null && doc.rootVisualElement != null && doc.rootVisualElement.Q("GameUIRoot") != null)
+                            {
+                                _cachedCanvasGo = doc.gameObject;
+                                break;
+                            }
+                        }
+                        if (_cachedCanvasGo == null && docs.Length > 0)
+                        {
+                            _cachedCanvasGo = docs[0].gameObject;
+                        }
+                    }
                 }
             }
             return _cachedCanvasGo;
