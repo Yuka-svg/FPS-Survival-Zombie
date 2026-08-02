@@ -487,23 +487,20 @@ public class AdRewardManager : MonoBehaviour
                 if (_currentPlayer != null)
                 {
                     var wRef = _currentPlayer.GetComponent<IWeaponReferenceProvider>();
-                    if (wRef != null && wRef.Id != null)
+                    bool granted = false;
+
+                    if (wRef != null)
                     {
-                        wRef.Id.totalBullets += _cachedAmount;
-                        var wEvents = _currentPlayer.GetComponent<IWeaponEventsProvider>();
-                        if (wEvents != null && wEvents.Events != null)
-                            wEvents.Events.OnAmmoChanged?.Invoke(false);
-                    }
-                    else
-                    {
-                        // Player is holding Melee or no weapon selected -> Grant to first available weapon or Coins
-                        bool granted = false;
-                        var inv = _currentPlayer.GetComponentInChildren<cowsins.WeaponInventorySystem>();
-                        if (inv != null && inv.inventory != null)
+                        if (wRef.Id != null && wRef.Id.weapon != null && wRef.Id.weapon.shootStyle != cowsins.ShootStyle.Melee && wRef.Id.weapon.limitedMagazines)
                         {
-                            foreach (var w in inv.inventory)
+                            wRef.Id.totalBullets += _cachedAmount;
+                            granted = true;
+                        }
+                        else if (wRef.Inventory != null)
+                        {
+                            foreach (var w in wRef.Inventory)
                             {
-                                if (w != null)
+                                if (w != null && w.weapon != null && w.weapon.shootStyle != cowsins.ShootStyle.Melee && w.weapon.limitedMagazines)
                                 {
                                     w.totalBullets += _cachedAmount;
                                     granted = true;
@@ -512,10 +509,17 @@ public class AdRewardManager : MonoBehaviour
                             }
                         }
 
-                        if (!granted && CoinManager.Instance != null)
+                        if (granted)
                         {
-                            CoinManager.Instance.AddCoins(_cachedAmount, false);
+                            var wEvents = _currentPlayer.GetComponent<IWeaponEventsProvider>();
+                            if (wEvents != null && wEvents.Events != null)
+                                wEvents.Events.OnAmmoChanged?.Invoke(false);
                         }
+                    }
+
+                    if (!granted && CoinManager.Instance != null)
+                    {
+                        CoinManager.Instance.AddCoins(_cachedAmount, false);
                     }
                 }
                 break;
