@@ -6,7 +6,7 @@ using GoogleMobileAds.Api;
 
 public class AdRewardManager : MonoBehaviour
 {
-    public enum AdUIState { Idle, Preview, Playing, ConfirmSkip, Claimed }
+    public enum AdUIState { Idle, Preview, Playing, Claimed }
 
     private static AdRewardManager _instance;
     public static AdRewardManager Instance
@@ -32,17 +32,6 @@ public class AdRewardManager : MonoBehaviour
     private Button _watchButton;
     private Button _closeButton;
 
-    // AdMob Mockup Visual Elements
-    private VisualElement _adMobMockupOverlay;
-    private Label _adMobMockupTimerLabel;
-    private VisualElement _adMobProgressBarFill;
-    private Button _adMobSkipButton;
-    private Button _adMobMockupCloseBtn;
-
-    // Skip Confirm Modal Elements
-    private VisualElement _adMobSkipConfirmModal;
-    private Button _adMobResumeBtn;
-    private Button _adMobConfirmSkipBtn;
 
     private bool _ready;
     private bool _isPanelOpen;
@@ -113,10 +102,6 @@ public class AdRewardManager : MonoBehaviour
         if (_closeButton != null) _closeButton.clicked -= OnCloseButtonClicked;
         if (_card != null) _card.generateVisualContent -= OnGenerateCardBackground;
 
-        if (_adMobSkipButton != null) _adMobSkipButton.clicked -= OnAdMobSkipClicked;
-        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.clicked -= OnAdMobMockupCloseClicked;
-        if (_adMobResumeBtn != null) _adMobResumeBtn.clicked -= OnAdMobResumeClicked;
-        if (_adMobConfirmSkipBtn != null) _adMobConfirmSkipBtn.clicked -= OnAdMobConfirmSkipClicked;
     }
 
     private void SetupUI()
@@ -152,16 +137,6 @@ public class AdRewardManager : MonoBehaviour
         _watchButton = _panel.Q<Button>("WatchAdButton");
         _closeButton = _panel.Q<Button>("AdCloseButton");
 
-        // AdMob Mockup Overlay & Modal elements
-        _adMobMockupOverlay = _panel.Q("AdMobMockupOverlay");
-        _adMobMockupTimerLabel = _panel.Q<Label>("AdMobMockupTimerLabel");
-        _adMobProgressBarFill = _panel.Q("AdMobProgressBarFill");
-        _adMobSkipButton = _panel.Q<Button>("AdMobSkipButton");
-        _adMobMockupCloseBtn = _panel.Q<Button>("AdMobMockupCloseBtn");
-
-        _adMobSkipConfirmModal = _panel.Q("AdMobSkipConfirmModal");
-        _adMobResumeBtn = _panel.Q<Button>("AdMobResumeBtn");
-        _adMobConfirmSkipBtn = _panel.Q<Button>("AdMobConfirmSkipBtn");
 
         _panel.style.display = DisplayStyle.None;
 
@@ -182,26 +157,6 @@ public class AdRewardManager : MonoBehaviour
             _closeButton.clicked += OnCloseButtonClicked;
         }
 
-        if (_adMobSkipButton != null)
-        {
-            _adMobSkipButton.clicked -= OnAdMobSkipClicked;
-            _adMobSkipButton.clicked += OnAdMobSkipClicked;
-        }
-        if (_adMobMockupCloseBtn != null)
-        {
-            _adMobMockupCloseBtn.clicked -= OnAdMobMockupCloseClicked;
-            _adMobMockupCloseBtn.clicked += OnAdMobMockupCloseClicked;
-        }
-        if (_adMobResumeBtn != null)
-        {
-            _adMobResumeBtn.clicked -= OnAdMobResumeClicked;
-            _adMobResumeBtn.clicked += OnAdMobResumeClicked;
-        }
-        if (_adMobConfirmSkipBtn != null)
-        {
-            _adMobConfirmSkipBtn.clicked -= OnAdMobConfirmSkipClicked;
-            _adMobConfirmSkipBtn.clicked += OnAdMobConfirmSkipClicked;
-        }
 
         SetButtonState(_watchButton, false, false, false, "XEM QUẢNG CÁO");
         SetButtonState(_closeButton, false, false, false, "BỎ QUA");
@@ -374,8 +329,6 @@ public class AdRewardManager : MonoBehaviour
 
         // Setup PREVIEW UI State
         if (_card != null) _card.style.display = DisplayStyle.Flex;
-        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
-        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
 
         if (_titleLabel != null) _titleLabel.text = "QUẢNG CÁO";
         if (_timerLabel != null) _timerLabel.text = "Nhấn XEM QUẢNG CÁO để nhận quà!";
@@ -466,52 +419,9 @@ public class AdRewardManager : MonoBehaviour
 
         if (_currentState == AdUIState.Playing)
         {
-#if UNITY_EDITOR
-            ClosePanelInternal();
-#else
-            ShowSkipConfirmModal();
-#endif
-            return;
-        }
-
-        if (_currentState == AdUIState.ConfirmSkip)
-        {
-            // ESC pressed again while ConfirmSkip modal is open -> Confirm cancel
             ClosePanelInternal();
             return;
         }
-    }
-
-    private void ShowSkipConfirmModal()
-    {
-        _currentState = AdUIState.ConfirmSkip;
-        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.Flex;
-    }
-
-    private void HideSkipConfirmModal()
-    {
-        _currentState = AdUIState.Playing;
-        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
-    }
-
-    private void OnAdMobSkipClicked()
-    {
-        ShowSkipConfirmModal();
-    }
-
-    private void OnAdMobResumeClicked()
-    {
-        HideSkipConfirmModal();
-    }
-
-    private void OnAdMobConfirmSkipClicked()
-    {
-        ClosePanelInternal();
-    }
-
-    private void OnAdMobMockupCloseClicked()
-    {
-        ClosePanelInternal();
     }
 
     private void StartAd()
@@ -591,7 +501,7 @@ public class AdRewardManager : MonoBehaviour
     {
         _currentState = AdUIState.Preview;
 
-        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
+
         if (_panel != null) _panel.style.display = DisplayStyle.Flex;
         if (_card != null) _card.style.display = DisplayStyle.Flex;
 
@@ -714,8 +624,7 @@ public class AdRewardManager : MonoBehaviour
         }
         AudioListener.pause = _previousAudioListenerPause;
 
-        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
-        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
+
         if (_card != null) _card.style.display = DisplayStyle.Flex;
 
         if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
