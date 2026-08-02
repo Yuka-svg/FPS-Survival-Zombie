@@ -175,6 +175,14 @@ public class AdRewardManager : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
+        if (_currentState == AdUIState.Playing)
+        {
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+        }
+#endif
+
         if (_currentState == AdUIState.Claimed)
         {
             _pendingAdClosed = false;
@@ -452,6 +460,16 @@ public class AdRewardManager : MonoBehaviour
         if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.Flex;
 
+#if UNITY_EDITOR
+        if (_doc != null)
+        {
+            _doc.pickingMode = PickingMode.Ignore;
+            _doc.style.display = DisplayStyle.None;
+        }
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        UnityEngine.Cursor.visible = true;
+#endif
+
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
             if (_panel != null) _panel.style.display = DisplayStyle.None;
@@ -548,6 +566,13 @@ public class AdRewardManager : MonoBehaviour
     {
         _currentState = AdUIState.Preview;
 
+#if UNITY_EDITOR
+        if (_doc != null)
+        {
+            _doc.pickingMode = PickingMode.Position;
+            _doc.style.display = DisplayStyle.Flex;
+        }
+#endif
 
         if (_panel != null) _panel.style.display = DisplayStyle.Flex;
         if (_card != null) _card.style.display = DisplayStyle.Flex;
@@ -713,6 +738,13 @@ public class AdRewardManager : MonoBehaviour
         }
         finally
         {
+#if UNITY_EDITOR
+            if (_doc != null)
+            {
+                _doc.pickingMode = PickingMode.Position;
+                _doc.style.display = DisplayStyle.Flex;
+            }
+#endif
             _isClosing = false;
         }
     }
