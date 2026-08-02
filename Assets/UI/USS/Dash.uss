@@ -16,7 +16,7 @@
     width: 22px;
     height: 22px;
     margin-left: 5px;
-    background-image: resource("Icons/icon_dash");
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_dash.svg");
     -unity-background-image-tint-color: rgba(255, 255, 255, 0.25);
     -unity-background-scale-mode: scale-to-fit;
     position: relative;

@@ -121,15 +121,15 @@
 }
 
 .icon-movement {
-    background-image: resource("Icons/icon_movement");
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_movement.svg");
 }
 
 .icon-aim {
-    background-image: resource("Icons/icon_target");
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_target.svg");
 }
 
 .icon-intelligence {
-    background-image: resource("Icons/icon_intelligence");
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_intelligence.svg");
 }
 
 .branch-header {
@@ -235,23 +235,23 @@
 }
 
 /* Node connection mappings for 15 SVGs */
-.node-icon-0-0 { background-image: resource("Icons/icon_walk"); }
-.node-icon-0-1 { background-image: resource("Icons/icon_run"); }
-.node-icon-0-2 { background-image: resource("Icons/icon_dash"); }
-.node-icon-0-3 { background-image: resource("Icons/icon_wallrun"); }
-.node-icon-0-4 { background-image: resource("Icons/icon_doublejump"); }
+.node-icon-0-0 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_walk.svg"); }
+.node-icon-0-1 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_run.svg"); }
+.node-icon-0-2 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_dash.svg"); }
+.node-icon-0-3 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_wallrun.svg"); }
+.node-icon-0-4 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_doublejump.svg"); }
 
-.node-icon-1-0 { background-image: resource("Icons/icon_recoil"); }
-.node-icon-1-1 { background-image: resource("Icons/icon_target_crit10"); }
-.node-icon-1-2 { background-image: resource("Icons/icon_target_crit20"); }
-.node-icon-1-3 { background-image: resource("Icons/icon_crit_dmg"); }
-.node-icon-1-4 { background-image: resource("Icons/icon_oneshot"); }
+.node-icon-1-0 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_recoil.svg"); }
+.node-icon-1-1 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_target_crit10.svg"); }
+.node-icon-1-2 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_target_crit20.svg"); }
+.node-icon-1-3 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_crit_dmg.svg"); }
+.node-icon-1-4 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_oneshot.svg"); }
 
-.node-icon-2-0 { background-image: resource("Icons/icon_xp_rad5"); }
-.node-icon-2-1 { background-image: resource("Icons/icon_xp_mult10"); }
-.node-icon-2-2 { background-image: resource("Icons/icon_xp_rad10"); }
-.node-icon-2-3 { background-image: resource("Icons/icon_xp_mult15"); }
-.node-icon-2-4 { background-image: resource("Icons/icon_xp_highlight"); }
+.node-icon-2-0 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp_rad5.svg"); }
+.node-icon-2-1 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp_mult10.svg"); }
+.node-icon-2-2 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp_rad10.svg"); }
+.node-icon-2-3 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp_mult15.svg"); }
+.node-icon-2-4 { background-image: url("project://database/Assets/UI/Resources/Icons/icon_xp_highlight.svg"); }
 
 /* Connection lines */
 .skill-line {

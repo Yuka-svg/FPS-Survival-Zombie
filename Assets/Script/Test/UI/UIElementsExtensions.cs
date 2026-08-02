@@ -7,7 +7,7 @@ public static class UIElementsExtensions
     {
         try
         {
-            return sprite != null && sprite && sprite.texture != null && sprite.texture.width > 0;
+            return sprite != null && sprite && sprite.texture != null && sprite.texture.width > 0 && sprite.texture.height > 0 && sprite.rect.width > 0 && sprite.rect.height > 0;
         }
         catch
         {
@@ -19,7 +19,7 @@ public static class UIElementsExtensions
     {
         try
         {
-            return texture != null && texture && texture.width > 0;
+            return texture != null && texture && texture.width > 0 && texture.height > 0;
         }
         catch
         {
@@ -43,7 +43,7 @@ public static class UIElementsExtensions
     {
         try
         {
-            return renderTexture != null && renderTexture && renderTexture.IsCreated() && renderTexture.width > 0;
+            return renderTexture != null && renderTexture && renderTexture.IsCreated() && renderTexture.width > 0 && renderTexture.height > 0;
         }
         catch
         {
