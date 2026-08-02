@@ -5,8 +5,8 @@ using UnityEditor;
 
 public static class ProceduralUISpriteGenerator
 {
-    const string FolderRel   = "UI/Generated";
-    const string FolderAsset = "Assets/UI/Generated";
+    const string FolderRel   = "UI/Resources/Images";
+    const string FolderAsset = "Assets/UI/Resources/Images";
 
     const int   PanelSize     = 96;
     const float PanelRadius   = 22f;

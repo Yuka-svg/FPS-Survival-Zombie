@@ -283,16 +283,7 @@ public class DialogueBubble : MonoBehaviour
         }
         if (_avatarImage != null)
         {
-            if (avatar != null)
-            {
-                _avatarImage.style.backgroundImage = new StyleBackground(avatar);
-                _avatarImage.style.display = DisplayStyle.Flex;
-            }
-            else
-            {
-                _avatarImage.style.backgroundImage = StyleKeyword.Null;
-                _avatarImage.style.display = DisplayStyle.None;
-            }
+            _avatarImage.SetBackgroundImageAndDisplaySafe(avatar);
         }
     }
 
