@@ -231,29 +231,55 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    padding: 0 32px;
+    gap: 16px;
     margin-bottom: 24px;
+    box-sizing: border-box;
 }
 
 /* === Ad Buttons (Sci-Fi Gold Tactical Theme) === */
 #AdRewardPanel .ad-button {
-    width: 540px;
-    height: 84px;
-    margin: 0 auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    max-width: 320px;
+    height: 68px;
+    margin: 0;
     align-self: center;
     background-color: rgba(16, 22, 30, 0.9);
     background-image: none;
     border-width: 1px;
-    border-color: rgba(217, 199, 115, 0.3);
+    border-color: rgba(217, 199, 115, 0.4);
     border-radius: 4px;
-    font-size: 30px;
+    font-size: 22px;
     -unity-font-definition: resource("Fonts/Outfit-SemiBold SDF");
     color: rgb(217, 199, 115);
     -unity-text-align: middle-center;
     -unity-font-style: bold;
-    letter-spacing: 8px;
+    letter-spacing: 3px;
     transition-property: scale, background-color, border-color, color;
     transition-duration: 0.15s, 0.15s, 0.15s, 0.15s;
     transition-timing-function: ease-out, ease-out, ease-out, ease-out;
+}
+
+#AdRewardPanel .ad-button.ad-button-single {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    width: 100%;
+    max-width: 440px;
+}
+
+#AdRewardPanel .ad-button.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(217, 199, 115, 0.2);
+    color: rgba(217, 199, 115, 0.7);
+}
+
+#AdRewardPanel .ad-button.btn-secondary:hover {
+    background-color: rgba(217, 199, 115, 0.1);
+    border-color: rgba(217, 199, 115, 0.5);
+    color: rgb(217, 199, 115);
 }
 
 #AdRewardPanel .ad-button:hover {

@@ -142,6 +142,9 @@ public class AdRewardManager : MonoBehaviour
             _closeButton.clicked += OnCloseButtonClicked;
         }
 
+        SetButtonState(_watchButton, false, false, false, "XEM QUẢNG CÁO");
+        SetButtonState(_closeButton, false, false, false, "BỎ QUA");
+
         _ready = true;
     }
 
@@ -279,16 +282,8 @@ public class AdRewardManager : MonoBehaviour
         var placeholder = _panel != null ? _panel.Q("ad-placeholder") : null;
         if (placeholder != null) placeholder.style.display = DisplayStyle.Flex;
 
-        if (_watchButton != null)
-        {
-            _watchButton.text = "XEM QUẢNG CÁO";
-            _watchButton.style.display = DisplayStyle.Flex;
-        }
-        if (_closeButton != null)
-        {
-            _closeButton.text = "BỎ QUA";
-            _closeButton.style.display = DisplayStyle.Flex;
-        }
+        SetButtonState(_watchButton, true, false, false, "XEM QUẢNG CÁO");
+        SetButtonState(_closeButton, true, false, true, "BỎ QUA");
 
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
@@ -437,11 +432,8 @@ public class AdRewardManager : MonoBehaviour
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
 
-        if (_closeButton != null)
-        {
-            _closeButton.text = "NHẬN THƯỞNG";
-            _closeButton.style.display = DisplayStyle.Flex;
-        }
+        SetButtonState(_watchButton, false, false, false, "");
+        SetButtonState(_closeButton, true, true, false, "NHẬN THƯỞNG");
 
         LoadRewardedAd();
     }
@@ -454,11 +446,21 @@ public class AdRewardManager : MonoBehaviour
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
 
-        if (_closeButton != null)
-        {
-            _closeButton.text = "BỎ QUA";
-            _closeButton.style.display = DisplayStyle.Flex;
-        }
+        SetButtonState(_watchButton, true, false, false, "THỬ LẠI");
+        SetButtonState(_closeButton, true, false, true, "BỎ QUA");
+    }
+
+    private void SetButtonState(Button btn, bool isVisible, bool isSingle, bool isSecondary, string text)
+    {
+        if (btn == null) return;
+        btn.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+        btn.text = text;
+
+        if (isSingle) btn.AddToClassList("ad-button-single");
+        else btn.RemoveFromClassList("ad-button-single");
+
+        if (isSecondary) btn.AddToClassList("btn-secondary");
+        else btn.RemoveFromClassList("btn-secondary");
     }
 
     private void ApplyCachedReward()
