@@ -232,9 +232,7 @@
     justify-content: center;
     align-items: center;
     padding: 0 32px;
-    gap: 16px;
     margin-bottom: 24px;
-    box-sizing: border-box;
 }
 
 /* === Ad Buttons (Sci-Fi Gold Tactical Theme) === */
@@ -244,7 +242,7 @@
     flex-basis: 0;
     max-width: 320px;
     height: 68px;
-    margin: 0;
+    margin: 0 8px;
     align-self: center;
     background-color: rgba(16, 22, 30, 0.9);
     background-image: none;
@@ -305,7 +303,6 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 30px;
-    z-index: 100;
 }
 
 #AdMobMockupHeader {
@@ -414,7 +411,7 @@
     width: 48px;
     height: 48px;
     margin-bottom: 10px;
-    background-image: url("project://database/Assets/UI/Resources/Icons/icon_ad.svg");
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_star.svg");
     -unity-background-image-tint-color: rgb(217, 199, 115);
 }
 
@@ -460,7 +457,6 @@
     background-color: rgba(0, 0, 0, 0.85);
     justify-content: center;
     align-items: center;
-    z-index: 200;
 }
 
 #AdMobConfirmCard {
