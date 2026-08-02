@@ -149,10 +149,18 @@ public class AdRewardManager : MonoBehaviour
         {
             _doc = canvasUIDocument.rootVisualElement;
         }
-        if (_doc == null && Application.isPlaying && gameObject.scene.isLoaded)
+        if (_doc == null)
         {
-            var uiDoc = FindFirstObjectByType<UIDocument>();
-            if (uiDoc != null) _doc = uiDoc.rootVisualElement;
+            var uiDocs = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+            foreach (var doc in uiDocs)
+            {
+                if (doc != null && doc.rootVisualElement != null && doc.rootVisualElement.Q("AdRewardPanel") != null)
+                {
+                    _doc = doc.rootVisualElement;
+                    canvasUIDocument = doc;
+                    break;
+                }
+            }
         }
         if (_doc == null) return;
 
@@ -370,10 +378,15 @@ public class AdRewardManager : MonoBehaviour
 
         EnsureEventSystem();
 
-        if (_isPanelOpen || _currentState != AdUIState.Idle) return false;
+        if (_isPanelOpen || _currentState != AdUIState.Idle)
+        {
+            Debug.LogWarning($"[AdReward] Cannot show ad: Panel is already open or state is not Idle (_isPanelOpen={_isPanelOpen}, _currentState={_currentState}).");
+            return false;
+        }
 
         if (PanelManager.Instance != null && !PanelManager.Instance.CanOpenPanel("AdReward"))
         {
+            Debug.LogWarning("[AdReward] Cannot show ad: PanelManager blocked opening 'AdReward' (another panel is active or transitioning).");
             _currentPlayer = null;
             _playerControl = null;
             return false;
@@ -390,7 +403,11 @@ public class AdRewardManager : MonoBehaviour
         if (!_ready)
         {
             SetupUI();
-            if (!_ready) return false;
+            if (!_ready)
+            {
+                Debug.LogWarning("[AdReward] Cannot show ad: SetupUI failed to find 'AdRewardPanel' element in scene UIDocument.");
+                return false;
+            }
         }
 
         _isPanelOpen = true;
