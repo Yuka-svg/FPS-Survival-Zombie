@@ -298,7 +298,7 @@ public class AdRewardManager : MonoBehaviour
                 _isAdReady = false;
                 _rewardedAd = null;
                 _pendingAdClosed = true;
-                _adClosedTimer = 2.0f; // 2.0s Grace period for reward callback handshake
+                _adClosedTimer = 0.5f; // 0.5s Grace period for reward callback handshake
             };
 
             _rewardedAd.OnAdFullScreenContentFailed += (adError) =>
@@ -466,7 +466,11 @@ public class AdRewardManager : MonoBehaviour
 
         if (_currentState == AdUIState.Playing)
         {
+#if UNITY_EDITOR
+            ClosePanelInternal();
+#else
             ShowSkipConfirmModal();
+#endif
             return;
         }
 
@@ -527,23 +531,16 @@ public class AdRewardManager : MonoBehaviour
         if (MusicManager.Instance != null) MusicManager.Instance.PauseMusic();
         AudioListener.pause = true;
 
-#if UNITY_EDITOR
-        if (_card != null) _card.style.display = DisplayStyle.None;
-        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.Flex;
-        if (_adMobSkipButton != null) _adMobSkipButton.style.display = DisplayStyle.Flex;
-        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.style.display = DisplayStyle.None;
-        if (_adMobProgressBarFill != null) _adMobProgressBarFill.style.width = Length.Percent(0);
-
-        _adCoroutine = StartCoroutine(EditorSimulateAd());
-#else
         if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.Flex;
 
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
+            if (_panel != null) _panel.style.display = DisplayStyle.None;
+
             _rewardedAd.Show(reward =>
             {
-                _isRewardEarned = true;
+                if (this != null) _isRewardEarned = true;
             });
         }
         else
@@ -552,7 +549,6 @@ public class AdRewardManager : MonoBehaviour
             if (!_isAdLoading) LoadRewardedAd();
             _adCoroutine = StartCoroutine(WaitForAdThenShow());
         }
-#endif
     }
 
     private IEnumerator WaitForAdThenShow()
@@ -566,9 +562,11 @@ public class AdRewardManager : MonoBehaviour
 
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
+            if (_panel != null) _panel.style.display = DisplayStyle.None;
+
             _rewardedAd.Show(reward =>
             {
-                _isRewardEarned = true;
+                if (this != null) _isRewardEarned = true;
             });
         }
         else
@@ -578,54 +576,13 @@ public class AdRewardManager : MonoBehaviour
         _adCoroutine = null;
     }
 
-    private IEnumerator EditorSimulateAd()
-    {
-        float duration = 5f;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            if (_currentState == AdUIState.Idle) yield break;
-
-            if (_currentState == AdUIState.ConfirmSkip)
-            {
-                yield return null;
-                continue;
-            }
-
-            elapsed += Time.unscaledDeltaTime;
-            float progress = Mathf.Clamp01(elapsed / duration);
-            float remaining = duration - elapsed;
-
-            if (_adMobProgressBarFill != null) _adMobProgressBarFill.style.width = Length.Percent(progress * 100f);
-            if (_adMobMockupTimerLabel != null) _adMobMockupTimerLabel.text = $"Quảng cáo kết thúc sau {remaining:F0}s";
-
-            yield return null;
-        }
-
-        _adCoroutine = null;
-        OnAdCompletedSuccessfully();
-    }
-
     private void OnAdCompletedSuccessfully()
     {
         _currentState = AdUIState.Claimed;
 
         ApplyCachedReward();
 
-#if UNITY_EDITOR
-        if (_adMobSkipButton != null) _adMobSkipButton.style.display = DisplayStyle.None;
-        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.style.display = DisplayStyle.Flex;
-        if (_adMobMockupTimerLabel != null) _adMobMockupTimerLabel.text = "Đã nhận thưởng thành công!";
-#else
-        if (_card != null) _card.style.display = DisplayStyle.Flex;
-        if (_timerLabel != null) _timerLabel.text = "Đã nhận thưởng thành công!";
-        if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
-        if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
-
-        SetButtonState(_watchButton, false, false, false, "");
-        SetButtonState(_closeButton, true, true, false, "NHẬN THƯỞNG");
-#endif
+        ClosePanelInternal();
 
         LoadRewardedAd();
     }
@@ -634,12 +591,24 @@ public class AdRewardManager : MonoBehaviour
     {
         _currentState = AdUIState.Preview;
 
+        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
+        if (_panel != null) _panel.style.display = DisplayStyle.Flex;
+        if (_card != null) _card.style.display = DisplayStyle.Flex;
+
+        _panel?.AddToClassList("visible");
+        _card?.AddToClassList("visible");
+
         if (_timerLabel != null) _timerLabel.text = "Không thể tải quảng cáo!";
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
 
+        AudioListener.pause = _previousAudioListenerPause;
+        if (MusicManager.Instance != null) MusicManager.Instance.ResumeMusic();
+
         SetButtonState(_watchButton, true, false, false, "THỬ LẠI");
         SetButtonState(_closeButton, true, false, true, "BỎ QUA");
+
+        LoadRewardedAd();
     }
 
     private void SetButtonState(Button btn, bool isVisible, bool isSingle, bool isSecondary, string text)
