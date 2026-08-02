@@ -255,6 +255,8 @@ public class PlayFabManager : MonoBehaviour
     {
         PlayerPrefs.DeleteKey("BestScore");
         PlayerPrefs.DeleteKey("BestWave");
+        PlayerPrefs.DeleteKey("BestEndlessScore");
+        PlayerPrefs.DeleteKey("BestEndlessWave");
 
         var am = AchievementManager.Instance;
         if (am != null && am.achievements != null)
@@ -288,9 +290,14 @@ public class PlayFabManager : MonoBehaviour
 
         var data = new Dictionary<string, string>
         {
-            [KeyPlayerStats] = BuildPlayerStatsJson(),
-            [KeyAchievements] = BuildAchievementsJson()
+            [KeyPlayerStats] = BuildPlayerStatsJson()
         };
+
+        string achJson = BuildAchievementsJson();
+        if (!string.IsNullOrEmpty(achJson))
+        {
+            data[KeyAchievements] = achJson;
+        }
 
         var request = new UpdateUserDataRequest { Data = data };
         PlayFabClientAPI.UpdateUserData(request,
@@ -433,6 +440,8 @@ public class PlayFabManager : MonoBehaviour
         {
             bestScore = PlayerPrefs.GetInt("BestScore", 0),
             bestWave = PlayerPrefs.GetInt("BestWave", 0),
+            bestEndlessScore = PlayerPrefs.GetInt("BestEndlessScore", 0),
+            bestEndlessWave = PlayerPrefs.GetInt("BestEndlessWave", 0),
             playTime = 0f,
             totalKills = 0,
             totalDeaths = 0
@@ -443,7 +452,7 @@ public class PlayFabManager : MonoBehaviour
         if (tracker != null)
         {
             data.playTime = tracker.GetPlayTime();
-            data.totalKills = tracker.zombieKills;
+            data.totalKills = tracker.TotalKills;
             data.totalDeaths = 0; // deaths not tracked persistently
         }
 
@@ -452,22 +461,26 @@ public class PlayFabManager : MonoBehaviour
 
     private string BuildAchievementsJson()
     {
+        var am = AchievementManager.Instance;
+        if (am == null || am.achievements == null || am.achievements.Length == 0)
+        {
+            // Do not generate JSON if AchievementManager is uninitialized,
+            // to avoid overwriting cloud achievements with an empty array.
+            return null;
+        }
+
         var data = new AchievementsCloudData { entries = new List<AchievementEntry>() };
 
-        var am = AchievementManager.Instance;
-        if (am != null && am.achievements != null)
+        foreach (var ach in am.achievements)
         {
-            foreach (var ach in am.achievements)
+            if (ach == null) continue;
+            data.entries.Add(new AchievementEntry
             {
-                if (ach == null) continue;
-                data.entries.Add(new AchievementEntry
-                {
-                    id = ach.id,
-                    unlocked = PlayerPrefs.GetInt(ach.UnlockedKey, 0) == 1,
-                    // Progress is per-match only — not synced to cloud.
-                    progress = 0
-                });
-            }
+                id = ach.id,
+                unlocked = PlayerPrefs.GetInt(ach.UnlockedKey, 0) == 1,
+                // Progress is per-match only — not synced to cloud.
+                progress = 0
+            });
         }
 
         return JsonUtility.ToJson(data);
@@ -521,8 +534,16 @@ public class PlayFabManager : MonoBehaviour
                     PlayerPrefs.SetInt("BestScore", cloud.bestScore);
                 if (cloud.bestWave > localBestWave)
                     PlayerPrefs.SetInt("BestWave", cloud.bestWave);
+
+                int localBestEndlessScore = PlayerPrefs.GetInt("BestEndlessScore", 0);
+                int localBestEndlessWave = PlayerPrefs.GetInt("BestEndlessWave", 0);
+                if (cloud.bestEndlessScore > localBestEndlessScore)
+                    PlayerPrefs.SetInt("BestEndlessScore", cloud.bestEndlessScore);
+                if (cloud.bestEndlessWave > localBestEndlessWave)
+                    PlayerPrefs.SetInt("BestEndlessWave", cloud.bestEndlessWave);
+
                 PlayerPrefs.Save();
-                Debug.Log($"[PlayFab] Merged player stats: BestScore={cloud.bestScore}, BestWave={cloud.bestWave}");
+                Debug.Log($"[PlayFab] Merged player stats: BestScore={cloud.bestScore}, BestWave={cloud.bestWave}, BestEndlessScore={cloud.bestEndlessScore}, BestEndlessWave={cloud.bestEndlessWave}");
             }
         }
 
@@ -619,6 +640,8 @@ public class PlayFabManager : MonoBehaviour
     {
         public int bestScore;
         public int bestWave;
+        public int bestEndlessScore;
+        public int bestEndlessWave;
         public float playTime;
         public int totalKills;
         public int totalDeaths;
