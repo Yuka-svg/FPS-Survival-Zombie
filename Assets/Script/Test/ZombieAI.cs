@@ -766,11 +766,10 @@ public class ZombieAI : MonoBehaviour, IDamageable, ICrookEnemy, IEnemyHealthRea
             {
                 // Disable jitter when close to attack range to prevent flip-flop.
                 Vector3 dest = target.position;
-                // Sample to the ground-level NavMesh near the player so
-                // zombies path to reachable terrain even when the player is
-                // standing on a disconnected raised surface (car roof, etc.).
+                // Sample to the NavMesh near the player so zombies path to reachable terrain
+                // even when the player is standing on elevated geometry or upper floors.
                 NavMeshHit navHit;
-                if (NavMesh.SamplePosition(new Vector3(dest.x, 0f, dest.z), out navHit, 2f, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(dest, out navHit, 2f, NavMesh.AllAreas))
                     dest = navHit.position;
                 // If the destination is still unreachable (partial path),
                 // use the nearest reachable NavMesh corner so the zombie
