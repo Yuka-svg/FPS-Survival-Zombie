@@ -78,7 +78,19 @@ public class AdRewardManager : MonoBehaviour
             return;
         }
         _instance = this;
+        EnsureEventSystem();
         InitializeAdMob();
+    }
+
+    private void EnsureEventSystem()
+    {
+        if (UnityEngine.EventSystems.EventSystem.current == null)
+        {
+            var esGo = new GameObject("EventSystem");
+            esGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            esGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            Debug.Log("[AdRewardManager] Automatically created missing EventSystem in scene for uGUI/AdMob support.");
+        }
     }
 
     private void OnDestroy()
@@ -305,6 +317,8 @@ public class AdRewardManager : MonoBehaviour
     public bool ShowAd(Transform player, GiftBox giftBox)
     {
         Debug.Log("[AdReward] ShowAd called. Player=" + (player != null ? player.name : "null") + " GiftBox=" + (giftBox != null ? giftBox.name : "null"));
+
+        EnsureEventSystem();
 
         if (_isPanelOpen || _currentState != AdUIState.Idle) return false;
 
