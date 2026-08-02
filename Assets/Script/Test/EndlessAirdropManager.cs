@@ -1,5 +1,6 @@
 using UnityEngine;
 using cowsins;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EndlessAirdropManager : MonoBehaviour
@@ -24,6 +25,8 @@ public class EndlessAirdropManager : MonoBehaviour
     private float _timer;
     private Transform _player;
     private bool _dropPending;
+    private GameObject _activeMarker;
+    private GameObject _activeLootbox;
 
     private void Awake()
     {
@@ -45,6 +48,8 @@ public class EndlessAirdropManager : MonoBehaviour
         ResetTimer();
         FindPlayer();
         FindAirdropMarkers();
+        foreach (var marker in airdropMarkers)
+            SetLightActive(marker, false);
     }
 
     private void FindAirdropMarkers()
@@ -90,6 +95,12 @@ public class EndlessAirdropManager : MonoBehaviour
             ResetTimer();
             StartAirdrop();
         }
+
+        if (_activeLootbox == null && _activeMarker != null)
+        {
+            SetLightActive(_activeMarker, false);
+            _activeMarker = null;
+        }
     }
 
     private void StartAirdrop()
@@ -103,13 +114,15 @@ public class EndlessAirdropManager : MonoBehaviour
 
         _dropPending = true;
         Vector3 markerPos = marker.transform.position;
-        marker.SetActive(false);
+        SetLightActive(marker, true);
+        _activeMarker = marker;
 
         float dropFrom = Mathf.Min(dropHeight, 15f);
         Vector3 spawnPos = markerPos + Vector3.up * dropFrom;
 
         GameObject selectedPrefab = lootboxPrefabs[Random.Range(0, lootboxPrefabs.Length)];
         GameObject lootbox = Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
+        _activeLootbox = lootbox;
         lootbox.layer = LayerMask.NameToLayer("Interactable");
 
         Rigidbody rb = lootbox.GetComponent<Rigidbody>();
@@ -129,16 +142,47 @@ public class EndlessAirdropManager : MonoBehaviour
             lb.Price = 0;
 
         _dropPending = false;
+
+        StartCoroutine(TurnOffLightOnLanded(marker, lootbox));
+    }
+
+    private IEnumerator TurnOffLightOnLanded(GameObject marker, GameObject lootbox)
+    {
+        Rigidbody rb = lootbox != null ? lootbox.GetComponent<Rigidbody>() : null;
+        float groundedTime = 0f;
+        while (lootbox != null)
+        {
+            if (rb != null && rb.linearVelocity.magnitude < 0.1f)
+            {
+                groundedTime += Time.deltaTime;
+                if (groundedTime >= 0.2f)
+                    break;
+            }
+            else
+            {
+                groundedTime = 0f;
+            }
+            yield return null;
+        }
+        SetLightActive(marker, false);
     }
 
     private GameObject GetAvailableMarker()
     {
         foreach (var marker in airdropMarkers)
         {
-            if (marker != null && marker.activeInHierarchy)
+            if (marker != null && marker != _activeMarker)
                 return marker;
         }
         return null;
+    }
+
+    private void SetLightActive(GameObject marker, bool active)
+    {
+        if (marker == null) return;
+        var light = marker.GetComponentInChildren<Light>(true);
+        if (light != null)
+            light.gameObject.SetActive(active);
     }
 
     private void OnDrawGizmosSelected()
