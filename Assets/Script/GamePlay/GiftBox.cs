@@ -42,6 +42,46 @@ public class GiftBox : Pickeable
         SnapToGround();
     }
 
+    public enum GiftRewardType { Coin, Exp, Ammo, Health, Undefined }
+
+    private GiftRewardType _assignedType = GiftRewardType.Undefined;
+    private int _assignedAmount = 0;
+
+    public (GiftRewardType type, int amount) GetOrGenerateReward(Transform player, int defaultCoins, float defaultExp, int ammoMags, int defaultHP)
+    {
+        if (_assignedType == GiftRewardType.Undefined)
+        {
+            GiftRewardType[] types = { GiftRewardType.Coin, GiftRewardType.Exp, GiftRewardType.Ammo, GiftRewardType.Health };
+            _assignedType = types[Random.Range(0, types.Length)];
+
+            switch (_assignedType)
+            {
+                case GiftRewardType.Coin:
+                    _assignedAmount = defaultCoins;
+                    break;
+                case GiftRewardType.Exp:
+                    _assignedAmount = Mathf.RoundToInt(defaultExp);
+                    break;
+                case GiftRewardType.Health:
+                    _assignedAmount = defaultHP;
+                    break;
+                case GiftRewardType.Ammo:
+                    int magSize = 30;
+                    if (player != null)
+                    {
+                        var wRef = player.GetComponent<IWeaponReferenceProvider>();
+                        if (wRef != null && wRef.Id != null)
+                        {
+                            magSize = wRef.Id.magazineSize;
+                        }
+                    }
+                    _assignedAmount = Mathf.Max(10, magSize * ammoMags);
+                    break;
+            }
+        }
+        return (_assignedType, _assignedAmount);
+    }
+
     private bool _isOpened = false;
 
     public override void Interact(Transform player)
@@ -62,16 +102,31 @@ public class GiftBox : Pickeable
 
         base.Interact(player);
 
-        if (AdRewardManager.Instance != null && AdRewardManager.Instance.ShowAd(player))
+        if (AdRewardManager.Instance != null)
         {
-            _isOpened = true;
-            Destroy(gameObject);
+            bool shown = AdRewardManager.Instance.ShowAd(player, this);
+            if (!shown)
+            {
+                if (col != null) col.enabled = true;
+            }
         }
         else
         {
             if (col != null) col.enabled = true;
-            _isOpened = false;
         }
+    }
+
+    public void OnAdCancelled()
+    {
+        _isOpened = false;
+        var col = GetComponent<Collider>();
+        if (col != null) col.enabled = true;
+    }
+
+    public void OnAdCompletedAndClaimed()
+    {
+        _isOpened = true;
+        Destroy(gameObject);
     }
 
     private void SnapToGround()

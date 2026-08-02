@@ -6,6 +6,8 @@ using GoogleMobileAds.Api;
 
 public class AdRewardManager : MonoBehaviour
 {
+    public enum AdUIState { Idle, Preview, Playing, Claimed }
+
     private static AdRewardManager _instance;
     public static AdRewardManager Instance
     {
@@ -29,12 +31,18 @@ public class AdRewardManager : MonoBehaviour
     private VisualElement _adPlayingOverlay;
     private Button _watchButton;
     private Button _closeButton;
+
     private bool _ready;
     private bool _isPanelOpen;
     private Coroutine _adCoroutine;
     private Transform _currentPlayer;
     private PlayerControl _playerControl;
     private float _previousTimeScale = 1f;
+
+    private AdUIState _currentState = AdUIState.Idle;
+    private GiftBox _currentGiftBox;
+    private GiftBox.GiftRewardType _cachedType;
+    private int _cachedAmount;
 
     [Header("AdMob Settings")]
     [Tooltip("AdMob Rewarded Ad Unit ID cho Android.")]
@@ -73,9 +81,12 @@ public class AdRewardManager : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_watchButton != null) _watchButton.clicked -= StartAd;
-        if (_closeButton != null) _closeButton.clicked -= ClosePanel;
+        if (_watchButton != null) _watchButton.clicked -= OnWatchButtonClicked;
+        if (_closeButton != null) _closeButton.clicked -= OnCloseButtonClicked;
         if (_card != null) _card.generateVisualContent -= OnGenerateCardBackground;
+        
+        _currentState = AdUIState.Idle;
+        _currentGiftBox = null;
         DestroyAd();
     }
 
@@ -122,13 +133,13 @@ public class AdRewardManager : MonoBehaviour
 
         if (_watchButton != null)
         {
-            _watchButton.clicked -= StartAd;
-            _watchButton.clicked += StartAd;
+            _watchButton.clicked -= OnWatchButtonClicked;
+            _watchButton.clicked += OnWatchButtonClicked;
         }
         if (_closeButton != null)
         {
-            _closeButton.clicked -= ClosePanel;
-            _closeButton.clicked += ClosePanel;
+            _closeButton.clicked -= OnCloseButtonClicked;
+            _closeButton.clicked += OnCloseButtonClicked;
         }
 
         _ready = true;
@@ -197,16 +208,21 @@ public class AdRewardManager : MonoBehaviour
                 Debug.LogError("Rewarded ad failed to show: " + adError);
                 _isAdReady = false;
                 _rewardedAd = null;
-                ClosePanel();
+                OnAdFailed();
             };
         });
     }
 
     public bool ShowAd(Transform player)
     {
-        Debug.Log("[AdReward] ShowAd called. Player=" + (player != null ? player.name : "null") + " _ready=" + _ready);
+        return ShowAd(player, null);
+    }
 
-        if (_isPanelOpen) return false;
+    public bool ShowAd(Transform player, GiftBox giftBox)
+    {
+        Debug.Log("[AdReward] ShowAd called. Player=" + (player != null ? player.name : "null") + " GiftBox=" + (giftBox != null ? giftBox.name : "null"));
+
+        if (_isPanelOpen || _currentState != AdUIState.Idle) return false;
 
         if (PanelManager.Instance != null && !PanelManager.Instance.CanOpenPanel("AdReward"))
         {
@@ -217,6 +233,7 @@ public class AdRewardManager : MonoBehaviour
 
         _currentPlayer = player;
         _playerControl = player != null ? player.GetComponentInChildren<PlayerControl>() : null;
+        _currentGiftBox = giftBox;
 
         if (!_ready)
         {
@@ -225,15 +242,25 @@ public class AdRewardManager : MonoBehaviour
         }
 
         _isPanelOpen = true;
+        _currentState = AdUIState.Preview;
 
-        // Use PanelManager to properly register the panel and handle pause/control/cursor
-        if (PanelManager.Instance != null)
+        if (giftBox != null)
         {
-            PanelManager.Instance.OpenPanel("AdReward", _panel, _card, ClosePanel);
+            (_cachedType, _cachedAmount) = giftBox.GetOrGenerateReward(player, coinAmount, expAmount, ammoMagazines, healthAmount);
         }
         else
         {
-            // Fallback if PanelManager not available
+            _cachedType = GiftBox.GiftRewardType.Coin;
+            _cachedAmount = coinAmount;
+        }
+
+        // Open Panel via PanelManager
+        if (PanelManager.Instance != null)
+        {
+            PanelManager.Instance.OpenPanel("AdReward", _panel, _card, OnEscapeCloseRequested);
+        }
+        else
+        {
             _panel.style.display = DisplayStyle.Flex;
             _previousTimeScale = Time.timeScale;
             Time.timeScale = 0f;
@@ -243,29 +270,64 @@ public class AdRewardManager : MonoBehaviour
             UnityEngine.Cursor.visible = true;
         }
 
+        // Setup PREVIEW UI State
         if (_titleLabel != null) _titleLabel.text = "QUẢNG CÁO";
-        if (_timerLabel != null)
-        {
-            if (_isAdReady)
-                _timerLabel.text = "Đang phát quảng cáo...";
-            else
-                _timerLabel.text = "Đang tải quảng cáo...";
-        }
-        if (_rewardLabel != null) _rewardLabel.text = "";
-        if (_rewardBadge != null) _rewardBadge.style.display = DisplayStyle.None;
-        ClearRewardIconClasses();
+        if (_timerLabel != null) _timerLabel.text = "Nhấn XEM QUẢNG CÁO để nhận quà!";
+
+        UpdateRewardBadgeUI(_cachedType, _cachedAmount);
 
         var placeholder = _panel != null ? _panel.Q("ad-placeholder") : null;
         if (placeholder != null) placeholder.style.display = DisplayStyle.Flex;
 
-        if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
-        if (_closeButton != null) _closeButton.style.display = DisplayStyle.None;
+        if (_watchButton != null)
+        {
+            _watchButton.text = "XEM QUẢNG CÁO";
+            _watchButton.style.display = DisplayStyle.Flex;
+        }
+        if (_closeButton != null)
+        {
+            _closeButton.text = "BỎ QUA";
+            _closeButton.style.display = DisplayStyle.Flex;
+        }
+
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
 
-        // Auto-play ad
-        StartAd();
         return true;
+    }
+
+    private void UpdateRewardBadgeUI(GiftBox.GiftRewardType type, int amount)
+    {
+        ClearRewardIconClasses();
+
+        switch (type)
+        {
+            case GiftBox.GiftRewardType.Coin:
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-coin");
+                if (_rewardLabel != null) _rewardLabel.text = $"+{amount} COINS";
+                break;
+
+            case GiftBox.GiftRewardType.Exp:
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-exp");
+                if (_rewardLabel != null) _rewardLabel.text = $"+{amount} EXP";
+                break;
+
+            case GiftBox.GiftRewardType.Ammo:
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-ammo");
+                if (_rewardLabel != null) _rewardLabel.text = $"+{amount} ĐẠN";
+                break;
+
+            case GiftBox.GiftRewardType.Health:
+                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-health");
+                if (_rewardLabel != null) _rewardLabel.text = $"+{amount} HP";
+                break;
+
+            default:
+                if (_rewardLabel != null) _rewardLabel.text = "+THƯỞNG";
+                break;
+        }
+
+        if (_rewardBadge != null) _rewardBadge.style.display = DisplayStyle.Flex;
     }
 
     private void ClearRewardIconClasses()
@@ -277,8 +339,27 @@ public class AdRewardManager : MonoBehaviour
         _rewardIcon.RemoveFromClassList("reward-icon-health");
     }
 
+    private void OnWatchButtonClicked()
+    {
+        if (_currentState != AdUIState.Preview) return;
+        StartAd();
+    }
+
+    private void OnCloseButtonClicked()
+    {
+        ClosePanelInternal();
+    }
+
+    private void OnEscapeCloseRequested()
+    {
+        if (_currentState == AdUIState.Idle || _currentState == AdUIState.Playing) return;
+        ClosePanelInternal();
+    }
+
     private void StartAd()
     {
+        _currentState = AdUIState.Playing;
+
         if (_adCoroutine != null)
         {
             StopCoroutine(_adCoroutine);
@@ -286,6 +367,7 @@ public class AdRewardManager : MonoBehaviour
         }
 
         if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
+        if (_closeButton != null) _closeButton.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.Flex;
 
@@ -296,14 +378,12 @@ public class AdRewardManager : MonoBehaviour
         {
             _rewardedAd.Show(reward =>
             {
-                GrantRandomReward();
-                if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
+                OnAdCompletedSuccessfully();
             });
         }
         else
         {
             if (_timerLabel != null) _timerLabel.text = "Đang tải quảng cáo...";
-            if (_watchButton != null) _watchButton.SetEnabled(false);
             if (!_isAdLoading) LoadRewardedAd();
             _adCoroutine = StartCoroutine(WaitForAdThenShow());
         }
@@ -321,19 +401,14 @@ public class AdRewardManager : MonoBehaviour
 
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
-            if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
-            if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
-
             _rewardedAd.Show(reward =>
             {
-                GrantRandomReward();
-                if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
+                OnAdCompletedSuccessfully();
             });
         }
         else
         {
-            if (_timerLabel != null) _timerLabel.text = "Không thể tải quảng cáo!";
-            if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
+            OnAdFailed();
         }
         _adCoroutine = null;
     }
@@ -348,87 +423,111 @@ public class AdRewardManager : MonoBehaviour
             timer -= Time.unscaledDeltaTime;
             yield return null;
         }
-        if (_timerLabel != null) _timerLabel.text = "";
-        if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
-        GrantRandomReward();
-        if (_closeButton != null) _closeButton.style.display = DisplayStyle.Flex;
         _adCoroutine = null;
+        OnAdCompletedSuccessfully();
     }
 
-    private void GrantRandomReward()
+    private void OnAdCompletedSuccessfully()
     {
-        if (!_isPanelOpen) return;
+        _currentState = AdUIState.Claimed;
 
-        string[] rewards = { "Coin", "Exp", "Ammo", "Health" };
-        string selected = rewards[Random.Range(0, rewards.Length)];
+        ApplyCachedReward();
 
-        ClearRewardIconClasses();
+        if (_timerLabel != null) _timerLabel.text = "Đã nhận thưởng thành công!";
+        if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
+        if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
 
-        switch (selected)
+        if (_closeButton != null)
         {
-            case "Coin":
-                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-coin");
+            _closeButton.text = "NHẬN THƯỞNG";
+            _closeButton.style.display = DisplayStyle.Flex;
+        }
+
+        LoadRewardedAd();
+    }
+
+    private void OnAdFailed()
+    {
+        _currentState = AdUIState.Preview;
+
+        if (_timerLabel != null) _timerLabel.text = "Không thể tải quảng cáo!";
+        if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
+        if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
+
+        if (_closeButton != null)
+        {
+            _closeButton.text = "BỎ QUA";
+            _closeButton.style.display = DisplayStyle.Flex;
+        }
+    }
+
+    private void ApplyCachedReward()
+    {
+        switch (_cachedType)
+        {
+            case GiftBox.GiftRewardType.Coin:
                 if (CoinManager.Instance != null)
-                {
-                    CoinManager.Instance.AddCoins(coinAmount, false);
-                    if (_rewardLabel != null)
-                        _rewardLabel.text = $"+{coinAmount} COINS";
-                }
+                    CoinManager.Instance.AddCoins(_cachedAmount, false);
                 break;
 
-            case "Exp":
-                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-exp");
+            case GiftBox.GiftRewardType.Exp:
                 if (ExperienceManager.Instance != null)
+                    ExperienceManager.Instance.AddExperience(_cachedAmount);
+                break;
+
+            case GiftBox.GiftRewardType.Health:
+                if (_currentPlayer != null)
                 {
-                    ExperienceManager.Instance.AddExperience(expAmount);
-                    if (_rewardLabel != null)
-                        _rewardLabel.text = $"+{expAmount} EXP";
+                    var stats = _currentPlayer.GetComponent<PlayerStats>();
+                    if (stats != null) stats.Heal(_cachedAmount);
                 }
                 break;
 
-            case "Ammo":
-                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-ammo");
+            case GiftBox.GiftRewardType.Ammo:
                 if (_currentPlayer != null)
                 {
                     var wRef = _currentPlayer.GetComponent<IWeaponReferenceProvider>();
                     if (wRef != null && wRef.Id != null)
                     {
-                        int amount = Mathf.Max(10, wRef.Id.magazineSize * ammoMagazines);
-                        wRef.Id.totalBullets += amount;
+                        wRef.Id.totalBullets += _cachedAmount;
                         var wEvents = _currentPlayer.GetComponent<IWeaponEventsProvider>();
                         if (wEvents != null && wEvents.Events != null)
                             wEvents.Events.OnAmmoChanged?.Invoke(false);
-                        if (_rewardLabel != null)
-                            _rewardLabel.text = $"+{amount} ĐẠN";
                     }
-                }
-                break;
-
-            case "Health":
-                if (_rewardIcon != null) _rewardIcon.AddToClassList("reward-icon-health");
-                if (_currentPlayer != null)
-                {
-                    var stats = _currentPlayer.GetComponent<PlayerStats>();
-                    if (stats != null)
+                    else
                     {
-                        stats.Heal(healthAmount);
-                        if (_rewardLabel != null)
-                            _rewardLabel.text = $"+{healthAmount} HP";
+                        // Player is holding Melee or no weapon selected -> Grant to first available weapon or Coins
+                        bool granted = false;
+                        var inv = _currentPlayer.GetComponentInChildren<cowsins.WeaponInventorySystem>();
+                        if (inv != null && inv.inventory != null)
+                        {
+                            foreach (var w in inv.inventory)
+                            {
+                                if (w != null)
+                                {
+                                    w.totalBullets += _cachedAmount;
+                                    granted = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!granted && CoinManager.Instance != null)
+                        {
+                            CoinManager.Instance.AddCoins(_cachedAmount, false);
+                        }
                     }
                 }
                 break;
         }
-
-        if (_rewardBadge != null) _rewardBadge.style.display = DisplayStyle.Flex;
-        var placeholder = _panel != null ? _panel.Q("ad-placeholder") : null;
-        if (placeholder != null) placeholder.style.display = DisplayStyle.None;
-
-        LoadRewardedAd();
     }
 
-    private void ClosePanel()
+    private void ClosePanelInternal()
     {
-        if (!_isPanelOpen) return;
+        if (_currentState == AdUIState.Idle) return;
+
+        AdUIState prevState = _currentState;
+        _currentState = AdUIState.Idle;
         _isPanelOpen = false;
 
         if (_adCoroutine != null)
@@ -439,14 +538,26 @@ public class AdRewardManager : MonoBehaviour
 
         DestroyAd();
 
-        // Use PanelManager to properly close and restore state
+        if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
+        {
+            if (prevState == AdUIState.Claimed)
+            {
+                _currentGiftBox.OnAdCompletedAndClaimed();
+            }
+            else
+            {
+                _currentGiftBox.OnAdCancelled();
+            }
+            _currentGiftBox = null;
+        }
+
+        // Close UI via PanelManager
         if (PanelManager.Instance != null)
         {
             PanelManager.Instance.ClosePanel("AdReward", _panel, _card);
         }
         else
         {
-            // Fallback
             if (_panel != null)
                 _panel.style.display = DisplayStyle.None;
             Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
