@@ -103,6 +103,12 @@ public class GameplayHUDController : MonoBehaviour
         {
             WaveManager.Instance.OnWaveStarted += OnWaveStarted;
             WaveManager.Instance.OnWaveCompleted += OnWaveCompleted;
+            WaveManager.Instance.OnWaveProgressChanged += OnWaveProgressChanged;
+
+            if (WaveManager.Instance.currentWave > 0)
+            {
+                OnWaveProgressChanged(WaveManager.Instance.zombiesKilledThisWave, WaveManager.Instance.zombiesToKill);
+            }
         }
         StartCoroutine(TimerRoutine());
     }
@@ -119,6 +125,7 @@ public class GameplayHUDController : MonoBehaviour
         {
             WaveManager.Instance.OnWaveStarted -= OnWaveStarted;
             WaveManager.Instance.OnWaveCompleted -= OnWaveCompleted;
+            WaveManager.Instance.OnWaveProgressChanged -= OnWaveProgressChanged;
         }
         StopAllCoroutines();
     }
@@ -151,6 +158,18 @@ public class GameplayHUDController : MonoBehaviour
         _lastKilled = wm.zombiesKilledThisWave;
         _lastToKill = wm.zombiesToKill;
         _waveLabel.text = $"Wave {wm.currentWave} \u00B7 {wm.zombiesKilledThisWave}/{wm.zombiesToKill}";
+    }
+
+    private void OnWaveProgressChanged(int killed, int toKill)
+    {
+        if (_waveChip == null || _waveLabel == null) return;
+        ShowChip(_waveChip, true);
+        var wm = WaveManager.Instance;
+        int wave = wm != null ? wm.currentWave : 1;
+        _lastWave = wave;
+        _lastKilled = killed;
+        _lastToKill = toKill;
+        _waveLabel.text = $"Wave {wave} \u00B7 {killed}/{toKill}";
     }
 
     private void OnWaveCompleted(int wave)

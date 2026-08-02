@@ -5,8 +5,10 @@ public class WaveManager : MonoBehaviour
     public static WaveManager Instance;
 
     public delegate void WaveEvent(int wave);
+    public delegate void WaveProgressEvent(int zombiesKilled, int zombiesToKill);
     public event WaveEvent OnWaveStarted;
     public event WaveEvent OnWaveCompleted;
+    public event WaveProgressEvent OnWaveProgressChanged;
 
     [Header("Wave")]
     public int currentWave = 1;
@@ -72,6 +74,7 @@ public class WaveManager : MonoBehaviour
     public void RegisterZombieKill()
     {
         zombiesKilledThisWave++;
+        OnWaveProgressChanged?.Invoke(zombiesKilledThisWave, zombiesToKill);
 
         if (
             zombiesKilledThisWave >=
