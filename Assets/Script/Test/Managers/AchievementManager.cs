@@ -89,41 +89,12 @@ public class AchievementManager : MonoBehaviour
             // Progress is NOT loaded from PlayerPrefs — it is per-match only
             // and resets at the start of each playthrough (see ResetProgress).
             if (ach.isProgression)
-                _progress[ach.id] = 0;
+                _progress[ach.id] = PlayerPrefs.GetInt(ach.ProgressKey, 0);
         }
     }
 
     /// <summary>
-    /// Reset all progression achievements' progress to 0. Call this at the start
-    /// of each match/playthrough so progress is only tracked within a single run.
-    /// Unlock state is preserved (once unlocked, stays unlocked).
-    /// </summary>
-    public void ResetProgress()
-    {
-        _progress.Clear();
-        if (achievements == null) return;
-        foreach (var ach in achievements)
-        {
-            if (ach == null || !ach.isProgression) continue;
-            if (!_unlocked.Contains(ach.id))
-                _progress[ach.id] = 0;
-        }
-        // Notify UI subscribers so progress bars reset visually.
-        if (achievements != null)
-        {
-            foreach (var ach in achievements)
-            {
-                if (ach == null || !ach.isProgression) continue;
-                OnProgressChanged?.Invoke(ach, 0, ach.targetValue);
-            }
-        }
-        Debug.Log("[AchievementManager] Progress reset for new playthrough.");
-    }
-
-    /// <summary>
-    /// Reload unlock state and progress from PlayerPrefs. Call this after
-    /// PlayerPrefs has been cleared/replaced (e.g. after switching PlayFab
-    /// accounts) so the in-memory cache matches the new account's data.
+    /// Reload unlock state and progress from PlayerPrefs.
     /// </summary>
     public void ReloadState()
     {
@@ -138,8 +109,9 @@ public class AchievementManager : MonoBehaviour
 
     private void SaveProgress(AchievementData ach, int value)
     {
-        // Progress is per-match only — intentionally not persisted to PlayerPrefs.
-        // It lives in the in-memory _progress dictionary and resets each playthrough.
+        if (ach == null || string.IsNullOrEmpty(ach.ProgressKey)) return;
+        PlayerPrefs.SetInt(ach.ProgressKey, value);
+        PlayerPrefs.Save();
     }
 
     // ---- Public read API ----

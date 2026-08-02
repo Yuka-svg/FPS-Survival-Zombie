@@ -214,6 +214,15 @@ public class GameOverManager : MonoBehaviour
             int journals = CollectibleManager.Instance != null ? CollectibleManager.Instance.Count : 0;
             int journalsTotal = CollectibleManager.Instance != null ? CollectibleManager.Instance.Total : 0;
 
+            int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+            int bestWave = PlayerPrefs.GetInt("BestWave", 0);
+            if (finalScore > bestScore) { bestScore = finalScore; PlayerPrefs.SetInt("BestScore", bestScore); }
+            if (wave > bestWave) { bestWave = wave; PlayerPrefs.SetInt("BestWave", bestWave); }
+            PlayerPrefs.Save();
+
+            if (PlayFabManager.Instance != null && PlayFabManager.Instance.IsLoggedIn)
+                PlayFabManager.Instance.SaveAllToCloud();
+
             if (_finalScoreText != null)
                 _finalScoreText.text = "Chapter: " + chapter;
             if (_waveReachedText != null)

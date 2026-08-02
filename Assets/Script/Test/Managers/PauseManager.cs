@@ -654,13 +654,42 @@ public class PauseManager : MonoBehaviour
         PanelManager.SetHUDVisible(canvasRoot, visible);
     }
 
+    public static void SaveCurrentMatchStats()
+    {
+        int finalScore = ScoreManager.Instance != null ? ScoreManager.Instance.GetFinalScore() : 0;
+        int wave = WaveManager.Instance != null ? WaveManager.Instance.currentWave : 0;
+        if (finalScore <= 0 && wave <= 0) return;
+
+        bool isEndless = GameModeManager.CurrentMode == GameMode.Endless;
+        if (isEndless)
+        {
+            int bestScore = PlayerPrefs.GetInt("BestEndlessScore", 0);
+            int bestWave = PlayerPrefs.GetInt("BestEndlessWave", 0);
+            if (finalScore > bestScore) { PlayerPrefs.SetInt("BestEndlessScore", finalScore); }
+            if (wave > bestWave) { PlayerPrefs.SetInt("BestEndlessWave", wave); }
+        }
+        else
+        {
+            int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+            int bestWave = PlayerPrefs.GetInt("BestWave", 0);
+            if (finalScore > bestScore) { PlayerPrefs.SetInt("BestScore", finalScore); }
+            if (wave > bestWave) { PlayerPrefs.SetInt("BestWave", wave); }
+        }
+        PlayerPrefs.Save();
+
+        if (PlayFabManager.Instance != null && PlayFabManager.Instance.IsLoggedIn)
+            PlayFabManager.Instance.SaveAllToCloud();
+    }
+
     public void GoToMainMenu()
     {
+        SaveCurrentMatchStats();
         StartCoroutine(TransitionAndLoadScene(mainMenuSceneName));
     }
 
     public void QuitGame()
     {
+        SaveCurrentMatchStats();
         StartCoroutine(TransitionAndQuit());
     }
 

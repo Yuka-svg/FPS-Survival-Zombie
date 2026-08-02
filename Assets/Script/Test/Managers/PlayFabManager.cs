@@ -146,13 +146,10 @@ public class PlayFabManager : MonoBehaviour
                 PlayFabId = result.PlayFabId;
                 Username = result.Username;
                 IsLoggedIn = true;
-                // Clear any local data left over from a previous account so the
-                // new account starts at 0 (no inherited BestScore / achievements).
-                ClearLocalPlayerData();
                 // Set display name so the player shows up on leaderboards.
                 UpdateDisplayName(username);
                 OnLoginSuccess?.Invoke(Username);
-                // Upload the (now clean) local data to the new account
+                // Upload local data to the new account
                 SaveAllToCloud();
                 callback?.Invoke(true, null);
             },
@@ -194,11 +191,6 @@ public class PlayFabManager : MonoBehaviour
                 PlayFabId = result.PlayFabId;
                 Username = username;
                 IsLoggedIn = true;
-
-                // Clear any local data left over from a previous account so the
-                // merge below starts from a clean slate (no stale BestScore /
-                // achievements from another user).
-                ClearLocalPlayerData();
 
                 // Merge cloud data into PlayerPrefs
                 MergeCloudDataToLocal(result.InfoResultPayload);
@@ -478,8 +470,7 @@ public class PlayFabManager : MonoBehaviour
             {
                 id = ach.id,
                 unlocked = PlayerPrefs.GetInt(ach.UnlockedKey, 0) == 1,
-                // Progress is per-match only — not synced to cloud.
-                progress = 0
+                progress = string.IsNullOrEmpty(ach.ProgressKey) ? 0 : PlayerPrefs.GetInt(ach.ProgressKey, 0)
             });
         }
 
@@ -567,7 +558,12 @@ public class PlayFabManager : MonoBehaviour
                             {
                                 if (entry.unlocked)
                                     PlayerPrefs.SetInt(ach.UnlockedKey, 1);
-                                // Progress is per-match only — do not restore from cloud.
+                                if (ach.isProgression && !string.IsNullOrEmpty(ach.ProgressKey))
+                                {
+                                    int localProg = PlayerPrefs.GetInt(ach.ProgressKey, 0);
+                                    if (entry.progress > localProg)
+                                        PlayerPrefs.SetInt(ach.ProgressKey, entry.progress);
+                                }
                                 break;
                             }
                         }
