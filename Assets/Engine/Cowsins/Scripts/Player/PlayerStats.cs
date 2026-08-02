@@ -153,6 +153,11 @@ namespace cowsins
         /// </summary>
         public void Damage(float _damage, bool isHeadshot)
         {
+            // Ignore any damage once the player is already dead.
+            // Otherwise enemies still attacking the corpse keep triggering
+            // OnDamage (camera shake / hit UI) every frame until the game over.
+            if (IsDead) return;
+
             if (player == null)
             {
                 player = playerDependencies.PlayerMovementState;

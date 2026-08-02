@@ -1,14 +1,29 @@
 using UnityEngine;
 using System.Collections;
+using cowsins;
 
 public class CameraShake : MonoBehaviour
 {
     private Vector3 startPos;
     private Coroutine shakeRoutine;
+    private PlayerStats playerStats;
 
     private void Awake()
     {
         startPos = transform.localPosition;
+    }
+
+    private void Start()
+    {
+        playerStats = FindAnyObjectByType<PlayerStats>();
+        if (playerStats != null)
+            playerStats.AddOnDieListener(CancelShake);
+    }
+
+    private void OnDestroy()
+    {
+        if (playerStats != null)
+            playerStats.RemoveOnDieListener(CancelShake);
     }
 
     public void Shake()
@@ -27,6 +42,17 @@ public class CameraShake : MonoBehaviour
             );
     }
 
+    private void CancelShake()
+    {
+        if (shakeRoutine != null)
+        {
+            StopCoroutine(shakeRoutine);
+            shakeRoutine = null;
+        }
+
+        transform.localPosition = startPos;
+    }
+
     private IEnumerator DoShake(
         float duration,
         float magnitude
@@ -41,7 +67,7 @@ public class CameraShake : MonoBehaviour
                 Random.insideUnitSphere *
                 magnitude;
 
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
 
             yield return null;
         }
