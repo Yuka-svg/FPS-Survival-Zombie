@@ -220,11 +220,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 288285f7d55122e42823cbe0c33612ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 4842169814165458633}
   measureType: 0
   decimals: 2
   updatePeriod: 0.1
-  seeThrough: 1
+  text: {fileID: 4842169814165458633}
   maxViewDistance: 30
 --- !u!114 &7359986225778379670
 MonoBehaviour:
