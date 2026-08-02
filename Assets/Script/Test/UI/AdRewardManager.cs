@@ -182,19 +182,15 @@ public class AdRewardManager : MonoBehaviour
             UnityEngine.Cursor.visible = true;
 
             // Editor Failsafe Controller for AdMob Test Ad:
-            // Top-Left Mouse Click Detection (Y-inverted coordinates matching IMGUI "Close Ad" Rect)
-            Vector2 mouseTopLeft = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
-            bool isCloseAreaClicked = Input.GetMouseButtonDown(0) && new Rect(0f, 0f, 180f, 70f).Contains(mouseTopLeft);
-
-            // Confirm & Earn Reward: Mouse Click on Close Ad area OR Key press SPACE / C / Enter
-            if (isCloseAreaClicked || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.Return))
+            // Confirm & Earn Reward: Key press SPACE / C / Enter
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.Return))
             {
                 Debug.Log("[AdRewardManager] Editor Ad Failsafe Triggered -> Simulated Ad Completion & Reward Claimed.");
                 _isRewardEarned = true;
                 OnAdCompletedSuccessfully();
             }
-            // Cancel Ad (No Reward): Key press ESC / X
-            else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.X))
+            // Cancel Ad (No Reward): Key press X (Avoid ESC to prevent PauseMenu conflict)
+            else if (Input.GetKeyDown(KeyCode.X))
             {
                 Debug.Log("[AdRewardManager] Editor Ad Failsafe Triggered -> Simulated Ad Cancelled.");
                 ClosePanelInternal();
@@ -487,6 +483,7 @@ public class AdRewardManager : MonoBehaviour
         }
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         UnityEngine.Cursor.visible = true;
+        Debug.Log("[AdRewardManager] AdMob Test Ad active in Editor. Press SPACE / ENTER / C to simulate full watch & claim reward. Press X to cancel ad without reward.");
 #endif
 
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
