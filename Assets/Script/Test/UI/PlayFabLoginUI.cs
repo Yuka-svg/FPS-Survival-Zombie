@@ -113,7 +113,6 @@ public class PlayFabLoginUI : MonoBehaviour
         SetupChamferedPlaque(root.Q("MainMenuModule_Endless"), 30f, true, false, null);
         SetupChamferedPlaque(root.Q("MainMenuModule_Profile"), 30f, true, false, null);
         SetupChamferedPlaque(root.Q("MainMenuModule_Rankings"), 34f, true, false, null);
-        SetupChamferedPlaque(root.Q("MainMenuModule_Help"), 30f, true, false, null);
 
         // Find child input fields and button sections to apply matching chamfered cuts
         _usernameInputContainer = root.Q("InputModule_User")?.Q(className: "input-container-inner");
@@ -129,13 +128,11 @@ public class PlayFabLoginUI : MonoBehaviour
         var endlessBtnTrigger = root.Q("MainMenuModule_Endless")?.Q(className: "button-trigger");
         var profileBtnTrigger = root.Q("MainMenuModule_Profile")?.Q(className: "button-trigger");
         var rankingsBtnTrigger = root.Q("MainMenuModule_Rankings")?.Q(className: "button-trigger");
-        var helpBtnTrigger = root.Q("MainMenuModule_Help")?.Q(className: "button-trigger");
 
         SetupChamferedPlaque(playBtnTrigger, 12f, false, false, null);
         SetupChamferedPlaque(endlessBtnTrigger, 12f, false, false, null);
         SetupChamferedPlaque(profileBtnTrigger, 12f, false, false, null);
         SetupChamferedPlaque(rankingsBtnTrigger, 12f, false, false, null);
-        SetupChamferedPlaque(helpBtnTrigger, 12f, false, false, null);
 
         // Hook up focus/blur listeners to trigger smooth transition border glows
         if (_usernameInput != null)
@@ -195,7 +192,6 @@ public class PlayFabLoginUI : MonoBehaviour
         root.Q("MainMenuModule_Endless")?.MarkDirtyRepaint();
         root.Q("MainMenuModule_Profile")?.MarkDirtyRepaint();
         root.Q("MainMenuModule_Rankings")?.MarkDirtyRepaint();
-        root.Q("MainMenuModule_Help")?.MarkDirtyRepaint();
     }
 
     private void AutoDetectMainMenu()
@@ -373,7 +369,6 @@ public class PlayFabLoginUI : MonoBehaviour
         var endlessModule = root.Q("MainMenuModule_Endless");
         var profileModule = root.Q("MainMenuModule_Profile");
         var rankingsModule = root.Q("MainMenuModule_Rankings");
-        var helpModule = root.Q("MainMenuModule_Help");
 
         // Login screen modules (crucial for sliding out when quitting from login screen)
         var userModule = root.Q("InputModule_User");
@@ -387,7 +382,6 @@ public class PlayFabLoginUI : MonoBehaviour
         if (endlessModule != null) endlessModule.RemoveFromClassList("slide-in");
         if (profileModule != null) profileModule.RemoveFromClassList("slide-in");
         if (rankingsModule != null) rankingsModule.RemoveFromClassList("slide-in");
-        if (helpModule != null) helpModule.RemoveFromClassList("slide-in");
 
         if (userModule != null) userModule.RemoveFromClassList("slide-in");
         if (passModule != null) passModule.RemoveFromClassList("slide-in");
@@ -507,7 +501,7 @@ public class PlayFabLoginUI : MonoBehaviour
         // 1. Reset all modules to slide out of screen at start (CSS handles position: absolute left)
         var modules = new string[] { 
             "HeaderModule", "InputModule_User", "InputModule_Pass", "ActionModule",
-            "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings", "MainMenuModule_Help"
+            "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings"
         };
         foreach (var name in modules)
         {
@@ -592,7 +586,7 @@ public class PlayFabLoginUI : MonoBehaviour
             if (logoutBtn != null) logoutBtn.AddToClassList("slide-in");
             if (quitBtn != null) quitBtn.AddToClassList("slide-in");
 
-            var startModules = new string[] { "HeaderModule", "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings", "MainMenuModule_Help" };
+            var startModules = new string[] { "HeaderModule", "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings" };
             foreach (var name in startModules)
             {
                 var el = _panel?.Q(name);
@@ -632,7 +626,7 @@ public class PlayFabLoginUI : MonoBehaviour
     {
         var modules = new string[] { 
             "HeaderModule", "InputModule_User", "InputModule_Pass", "ActionModule",
-            "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings", "MainMenuModule_Help"
+            "MainMenuModule_Play", "MainMenuModule_Endless", "MainMenuModule_Profile", "MainMenuModule_Rankings"
         };
         foreach (var name in modules)
         {

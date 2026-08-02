@@ -8,10 +8,11 @@ using System.Collections.Generic;
 /// ground strips lying flat along the boundary edges (painted-line style),
 /// 4 corner point lights, and an optional soft ground glow.
 ///
-/// The glow only appears once the player PHYSICALLY ARRIVES inside the chapter
-/// zone (presence check in Update) AND the story has reached that chapter. The
-/// zone lights up when you walk into it — not earlier. It turns off when the
-/// player leaves the area.
+/// The glow behaves as a boundary MARKER: it shines at full strength while the
+/// player is OUTSIDE the chapter zone (so the edge is easy to spot from afar),
+/// and dims to <see cref="insideDimFactor"/> while the player is inside. It only
+/// engages once the story has reached that chapter; completed/future chapters
+/// stay dark regardless of position.
 ///
 /// Place this on the same GameObject as a <see cref="ChapterBoundary"/> (it reads
 /// the boundary's trigger collider to size the visuals). It can also be placed
@@ -73,6 +74,28 @@ public class ChapterZoneHighlight : MonoBehaviour
     [Tooltip("Opacity of the ground edge strips.")]
     [Range(0f, 1f)] public float stripAlpha = 0.4f;
 
+    [Header("Soft Edge Quality")]
+    [Tooltip("Apply smooth alpha gradients (soft falloff at both edges of each strip, " +
+             "instead of hard flat rectangles) via procedurally generated textures.")]
+    public bool softEdges = true;
+
+    [Tooltip("Add a soft inner halo hugging the 4 edges — a gentle glow that fades " +
+             "toward the inside of the zone, so the boundary reads as light spilling " +
+             "in from the edge rather than painted lines.")]
+    public bool rimGlow = false;
+
+    [Tooltip("Width of the inner halo rim, as a fraction of the zone size (clamped to min 3m).")]
+    [Range(0.05f, 0.5f)] public float rimWidthFactor = 0.18f;
+
+    [Tooltip("Opacity of the inner halo rim.")]
+    [Range(0f, 1f)] public float rimAlpha = 0.12f;
+
+    [Header("Inside Dimming")]
+    [Tooltip("Brightness multiplier applied while the player is INSIDE the zone. " +
+             "The glow shines at full strength only when the player is OUTSIDE, " +
+             "so the boundary reads as a marker from afar and stays subtle inside.")]
+    [Range(0f, 1f)] public float insideDimFactor = 0.35f;
+
     [Header("Anim")]
     [Tooltip("Pulse the glow panels.")]
     public bool pulse = true;
@@ -89,6 +112,9 @@ public class ChapterZoneHighlight : MonoBehaviour
     private GameObject _root;
     private Material _groundMat;
     private Material _stripMat;
+    private Material _rimMat;
+    private Texture2D _stripTex;
+    private Texture2D _rimTex;
     private Light[] _cornerLights;
     private float _animTime;
     private bool _playerInside;
@@ -132,6 +158,9 @@ public class ChapterZoneHighlight : MonoBehaviour
     {
         if (_groundMat != null) Destroy(_groundMat);
         if (_stripMat != null) Destroy(_stripMat);
+        if (_rimMat != null) Destroy(_rimMat);
+        if (_stripTex != null) Destroy(_stripTex);
+        if (_rimTex != null) Destroy(_rimTex);
     }
 
     private void Subscribe()
@@ -147,16 +176,19 @@ public class ChapterZoneHighlight : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolve whether this zone should be visible. A zone is lit only while the
-    /// player has physically arrived inside this chapter's area AND the story
-    /// has reached this chapter. Completed/future chapters stay dark until the
-    /// player actually walks in.
+    /// Resolve whether this zone's visuals should exist at all. The glow is a
+    /// boundary MARKER for the current chapter: it is built (full brightness)
+    /// while the player is OUTSIDE the zone, and dims to
+    /// <see cref="insideDimFactor"/> while they're inside — the dimming is
+    /// applied every frame in Update, so the root object stays alive as long as
+    /// the story is on this chapter. Completed/future chapters stay dark
+    /// regardless of position.
     /// </summary>
     private void EvaluateVisibility()
     {
         bool visible = false;
         var sm = StoryManager.Instance;
-        if (sm != null && _playerInside)
+        if (sm != null)
         {
             int ch = _boundary != null ? _boundary.chapter : chapter;
             visible = sm.CurrentChapter == ch;
@@ -194,24 +226,54 @@ public class ChapterZoneHighlight : MonoBehaviour
     }
 
     /// <summary>
-    /// Re-pin all glow visuals to the floor under the player's feet. Called the
-    /// first time the glow becomes visible (player physically inside the zone),
-    /// so large/uneven chapter zones — and elevated ones like Ch5's bridge at
-    /// y~24 — always have the glow hugging the exact ground the player walks on.
+    /// World Y of the floor under the ZONE (center + 4 edge midpoints),
+    /// independent of where the player currently stands. Sampling at the
+    /// player's feet is wrong: when the player is outside the zone (the case
+    /// where the glow is visible) their feet may be on a roof, a bridge or the
+    /// far side of a hill, which would pin the glow in the air.
+    ///
+    /// The 5 samples are collapsed to the MEDIAN OF THE 3 LOWEST. This rejects
+    /// tall outliers (building roofs, tunnel mouths, hills — e.g. Ch1's zone
+    /// spans a quarantine wall at y=1.2, a tunnel at y=4.8 and a hill at y=7.6)
+    /// that would otherwise lift the whole glow off the ground, while a single
+    /// deep pit (Ch3's y=-2.5 trench) can't drag it down either.
+    /// </summary>
+    private float GetZoneGroundWorldY()
+    {
+        if (_triggerCol == null) return transform.position.y;
+        Vector3 zoneCenter = _triggerCol.bounds.center;
+        Vector3 zoneSize = _triggerCol.bounds.size;
+        Vector3[] samples =
+        {
+            new Vector3(zoneCenter.x, 0f, zoneCenter.z),
+            new Vector3(zoneCenter.x - zoneSize.x * 0.45f, 0f, zoneCenter.z),
+            new Vector3(zoneCenter.x + zoneSize.x * 0.45f, 0f, zoneCenter.z),
+            new Vector3(zoneCenter.x, 0f, zoneCenter.z - zoneSize.z * 0.45f),
+            new Vector3(zoneCenter.x, 0f, zoneCenter.z + zoneSize.z * 0.45f),
+        };
+        List<float> floorYs = new List<float>(samples.Length);
+        foreach (Vector3 sample in samples)
+            floorYs.Add(RaycastGround(sample));
+        floorYs.Sort();
+        return floorYs[1];
+    }
+
+    /// <summary>
+    /// Re-pin all glow visuals to the zone's ground. Called each time the glow
+    /// becomes visible (player steps out of the zone / story reaches the
+    /// chapter), so large or uneven zones always hug the ground they belong to.
     /// </summary>
     private void SnapGlowToGround()
     {
         if (!stickToGround || _root == null) return;
-        var player = GetPlayer();
-        if (player == null) return;
-        float groundLocalY = RaycastGround(player.transform.position) - transform.position.y;
+        float groundLocalY = GetZoneGroundWorldY() - transform.position.y;
         float stripY = groundLocalY + groundOffset;
         float glowY = groundLocalY + 0.04f;
-        float lightY = groundLocalY + 1.1f;
+        float lightY = groundLocalY + 0.35f;
         foreach (Transform child in _root.transform)
         {
             Vector3 p = child.localPosition;
-            if (child.name == "GlowGround")
+            if (child.name == "GlowGround" || child.name.StartsWith("GlowRim_"))
                 child.localPosition = new Vector3(p.x, glowY, p.z);
             else if (child.name.StartsWith("GlowStrip_"))
                 child.localPosition = new Vector3(p.x, stripY, p.z);
@@ -227,13 +289,24 @@ public class ChapterZoneHighlight : MonoBehaviour
         return _cachedPlayer;
     }
 
-    /// <summary>True while the player is inside this chapter's trigger collider.</summary>
+    /// <summary>
+    /// True while the player is inside this chapter's trigger collider.
+    /// Compared in XZ only (ignores Y): the colliders are tall (chapter bounds
+    /// span y=-10..20, save rooms ~4m), so a 3D bounds.Contains would keep
+    /// reporting "inside" while the player stands on roofs or flies high above
+    /// the zone — and would report "outside" for elevated walkable areas (Ch5's
+    /// bridge sits at y~24, far above the save-room collider's top). The player
+    /// is a ground creature; the boundary question is purely horizontal.
+    /// </summary>
     private bool IsPlayerInside()
     {
         if (_triggerCol == null) return false;
         var player = GetPlayer();
         if (player == null) return false;
-        return _triggerCol.bounds.Contains(player.transform.position);
+        Vector3 b = _triggerCol.bounds.center;
+        Vector3 e = _triggerCol.bounds.extents;
+        Vector3 p = player.transform.position;
+        return Mathf.Abs(p.x - b.x) <= e.x && Mathf.Abs(p.z - b.z) <= e.z;
     }
 
     private void Start()
@@ -242,6 +315,51 @@ public class ChapterZoneHighlight : MonoBehaviour
         Subscribe();
         _playerInside = IsPlayerInside();
         EvaluateVisibility();
+    }
+
+    /// <summary>
+    /// 1D alpha gradient for the edge strips: 0 at both outer edges, 1 in the
+    /// middle (soft sine profile). Applied along the strip WIDTH, so instead of
+    /// a hard flat rectangle each strip looks like a soft painted line whose
+    /// edges melt into the ground.
+    /// </summary>
+    private static Texture2D MakeSoftStripTexture()
+    {
+        const int h = 64;
+        var tex = new Texture2D(4, h, TextureFormat.RGBA32, false);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        tex.filterMode = FilterMode.Bilinear;
+        for (int y = 0; y < h; y++)
+        {
+            float t = y / (h - 1f);
+            float a = Mathf.Sin(t * Mathf.PI);
+            for (int x = 0; x < 4; x++)
+                tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
+        }
+        tex.Apply();
+        return tex;
+    }
+
+    /// <summary>
+    /// 1D alpha gradient for the halo rim: 0 deep inside the zone, ramping up
+    /// near the edge, then melting to 0 right at the boundary line itself — a
+    /// glow that spills inward from the border instead of a hard edge.
+    /// </summary>
+    private static Texture2D MakeRimTexture()
+    {
+        const int h = 64;
+        var tex = new Texture2D(4, h, TextureFormat.RGBA32, false);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        tex.filterMode = FilterMode.Bilinear;
+        for (int y = 0; y < h; y++)
+        {
+            float v = y / (h - 1f);
+            float a = Mathf.SmoothStep(0.25f, 0.85f, v) * (1f - Mathf.SmoothStep(0.85f, 1f, v));
+            for (int x = 0; x < 4; x++)
+                tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
+        }
+        tex.Apply();
+        return tex;
     }
 
     private static Mesh GetQuadMesh()
@@ -369,49 +487,22 @@ public class ChapterZoneHighlight : MonoBehaviour
             size = new Vector3(60f, 20f, 60f);
         }
 
-        // ---- Ground level (world Y of the floor under the zone center) ----
+        // ---- Ground level (world Y of the floor under the zone) ----
         // Used to pin strips/lights/ground glow flat against the ground instead
         // of floating at the collider's mid height (save rooms sit at y=1 with
         // a 4-tall collider, so naive placement puts visuals ~1m in the air).
-        float groundWorldY = 0f;
-        if (stickToGround)
-        {
-            var player = GetPlayer();
-            if (player != null && _triggerCol.bounds.Contains(player.transform.position))
-            {
-                // Player is standing here right now (save rooms, chapter-1
-                // spawn) — snap straight to the floor under the player's feet.
-                groundWorldY = RaycastGround(player.transform.position);
-            }
-            else
-            {
-                // Player not here yet: sample the zone center + 4 edge
-                // midpoints and take the MEDIAN. A single center raycast can
-                // land on a building roof (Ch2's center is over a commercial
-                // block); the median of the edge samples pulls it back down to
-                // the street. (Re-snapped under the player on first arrival.)
-                Vector3 zoneCenter = _triggerCol.bounds.center;
-                Vector3 zoneSize = _triggerCol.bounds.size;
-                Vector3[] samples =
-                {
-                    new Vector3(zoneCenter.x, 0f, zoneCenter.z),
-                    new Vector3(zoneCenter.x - zoneSize.x * 0.45f, 0f, zoneCenter.z),
-                    new Vector3(zoneCenter.x + zoneSize.x * 0.45f, 0f, zoneCenter.z),
-                    new Vector3(zoneCenter.x, 0f, zoneCenter.z - zoneSize.z * 0.45f),
-                    new Vector3(zoneCenter.x, 0f, zoneCenter.z + zoneSize.z * 0.45f),
-                };
-                List<float> floorYs = new List<float>(samples.Length);
-                foreach (Vector3 sample in samples)
-                    floorYs.Add(RaycastGround(sample));
-                floorYs.Sort();
-                groundWorldY = floorYs[floorYs.Count / 2];
-            }
-        }
+        // Samples the zone center + 4 edge midpoints and takes the MEDIAN: a
+        // single center raycast can land on a building roof (Ch2's center is
+        // over a commercial block); the median of the edge samples pulls it
+        // back down to the street. Never sampled at the player's feet — the
+        // glow must pin to the ZONE's ground, not whatever the player happens
+        // to stand on (roofs, bridges), or it floats in the air.
+        float groundWorldY = stickToGround ? GetZoneGroundWorldY() : 0f;
         // Local Y (relative to this transform) of the ground, plus offsets.
         float groundLocalY = groundWorldY - transform.position.y;
         float stripY = groundLocalY + (stickToGround ? groundOffset : stripHeight);
         float glowY = groundLocalY + 0.04f;
-        float lightY = groundLocalY + 1.1f;
+        float lightY = groundLocalY + 0.35f;
 
         Shader unlitShader = Shader.Find("Sprites/Default");
         if (unlitShader == null) unlitShader = Shader.Find("Unlit/Transparent");
@@ -486,6 +577,11 @@ public class ChapterZoneHighlight : MonoBehaviour
             _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, stripAlpha);
             _stripMat.SetFloat("_Cull", 0f);
             _stripMat.SetFloat("_Mode", 3);
+            if (softEdges)
+            {
+                _stripTex = MakeSoftStripTexture();
+                _stripMat.mainTexture = _stripTex;
+            }
 
             for (int i = 0; i < 4; i++)
             {
@@ -502,16 +598,81 @@ public class ChapterZoneHighlight : MonoBehaviour
                 sRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 sRenderer.receiveShadows = false;
             }
+
+            // ---- Inner halo rim (soft spill along the 4 edges) ----
+            if (rimGlow)
+            {
+                float rimW = Mathf.Max(3f, Mathf.Min(size.x, size.z) * rimWidthFactor);
+                // Rim quads lie flat just under the strips, inset half their
+                // width from each edge so they hug the boundary from inside.
+                Vector3[] rimCenters = {
+                    new Vector3(center.x - halfX + rimW * 0.5f, glowY, center.z),  // X- edge
+                    new Vector3(center.x + halfX - rimW * 0.5f, glowY, center.z),  // X+ edge
+                    new Vector3(center.x, glowY, center.z - halfZ + rimW * 0.5f),  // Z- edge
+                    new Vector3(center.x, glowY, center.z + halfZ - rimW * 0.5f),  // Z+ edge
+                };
+                // Quads on the X edges run along Z; with these rotations the
+                // quad's v-axis (texture Y) always points along the WORLD axis
+                // leading INTO the zone (+X for X edges, +Z for Z edges).
+                Vector3[] rimSizes = {
+                    new Vector3(rimW, size.z, 1f),
+                    new Vector3(rimW, size.z, 1f),
+                    new Vector3(size.x, rimW, 1f),
+                    new Vector3(size.x, rimW, 1f),
+                };
+                Quaternion[] rimRots = {
+                    Quaternion.Euler(90f, 0f, -90f),
+                    Quaternion.Euler(90f, 0f, -90f),
+                    Quaternion.Euler(90f, 0f, 0f),
+                    Quaternion.Euler(90f, 0f, 0f),
+                };
+                // v=1 then lands at +X/+Z — the OUTER side on X+/Z+ edges and
+                // the INNER side on X-/Z-. Flip V on the latter pair so the
+                // bright end of the gradient always sits at the outer boundary.
+                bool[] rimFlipV = { true, false, true, false };
+
+                _rimMat = new Material(unlitShader) { name = "ZoneGlowRim_Runtime" };
+                _rimMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, rimAlpha);
+                _rimMat.SetFloat("_Cull", 0f);
+                _rimMat.SetFloat("_Mode", 3);
+                if (softEdges)
+                {
+                    _rimTex = MakeRimTexture();
+                    _rimMat.mainTexture = _rimTex;
+                }
+
+                for (int i = 0; i < 4; i++)
+                {
+                    var rimGO = new GameObject($"GlowRim_{i}");
+                    rimGO.transform.SetParent(_root.transform, false);
+                    rimGO.transform.localPosition = rimCenters[i];
+                    rimGO.transform.localRotation = rimRots[i];
+                    rimGO.transform.localScale = rimSizes[i];
+
+                    var rFilter = rimGO.AddComponent<MeshFilter>();
+                    rFilter.sharedMesh = GetQuadMesh();
+                    var rRenderer = rimGO.AddComponent<MeshRenderer>();
+                    rRenderer.sharedMaterial = _rimMat;
+                    rRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                    rRenderer.receiveShadows = false;
+                    if (rimFlipV[i])
+                    {
+                        var mpb = new MaterialPropertyBlock();
+                        mpb.SetVector("_MainTex_ST", new Vector4(1f, -1f, 0f, 0f));
+                        rRenderer.SetPropertyBlock(mpb);
+                    }
+                }
+            }
         }
     }
 
     private void Update()
     {
         // Periodic presence check (mirrors ChapterBoundary.Update): the glow
-        // only turns on once the player physically walks into the zone, and
-        // turns off when they leave. A plain OnTriggerEnter is not enough —
-        // teleports (chapter transitions, respawns) bypass trigger events, so
-        // we poll the player's position every second.
+        // shines at full strength while the player is OUTSIDE the zone and dims
+        // to insideDimFactor while they're inside. A plain OnTriggerEnter is not
+        // enough — teleports (chapter transitions, respawns) bypass trigger
+        // events, so we poll the player's position every second.
         _presenceTimer += Time.unscaledDeltaTime;
         if (_presenceTimer >= 1f)
         {
@@ -524,21 +685,36 @@ public class ChapterZoneHighlight : MonoBehaviour
             }
         }
 
-        if (!pulse || _root == null || !_root.activeSelf) return;
+        // Push the current dim state into the visuals every frame (cheap, also
+        // handles the case where no pulse is configured).
+        float dim = _playerInside ? insideDimFactor : 1f;
+        float targetAlpha = stripAlpha * dim;
+        float targetRimAlpha = rimAlpha * dim;
+        float targetIntensity = lightIntensity * dim;
 
-        _animTime += Time.deltaTime * pulseSpeed;
-        float pulseScale = 1f + Mathf.Sin(_animTime) * pulseAmount;
+        if (pulse)
+        {
+            _animTime += Time.deltaTime * pulseSpeed;
+            float pulseScale = 1f + Mathf.Sin(_animTime) * pulseAmount;
+            targetAlpha *= pulseScale;
+            targetRimAlpha *= pulseScale;
+            targetIntensity *= pulseScale;
+        }
 
         // Pulse ground strips so the painted edges breathe.
         if (_stripMat != null)
-            _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, stripAlpha * pulseScale);
+            _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, targetAlpha);
+
+        // The halo rim breathes in sync with the strips.
+        if (_rimMat != null)
+            _rimMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, targetRimAlpha);
 
         // Pulse corner light intensity.
         if (_cornerLights != null)
         {
             foreach (var l in _cornerLights)
             {
-                if (l != null) l.intensity = lightIntensity * pulseScale;
+                if (l != null) l.intensity = targetIntensity;
             }
         }
     }
