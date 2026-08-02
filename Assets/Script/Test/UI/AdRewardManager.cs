@@ -46,6 +46,7 @@ public class AdRewardManager : MonoBehaviour
     private GiftBox.GiftRewardType _cachedType;
     private int _cachedAmount;
     private bool _hasClaimedReward;
+    private bool _isClosing;
 
     // Mobile Thread-Safe Callbacks (#else)
     private volatile bool _isRewardEarned;
@@ -91,6 +92,14 @@ public class AdRewardManager : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeUIEvents();
+        if (_isPanelOpen || _currentState != AdUIState.Idle)
+        {
+            ClosePanelInternal();
+        }
+        else if (PanelManager.Instance != null)
+        {
+            PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
+        }
         _currentState = AdUIState.Idle;
         _currentGiftBox = null;
         DestroyAd();
@@ -166,26 +175,25 @@ public class AdRewardManager : MonoBehaviour
 
     private void Update()
     {
-        if (_isRewardEarned && !_hasClaimedReward)
+        if (_currentState == AdUIState.Claimed)
         {
-            _hasClaimedReward = true;
+            _pendingAdClosed = false;
+            _adClosedTimer = 0f;
+        }
+        else if (_isRewardEarned && !_hasClaimedReward)
+        {
+            _pendingAdClosed = false;
+            _adClosedTimer = 0f;
             OnAdCompletedSuccessfully();
         }
 
-        if (_pendingAdClosed)
+        if (_pendingAdClosed && _currentState == AdUIState.Playing)
         {
-            if (_hasClaimedReward || _isRewardEarned)
+            _adClosedTimer -= Time.unscaledDeltaTime;
+            if (_adClosedTimer <= 0f && !_isRewardEarned)
             {
                 _pendingAdClosed = false;
-            }
-            else
-            {
-                _adClosedTimer -= Time.unscaledDeltaTime;
-                if (_adClosedTimer <= 0f)
-                {
-                    _pendingAdClosed = false;
-                    ClosePanelInternal();
-                }
+                ClosePanelInternal();
             }
         }
 
@@ -419,7 +427,7 @@ public class AdRewardManager : MonoBehaviour
 
         if (_currentState == AdUIState.Playing)
         {
-            ClosePanelInternal();
+            // Block ESC key while ad video is playing to prevent unpausing gameplay behind ad
             return;
         }
     }
@@ -488,13 +496,52 @@ public class AdRewardManager : MonoBehaviour
 
     private void OnAdCompletedSuccessfully()
     {
+        if (_hasClaimedReward && _currentState == AdUIState.Claimed) return;
+
+        _hasClaimedReward = true;
+        _pendingAdClosed = false;
+        _adClosedTimer = 0f;
         _currentState = AdUIState.Claimed;
+        _isPanelOpen = true;
 
         ApplyCachedReward();
 
-        ClosePanelInternal();
+        if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
+        {
+            _currentGiftBox.OnAdCompletedAndClaimed();
+            _currentGiftBox = null;
+        }
 
         LoadRewardedAd();
+
+        ShowClaimedUI();
+    }
+
+    private void ShowClaimedUI()
+    {
+        if (_panel != null)
+        {
+            _panel.style.display = DisplayStyle.Flex;
+            _panel.AddToClassList("visible");
+        }
+        if (_card != null)
+        {
+            _card.style.display = DisplayStyle.Flex;
+            _card.AddToClassList("visible");
+            _card.MarkDirtyRepaint();
+        }
+
+        if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
+        if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
+
+        AudioListener.pause = _previousAudioListenerPause;
+        if (MusicManager.Instance != null) MusicManager.Instance.ResumeMusic();
+
+        if (_titleLabel != null) _titleLabel.text = "NHẬN THƯỞNG THÀNH CÔNG!";
+        if (_timerLabel != null) _timerLabel.text = "Bạn đã nhận phần thưởng!";
+
+        SetButtonState(_watchButton, false, false, false, "");
+        SetButtonState(_closeButton, true, true, false, "ĐÓNG");
     }
 
     private void OnAdFailed()
@@ -537,7 +584,6 @@ public class AdRewardManager : MonoBehaviour
     private void ApplyCachedReward()
     {
         if (_hasClaimedReward && _currentState != AdUIState.Claimed) return;
-        _hasClaimedReward = true;
 
         switch (_cachedType)
         {
@@ -604,60 +650,71 @@ public class AdRewardManager : MonoBehaviour
 
     private void ClosePanelInternal()
     {
+        if (_isClosing) return;
         if (_currentState == AdUIState.Idle && !_isPanelOpen) return;
 
-        AdUIState prevState = _currentState;
-        _currentState = AdUIState.Idle;
-        _isPanelOpen = false;
-
-        if (_adCoroutine != null)
+        _isClosing = true;
+        try
         {
-            StopCoroutine(_adCoroutine);
-            _adCoroutine = null;
-        }
+            AdUIState prevState = _currentState;
+            _currentState = AdUIState.Idle;
+            _isPanelOpen = false;
 
-        DestroyAd();
-
-        if (MusicManager.Instance != null)
-        {
-            MusicManager.Instance.ResumeMusic();
-        }
-        AudioListener.pause = _previousAudioListenerPause;
-
-
-        if (_card != null) _card.style.display = DisplayStyle.Flex;
-
-        if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
-        {
-            if (prevState == AdUIState.Claimed)
+            if (_adCoroutine != null)
             {
-                _currentGiftBox.OnAdCompletedAndClaimed();
+                StopCoroutine(_adCoroutine);
+                _adCoroutine = null;
+            }
+
+            DestroyAd();
+
+            if (MusicManager.Instance != null)
+            {
+                MusicManager.Instance.ResumeMusic();
+            }
+            AudioListener.pause = _previousAudioListenerPause;
+
+            if (_card != null) _card.style.display = DisplayStyle.Flex;
+
+            if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
+            {
+                if (prevState == AdUIState.Claimed || _hasClaimedReward)
+                {
+                    _currentGiftBox.OnAdCompletedAndClaimed();
+                }
+                else
+                {
+                    _currentGiftBox.OnAdCancelled();
+                }
+                _currentGiftBox = null;
+            }
+
+            _isRewardEarned = false;
+            _pendingAdClosed = false;
+
+            // Close UI via PanelManager Immediate
+            if (PanelManager.Instance != null)
+            {
+                PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
             }
             else
             {
-                _currentGiftBox.OnAdCancelled();
+                if (_panel != null)
+                    _panel.style.display = DisplayStyle.None;
+                Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
+                if (_playerControl != null) _playerControl.GrantControl();
+                PauseMenu.isPaused = false;
+                UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+                UnityEngine.Cursor.visible = false;
             }
-            _currentGiftBox = null;
-        }
 
-        // Close UI via PanelManager Immediate
-        if (PanelManager.Instance != null)
-        {
-            PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
+            _currentPlayer = null;
+            _playerControl = null;
         }
-        else
+        finally
         {
-            if (_panel != null)
-                _panel.style.display = DisplayStyle.None;
-            Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
-            if (_playerControl != null) _playerControl.GrantControl();
-            PauseMenu.isPaused = false;
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            UnityEngine.Cursor.visible = false;
+            _isClosing = false;
         }
-
-        _currentPlayer = null;
-        _playerControl = null;
     }
 
     private void DestroyAd()
