@@ -220,15 +220,10 @@ public class PlayerProfileWidget : MonoBehaviour
         if (_panelId != null) _panelId.text = loggedIn ? (pm.PlayFabId ?? "---") : "---";
 
         int bestScore = PlayerPrefs.GetInt("BestScore", 0);
-        int bestWave = PlayerPrefs.GetInt("BestWave", 0);
-        int bestEndlessScore = PlayerPrefs.GetInt("BestEndlessScore", 0);
         int bestEndlessWave = PlayerPrefs.GetInt("BestEndlessWave", 0);
 
-        int finalBestScore = Mathf.Max(bestScore, bestEndlessScore);
-        int finalBestWave = Mathf.Max(bestWave, bestEndlessWave);
-
-        if (_panelBestScore != null) _panelBestScore.text = finalBestScore.ToString();
-        if (_panelBestWave != null) _panelBestWave.text = finalBestWave.ToString();
+        if (_panelBestScore != null) _panelBestScore.text = bestScore.ToString();
+        if (_panelBestWave != null) _panelBestWave.text = bestEndlessWave.ToString();
 
         int unlocked = 0;
         int total = 0;

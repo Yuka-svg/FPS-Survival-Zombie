@@ -104,21 +104,17 @@ public class MainMenuManager : MonoBehaviour
     public void RefreshBestScore()
     {
         int bestScore = PlayerPrefs.GetInt("BestScore", 0);
-        int bestWave = PlayerPrefs.GetInt("BestWave", 0);
+        int bestEndlessWave = PlayerPrefs.GetInt("BestEndlessWave", 0);
         if (_bestLabel != null)
         {
-            _bestLabel.text = bestScore > 0
-                ? ("Best  " + bestScore + "    Wave " + bestWave)
+            _bestLabel.text = (bestScore > 0 || bestEndlessWave > 0)
+                ? ("Best  " + bestScore + "    Wave " + bestEndlessWave)
                 : "No record yet";
         }
 
-        int bestEndlessScore = PlayerPrefs.GetInt("BestEndlessScore", 0);
-        int bestEndlessWave = PlayerPrefs.GetInt("BestEndlessWave", 0);
         if (_bestEndlessLabel != null)
         {
-            _bestEndlessLabel.text = bestEndlessScore > 0 || bestEndlessWave > 0
-                ? ("Best  " + bestEndlessScore + "    Wave " + bestEndlessWave)
-                : "No record yet";
+            _bestEndlessLabel.text = string.Empty;
         }
     }
 
