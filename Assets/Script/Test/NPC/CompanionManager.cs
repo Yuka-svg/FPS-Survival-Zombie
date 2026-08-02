@@ -736,16 +736,36 @@ public class CompanionManager : MonoBehaviour
         var sm = StoryManager.Instance;
         if (sm == null) yield break;
 
-        // 1) Skip remaining Chapter 4 quests (Quest 9) silently.
+        // 1) Force-advance the story to Chapter 5 regardless of the player's
+        //    current chapter/quest state. Handles every case:
+        //    - Quest active -> complete it (advances index / chapter).
+        //    - Chapter pending entry (chapter advanced, no active quest yet) ->
+        //      activate the first quest of the current chapter so it can be completed.
+        //    - No quest and not pending (rare) -> force the first quest of the chapter.
+        //    Without this, a skip issued while Chapter 4 is still pending leaves
+        //    CurrentChapter at 4, so ForceSetQuest(5, 1) below silently no-ops and
+        //    the player is teleported to Ch5 with a Ch4 quest still active.
         int safety = 0;
-        while (sm.CurrentChapter == 4 && sm.ActiveQuest != null && safety < 50)
+        while (sm.CurrentChapter < 5 && safety < 100)
         {
-            sm.CompleteActiveQuest();
+            if (sm.ActiveQuest != null)
+            {
+                sm.CompleteActiveQuest();
+            }
+            else if (sm.PendingChapterEntry)
+            {
+                sm.ActivatePendingChapterQuest();
+            }
+            else
+            {
+                var list = sm.GetCurrentChapterQuests();
+                if (list != null && list.Length > 0) sm.ForceSetQuest(sm.CurrentChapter, 0);
+            }
             yield return null;
             safety++;
         }
-        if (safety >= 50)
-            Debug.LogError("[CompanionManager] Safety limit hit skipping Ch4 quests! Possible infinite loop.");
+        if (safety >= 100)
+            Debug.LogError("[CompanionManager] Safety limit hit advancing to Chapter 5! Possible infinite loop.");
 
         // 2) Side quests Ch4: unlock + auto-complete (grant rewards).
         //    The skip path assumes the player "already explored" Ch4, so all
