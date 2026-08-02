@@ -101,6 +101,34 @@ public class AchievementManager : MonoBehaviour
         LoadState();
     }
 
+    /// <summary>
+    /// Resets per-match achievement progress for all un-unlocked progression achievements,
+    /// clears local PlayerPrefs progress keys, and resets internal runtime state.
+    /// Called at the start of a new playthrough (MainMenuManager / GameOverManager).
+    /// </summary>
+    public void ResetProgress()
+    {
+        _wallRunning = false;
+        _progress.Clear();
+
+        if (achievements == null) return;
+
+        foreach (var ach in achievements)
+        {
+            if (ach == null || !ach.isProgression || IsUnlocked(ach)) continue;
+
+            if (!string.IsNullOrEmpty(ach.ProgressKey))
+            {
+                PlayerPrefs.DeleteKey(ach.ProgressKey);
+            }
+
+            OnProgressChanged?.Invoke(ach, 0, ach.targetValue);
+        }
+
+        PlayerPrefs.Save();
+    }
+
+
     private void SaveUnlocked(AchievementData ach)
     {
         PlayerPrefs.SetInt(ach.UnlockedKey, 1);
