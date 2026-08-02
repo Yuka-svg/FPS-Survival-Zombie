@@ -6,6 +6,8 @@ namespace cowsins
 {
     public partial class BulletsPickeable : Pickeable
     {
+        public override bool InstantInteraction => true;
+
         [Tooltip("How many bullets you will get"), SerializeField, SaveField] private int amountOfBullets;
 
         [Tooltip("If true, the pickup amount for hitscan/custom weapons is scaled by the current weapon's magazine size (magazinesPerPickup). If false, amountOfBullets is used as a flat amount for every weapon."), SerializeField]
