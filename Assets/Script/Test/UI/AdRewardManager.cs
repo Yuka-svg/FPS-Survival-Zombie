@@ -185,8 +185,26 @@ public class AdRewardManager : MonoBehaviour
         _ready = true;
     }
 
+    private bool _skipNextDeltaTimeTimer;
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            // Skip DeltaTime timer countdown on the frame App Focus is regained to prevent Time.unscaledDeltaTime spike
+            _skipNextDeltaTimeTimer = true;
+        }
+    }
+
     private void Update()
     {
+        if (_skipNextDeltaTimeTimer)
+        {
+            _skipNextDeltaTimeTimer = false;
+            // Return early to consume the delta time spike without decrementing _adClosedTimer
+            return;
+        }
+
 #if UNITY_EDITOR
         if (_currentState == AdUIState.Playing)
         {
@@ -210,7 +228,7 @@ public class AdRewardManager : MonoBehaviour
         }
 #endif
 
-        if (_currentState == AdUIState.Claimed)
+        if (_currentState == AdUIState.Claimed || _hasClaimedReward)
         {
             _pendingAdClosed = false;
             _adClosedTimer = 0f;
@@ -222,13 +240,20 @@ public class AdRewardManager : MonoBehaviour
             OnAdCompletedSuccessfully();
         }
 
-        if (_pendingAdClosed && _currentState == AdUIState.Playing)
+        if (_pendingAdClosed && (_currentState == AdUIState.Playing || _currentState == AdUIState.Preview))
         {
             _adClosedTimer -= Time.unscaledDeltaTime;
-            if (_adClosedTimer <= 0f && !_isRewardEarned)
+            if (_adClosedTimer <= 0f)
             {
                 _pendingAdClosed = false;
-                ClosePanelInternal();
+                if (_isRewardEarned || _hasClaimedReward)
+                {
+                    OnAdCompletedSuccessfully();
+                }
+                else
+                {
+                    ClosePanelInternal();
+                }
             }
         }
 
