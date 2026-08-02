@@ -37,6 +37,10 @@ public class GiftBox : Pickeable
         model.transform.localPosition = Vector3.zero;
         model.transform.localRotation = Quaternion.identity;
         model.transform.localScale = Vector3.one * 1.5f;
+
+        Collider[] modelColliders = model.GetComponentsInChildren<Collider>(true);
+        foreach (var col in modelColliders)
+            col.enabled = false;
     }
 
     private void Start()
