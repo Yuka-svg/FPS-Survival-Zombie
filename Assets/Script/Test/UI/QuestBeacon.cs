@@ -57,6 +57,12 @@ public class QuestBeacon : MonoBehaviour
              "the beacon shows regardless of quest/chapter state. Read-only at runtime.")]
     public bool followerActive = false;
 
+    [Header("World Visuals")]
+    [Tooltip("Master switch for ALL in-world visuals (ground ring, particles, light, arrow, icon). " +
+             "When false the beacon still registers for minimap/objective targeting, but nothing is " +
+             "rendered in the world. Used to strip ring+icon clutter from journal pickups.")]
+    public bool showWorldVisuals = true;
+
     [Tooltip("If true, hide the beacon once the player gets within this distance.")]
     public bool hideWhenClose = true;
 
@@ -90,8 +96,8 @@ public class QuestBeacon : MonoBehaviour
     [Tooltip("Add an expanding ripple particle effect on the ground ring.")]
     public bool ringParticles = true;
 
-    [Tooltip("Add a point light at the ring for ambient glow.")]
-    public bool ringLight = true;
+    [Tooltip("Add a point light at the ring for ambient glow. Off by default — the light tints the floor with the beacon color; the ring mesh + ripple particles are the intended visuals.")]
+    public bool ringLight = false;
 
     [Header("Floating Arrow")]
     [Tooltip("Height of the floating arrow above the ground.")]
@@ -347,6 +353,14 @@ public class QuestBeacon : MonoBehaviour
             _icon = null;
             _ringParticles = null;
             _ringLight = null;
+        }
+
+        // No in-world visuals requested (journal pickups etc.) — the beacon
+        // still evaluates activation and stays in ActiveBeacons so the minimap
+        // and objective targeting keep working.
+        if (!showWorldVisuals)
+        {
+            return;
         }
 
         Shader unlitShader = Shader.Find("Sprites/Default");

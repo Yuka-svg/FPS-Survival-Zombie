@@ -32,8 +32,8 @@ public class ChapterZoneHighlight : MonoBehaviour
     public Color glowColor = new Color(0.4f, 0.9f, 0.6f, 0.35f);
 
     [Header("Corner Lights")]
-    [Tooltip("Add a point light at each corner of the zone.")]
-    public bool cornerLights = true;
+    [Tooltip("Add a point light at each corner of the zone. Off by default — lights spill into the zone interior; the flat ground glow + strips are the intended boundary visuals.")]
+    public bool cornerLights = false;
 
     [Tooltip("Corner light intensity.")]
     public float lightIntensity = 0.7f;
@@ -42,8 +42,8 @@ public class ChapterZoneHighlight : MonoBehaviour
     public float lightRange = 6f;
 
     [Header("Ground Glow")]
-    [Tooltip("Show a soft translucent glow on the ground over the whole zone.")]
-    public bool showGroundGlow = true;
+    [Tooltip("Show a soft translucent glow on the ground over the whole zone. Off by default — the full-zone quad tints the floor with the glow color; the edge strips are the intended boundary visuals.")]
+    public bool showGroundGlow = false;
 
     [Tooltip("Ground glow opacity.")]
     [Range(0f, 1f)] public float groundAlpha = 0.12f;
@@ -66,13 +66,13 @@ public class ChapterZoneHighlight : MonoBehaviour
     public bool showGroundStrips = true;
 
     [Tooltip("Width of each ground edge strip (world units).")]
-    public float stripWidth = 2.5f;
+    public float stripWidth = 1.5f;
 
     [Tooltip("How high above the ground the strips are placed (world units).")]
     public float stripHeight = 0.1f;
 
     [Tooltip("Opacity of the ground edge strips.")]
-    [Range(0f, 1f)] public float stripAlpha = 0.4f;
+    [Range(0f, 1f)] public float stripAlpha = 0.32f;
 
     [Header("Soft Edge Quality")]
     [Tooltip("Apply smooth alpha gradients (soft falloff at both edges of each strip, " +
@@ -318,10 +318,11 @@ public class ChapterZoneHighlight : MonoBehaviour
     }
 
     /// <summary>
-    /// 1D alpha gradient for the edge strips: 0 at both outer edges, 1 in the
-    /// middle (soft sine profile). Applied along the strip WIDTH, so instead of
-    /// a hard flat rectangle each strip looks like a soft painted line whose
-    /// edges melt into the ground.
+    /// 1D alpha gradient for the edge glow: 0 at both outer edges, peaking in
+    /// the middle (soft bell profile). Applied along the V axis — LineRenderer
+    /// maps U along the line's length and V across its width, so a V-wise
+    /// gradient melts the two long edges of the closed loop into the ground
+    /// instead of hard rectangles.
     /// </summary>
     private static Texture2D MakeSoftStripTexture()
     {
@@ -333,6 +334,7 @@ public class ChapterZoneHighlight : MonoBehaviour
         {
             float t = y / (h - 1f);
             float a = Mathf.Sin(t * Mathf.PI);
+            a = a * a; // Squared sine: wider soft shoulder, gentler peak.
             for (int x = 0; x < 4; x++)
                 tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
         }
@@ -553,26 +555,13 @@ public class ChapterZoneHighlight : MonoBehaviour
             gRenderer.receiveShadows = false;
         }
 
-        // ---- 4 ground edge strips (painted-line style) ----
-        // These lie flat on the ground along the 4 edges so the boundary stays
-        // visible from ANY viewing angle. Vertical panels collapse to a thin
-        // line when looking straight along the X axis, but a strip on the
-        // ground always shows its full edge length.
+        // ---- Ground edge glow (continuous closed loop) ----
+        // A single LineRenderer draws a closed rectangle around the zone
+        // footprint. One renderer (vs 4 separate quads) means the boundary is
+        // seamless at the corners: no double-bright overlaps and no visible
+        // breaks where individual strips used to meet.
         if (showGroundStrips)
         {
-            Vector3[] stripCenters = {
-                new Vector3(center.x - halfX, stripY, center.z),   // X- edge, strip spans Z
-                new Vector3(center.x + halfX, stripY, center.z),   // X+ edge, strip spans Z
-                new Vector3(center.x, stripY, center.z - halfZ),   // Z- edge, strip spans X
-                new Vector3(center.x, stripY, center.z + halfZ),   // Z+ edge, strip spans X
-            };
-            Vector3[] stripSizes = {
-                new Vector3(stripWidth, size.z, 1f),   // X-: long along Z
-                new Vector3(stripWidth, size.z, 1f),   // X+: long along Z
-                new Vector3(size.x, stripWidth, 1f),   // Z-: long along X
-                new Vector3(size.x, stripWidth, 1f),   // Z+: long along X
-            };
-
             _stripMat = new Material(unlitShader) { name = "ZoneGlowStrip_Runtime" };
             _stripMat.color = new Color(glowColor.r, glowColor.g, glowColor.b, stripAlpha);
             _stripMat.SetFloat("_Cull", 0f);
@@ -583,21 +572,36 @@ public class ChapterZoneHighlight : MonoBehaviour
                 _stripMat.mainTexture = _stripTex;
             }
 
-            for (int i = 0; i < 4; i++)
-            {
-                var stripGO = new GameObject($"GlowStrip_{i}");
-                stripGO.transform.SetParent(_root.transform, false);
-                stripGO.transform.localPosition = stripCenters[i];
-                stripGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                stripGO.transform.localScale = stripSizes[i];
+            var stripGO = new GameObject("GlowStrip");
+            stripGO.transform.SetParent(_root.transform, false);
+            stripGO.transform.localPosition = new Vector3(center.x, stripY, center.z);
+            // TransformZ alignment draws the line flat in the transform's XY
+            // plane; rotating 90° about X lays that plane down onto the ground,
+            // exactly like the old strip quads.
+            stripGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
-                var sFilter = stripGO.AddComponent<MeshFilter>();
-                sFilter.sharedMesh = GetQuadMesh();
-                var sRenderer = stripGO.AddComponent<MeshRenderer>();
-                sRenderer.sharedMaterial = _stripMat;
-                sRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                sRenderer.receiveShadows = false;
-            }
+            var line = stripGO.AddComponent<LineRenderer>();
+            line.useWorldSpace = false;
+            line.loop = true;
+            line.positionCount = 4;
+            // Alignment Local keeps the line inside the transform's XY plane;
+            // after the 90°-about-X rotation that plane lies flat on the ground
+            // (local X stays world X, local Y becomes world Z), so the corner
+            // points are written as (x, z, 0).
+            line.SetPositions(new[]
+            {
+                new Vector3(-halfX, -halfZ, 0f),
+                new Vector3(+halfX, -halfZ, 0f),
+                new Vector3(+halfX, +halfZ, 0f),
+                new Vector3(-halfX, +halfZ, 0f),
+            });
+            line.widthMultiplier = stripWidth;
+            line.textureMode = LineTextureMode.Stretch;
+            line.alignment = LineAlignment.TransformZ;
+            line.sharedMaterial = _stripMat;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+        }
 
             // ---- Inner halo rim (soft spill along the 4 edges) ----
             if (rimGlow)
@@ -663,7 +667,6 @@ public class ChapterZoneHighlight : MonoBehaviour
                     }
                 }
             }
-        }
     }
 
     private void Update()
