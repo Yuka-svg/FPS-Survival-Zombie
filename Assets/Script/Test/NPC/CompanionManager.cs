@@ -847,8 +847,10 @@ public class CompanionManager : MonoBehaviour
         // Safety net: wait one frame for any remaining triggers to settle,
         // then force-restore timeScale.
         yield return null;
+        bool anyPanel = (PanelManager.Instance != null && PanelManager.Instance.IsAnyPanelActive()) || (AdRewardManager.Instance != null && AdRewardManager.Instance.IsPanelOpen);
         if (!(PauseManager.Instance != null && PauseManager.Instance.IsPaused) &&
-            !(GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver))
+            !(GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) &&
+            !anyPanel)
             Time.timeScale = 1f;
 
         // Re-enable chapter-transition cutscenes for future chapters.
@@ -1030,7 +1032,8 @@ public class CompanionManager : MonoBehaviour
         {
             bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
             bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-            if (!pauseOpen && !gameOver) Time.timeScale = 1f;
+            bool anyPanel = (PanelManager.Instance != null && PanelManager.Instance.IsAnyPanelActive()) || (AdRewardManager.Instance != null && AdRewardManager.Instance.IsPanelOpen);
+            if (!pauseOpen && !gameOver && !anyPanel) Time.timeScale = 1f;
         }
 
         // 1) Try PlayerStats.Respawn (fires OnRespawn event → PlayerMovement.TeleportPlayer).
@@ -1100,7 +1103,8 @@ public class CompanionManager : MonoBehaviour
         {
             bool pauseOpen = PauseManager.Instance != null && PauseManager.Instance.IsPaused;
             bool gameOver = GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver;
-            if (!pauseOpen && !gameOver) Time.timeScale = 1f;
+            bool anyPanel = (PanelManager.Instance != null && PanelManager.Instance.IsAnyPanelActive()) || (AdRewardManager.Instance != null && AdRewardManager.Instance.IsPanelOpen);
+            if (!pauseOpen && !gameOver && !anyPanel) Time.timeScale = 1f;
         }
 
         bool done = false;

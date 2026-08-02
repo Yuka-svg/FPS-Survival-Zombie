@@ -35,6 +35,7 @@ public class AdRewardManager : MonoBehaviour
 
     private bool _ready;
     private bool _isPanelOpen;
+    public bool IsPanelOpen => _isPanelOpen || _currentState != AdUIState.Idle;
     private Coroutine _adCoroutine;
     private Transform _currentPlayer;
     private PlayerControl _playerControl;
@@ -227,6 +228,18 @@ public class AdRewardManager : MonoBehaviour
             }
         }
 #endif
+
+        if (_isPanelOpen || _currentState != AdUIState.Idle)
+        {
+            Time.timeScale = 0f;
+            PauseMenu.isPaused = true;
+            if (_playerControl != null) _playerControl.LoseControl();
+            if (_currentState == AdUIState.Preview || _currentState == AdUIState.Claimed || _currentState == AdUIState.Playing)
+            {
+                UnityEngine.Cursor.lockState = CursorLockMode.None;
+                UnityEngine.Cursor.visible = true;
+            }
+        }
 
         if (_currentState == AdUIState.Claimed || _hasClaimedReward)
         {
@@ -623,6 +636,18 @@ public class AdRewardManager : MonoBehaviour
 
         SetButtonState(_watchButton, false, false, false, "");
         SetButtonState(_closeButton, true, true, false, "ĐÓNG");
+
+        // Enforce pause state and cursor unlock while Claimed UI is open
+        Time.timeScale = 0f;
+        PauseMenu.isPaused = true;
+        if (_playerControl != null) _playerControl.LoseControl();
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
+        UnityEngine.Cursor.visible = true;
+
+        if (PanelManager.Instance != null)
+        {
+            PanelManager.Instance.RegisterPanelActive("AdReward", true, OnEscapeCloseRequested);
+        }
     }
 
     private void OnAdFailed()

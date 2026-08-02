@@ -90,11 +90,13 @@
 }
 
 #AdRewardPanel #AdTitle {
-    font-size: var(--fs-display, 48px);
+    font-size: 32px;
     -unity-font-definition: resource("Fonts/BlackOpsOne-Regular SDF");
     -unity-text-align: middle-center;
-    letter-spacing: 8px;
-    width: 100%;
+    letter-spacing: 3px;
+    width: 92%;
+    max-width: 680px;
+    white-space: normal;
     height: auto;
     margin-top: 8px;
     margin-bottom: 8px;
