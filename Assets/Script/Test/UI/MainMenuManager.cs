@@ -70,6 +70,7 @@ public class MainMenuManager : MonoBehaviour
         {
             pm.OnLoginSuccess += HandleLoginSuccess;
             pm.OnCloudDataLoaded += HandleCloudDataLoaded;
+            pm.OnLogout += HandleLogout;
             if (pm.IsLoggedIn) RefreshBestScore();
         }
     }
@@ -81,7 +82,13 @@ public class MainMenuManager : MonoBehaviour
         {
             pm.OnLoginSuccess -= HandleLoginSuccess;
             pm.OnCloudDataLoaded -= HandleCloudDataLoaded;
+            pm.OnLogout -= HandleLogout;
         }
+    }
+
+    private void HandleLogout()
+    {
+        RefreshBestScore();
     }
 
     private void HandleLoginSuccess(string username)

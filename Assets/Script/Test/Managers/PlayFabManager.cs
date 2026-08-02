@@ -210,7 +210,7 @@ public class PlayFabManager : MonoBehaviour
                 // leaderboard. This is needed because older accounts may have a
                 // BestScore in UserData but never submitted it as a statistic
                 // (the leaderboard feature was added later).
-                int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+                int bestScore = Mathf.Max(PlayerPrefs.GetInt("BestScore", 0), PlayerPrefs.GetInt("BestEndlessScore", 0));
                 if (bestScore > 0)
                     UpdatePlayerStatistic(LeaderboardStatName, bestScore);
 
@@ -313,7 +313,7 @@ public class PlayFabManager : MonoBehaviour
             });
 
         // Also submit the best score as a statistic so it appears on leaderboards.
-        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        int bestScore = Mathf.Max(PlayerPrefs.GetInt("BestScore", 0), PlayerPrefs.GetInt("BestEndlessScore", 0));
         if (bestScore > 0)
             UpdatePlayerStatistic(LeaderboardStatName, bestScore);
     }
