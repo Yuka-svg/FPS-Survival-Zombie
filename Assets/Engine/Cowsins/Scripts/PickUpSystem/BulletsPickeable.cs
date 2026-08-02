@@ -6,7 +6,7 @@ namespace cowsins
 {
     public partial class BulletsPickeable : Pickeable
     {
-        public override bool InstantInteraction => true;
+        public override bool RequiresLookAt => true;
 
         [Tooltip("How many bullets you will get"), SerializeField, SaveField] private int amountOfBullets;
 

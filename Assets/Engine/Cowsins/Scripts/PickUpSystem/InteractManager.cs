@@ -224,7 +224,7 @@ namespace cowsins
             foreach (var col in hits)
             {
                 var trigger = col.GetComponentInParent<Interactable>();
-                if (trigger != null && !trigger.IsForbiddenInteraction(weaponReferences) && !trigger.InstantInteraction)
+                if (trigger != null && !trigger.IsForbiddenInteraction(weaponReferences) && !trigger.InstantInteraction && !trigger.RequiresLookAt)
                 {
                     Vector3 dirToTarget = (col.bounds.center - mainCamera.transform.position).normalized;
                     if (Vector3.Dot(mainCamera.transform.forward, dirToTarget) > 0.3f)

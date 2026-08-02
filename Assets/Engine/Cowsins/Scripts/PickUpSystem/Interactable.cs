@@ -1,5 +1,5 @@
 /// <summary>
-/// This script belongs to cowsins™ as a part of the cowsins´ FPS Engine. All rights reserved. 
+/// This script belongs to cowsinsï¿½ as a part of the cowsinsï¿½ FPS Engine. All rights reserved. 
 /// </summary>
 using UnityEngine;
 using UnityEngine.Events;
@@ -31,6 +31,13 @@ namespace cowsins
         public virtual float GetHoldDuration(float defaultDuration) => customHoldDuration > 0f ? customHoldDuration : defaultDuration;
 
         public virtual bool InstantInteraction => instantInteraction && GetHoldDuration(0f) <= 0f;
+
+        /// <summary>
+        /// If true, this interactable is excluded from proximity detection and
+        /// can only be targeted by looking at it (camera raycast). Does not
+        /// affect whether interaction is instant or requires holding.
+        /// </summary>
+        public virtual bool RequiresLookAt => false;
 
         public virtual void OnHoldProgressUpdate(float progress) {}
 
