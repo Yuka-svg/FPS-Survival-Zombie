@@ -5,6 +5,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// End credits: scrolls sections from bottom to top. No self-fade — the
+/// EndingSequenceManager reveals it from EndingBlackout and fades to black
+/// again before this component loads the main menu (ExitToMainMenu). Can be
+/// skipped with ESC or a left click, which immediately reports completion so
+/// the manager can cut to black and leave.
+/// </summary>
 public class CreditsSequence : MonoBehaviour
 {
     [Serializable]
@@ -43,84 +50,86 @@ public class CreditsSequence : MonoBehaviour
     };
 
     [Header("Timing")]
-    [Tooltip("Fade-in duration at the start of the credits.")]
-    public float fadeIn = 1f;
     [Tooltip("Scroll speed in pixels/second (unscaled).")]
     public float scrollSpeed = 60f;
-    [Tooltip("Extra hold time (seconds) after the scroll finishes, before returning to the main menu.")]
+    [Tooltip("Extra hold time (seconds) after the scroll finishes, before reporting completion.")]
     public float holdAtEnd = 2f;
-    [Tooltip("Fade-out duration before loading the main menu.")]
-    public float fadeOut = 1f;
 
     [Header("Scene")]
     public string mainMenuSceneName = "MainMenu";
-
-    [Header("Visuals")]
-    public Color backgroundColor = Color.black;
 
     private bool _played;
     private VisualElement _root;
     private VisualElement _scrollContent;
     private GameObject _docGO;
-    private bool _skipRequested;
+    private Coroutine _routine;
+    private bool _finished;
     private float _contentHeight;
     private const float SectionGapTop = 70f;
     private const float HeaderHeight = 56f;
     private const float LineHeight = 40f;
     private const float LogoHeight = 220f;
 
+    /// <summary>True once the scroll finished (or was skipped).</summary>
+    public bool IsFinished => _finished;
+
+    /// <summary>
+    /// Builds and scrolls the credits. Reports completion when the scroll ends
+    /// or the player skips (ESC / left click). The manager should already be
+    /// revealing this panel from black.
+    /// </summary>
     public void Play(Action onComplete = null)
     {
         if (_played) { onComplete?.Invoke(); return; }
         _played = true;
-
-        // Switch to the credits music.
-        if (MusicManager.Instance != null)
-            MusicManager.Instance.PlayAfterCreditMusic();
-
-        StartCoroutine(PlayRoutine(onComplete));
+        _routine = StartCoroutine(PlayRoutine(onComplete));
     }
 
-    public void Skip() => _skipRequested = true;
+    /// <summary>
+    /// Restores time/audio and loads the main menu. Call only while the
+    /// screen is fully black (EndingSequenceManager fades to black first).
+    /// </summary>
+    public void ExitToMainMenu()
+    {
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
 
     private IEnumerator PlayRoutine(Action onComplete)
     {
         Build();
 
-        float prevTimeScale = Time.timeScale;
+        // Switch to the credits music.
+        if (MusicManager.Instance != null)
+            MusicManager.Instance.PlayAfterCreditMusic();
+
         Time.timeScale = 0f;
         AudioListener.pause = true;
-
         global::UnityEngine.Cursor.lockState = CursorLockMode.None;
         global::UnityEngine.Cursor.visible = true;
-
-        _root.style.opacity = 1f;
-        yield return new WaitForSecondsRealtime(fadeIn);
 
         float viewportHeight = Screen.height;
         float totalTravel = _contentHeight + viewportHeight;
         float traveled = 0f;
+        bool skip = false;
         _scrollContent.style.translate = new Translate(0, viewportHeight);
 
-        while (traveled < totalTravel && !_skipRequested)
+        while (traveled < totalTravel && !skip)
         {
+            skip = Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(0);
             float delta = scrollSpeed * Time.unscaledDeltaTime;
             traveled += delta;
             _scrollContent.style.translate = new Translate(0, viewportHeight - traveled);
             yield return null;
         }
 
-        if (!_skipRequested)
+        if (!skip)
             yield return new WaitForSecondsRealtime(holdAtEnd);
 
-        _root.style.opacity = 0f;
-        yield return new WaitForSecondsRealtime(fadeOut);
-
-        Time.timeScale = prevTimeScale > 0f ? prevTimeScale : 1f;
-        AudioListener.pause = false;
-        Destroy(_docGO);
-
-        SceneManager.LoadScene(mainMenuSceneName);
+        _finished = true;
+        _routine = null;
+        onComplete?.Invoke();
     }
 
     private void Build()
@@ -130,19 +139,10 @@ public class CreditsSequence : MonoBehaviour
         var doc = _docGO.GetComponent<UIDocument>();
         doc.sortingOrder = 1800;
 
-        // Copy panelSettings from an existing screen-space UIDocument so the panel actually renders.
-        // Without this, the UIDocument has no panel and nothing is visible on screen.
-        // Must filter out WorldSpacePanelSettings — see UIPanelSettingsUtil for details.
         var ssDoc = UIPanelSettingsUtil.FindScreenSpaceUIDocument(doc);
-        if (ssDoc != null)
-        {
-            doc.panelSettings = ssDoc.panelSettings;
-        }
+        if (ssDoc != null) doc.panelSettings = ssDoc.panelSettings;
         if (doc.panelSettings == null)
-        {
-            // Fallback: search all loaded PanelSettings assets directly.
             doc.panelSettings = UIPanelSettingsUtil.FindScreenSpacePanelSettingsAsset();
-        }
 
         var asset = Resources.Load<VisualTreeAsset>("CreditsSequence");
         if (asset == null) return;
@@ -152,10 +152,8 @@ public class CreditsSequence : MonoBehaviour
         _scrollContent = doc.rootVisualElement.Q("ScrollContent");
         if (_root == null || _scrollContent == null) return;
 
-        _root.style.opacity = 0f;
+        _root.style.opacity = 1f;
         _root.pickingMode = PickingMode.Ignore;
-        var bg = _root.Q("Background");
-        if (bg != null) bg.style.backgroundColor = backgroundColor;
 
         float y = 0f;
 

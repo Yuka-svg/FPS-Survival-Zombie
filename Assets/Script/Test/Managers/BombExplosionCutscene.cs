@@ -165,13 +165,28 @@ public class BombExplosionCutscene : MonoBehaviour
 
         Time.timeScale = prevTimeScale > 0f ? prevTimeScale : 1f;
 
-        _fadeRoot.style.opacity = 0f;
-        yield return new WaitForSecondsRealtime(fadeDuration);
-
-        Destroy(_fadeDocGO);
+        // NOTE: no fade-open here on purpose. The screen stays black so the
+        // next ending step can build behind it — EndingSequenceManager owns the
+        // reveal via EndingBlackout and calls ReleaseFadeOverlay() once its own
+        // overlay is covering the screen.
         _playing = false;
         if (CutscenePlayer._playingCount > 0) CutscenePlayer._playingCount--;
         onComplete?.Invoke();
+    }
+
+    /// <summary>
+    /// Destroys the cutscene's own fade overlay so it stops covering the
+    /// screen. The caller (EndingSequenceManager) must ensure EndingBlackout
+    /// is already black before calling this, or the gameplay would flash.
+    /// </summary>
+    public void ReleaseFadeOverlay()
+    {
+        if (_fadeDocGO != null)
+        {
+            Destroy(_fadeDocGO);
+            _fadeDocGO = null;
+            _fadeRoot = null;
+        }
     }
 
     private void BuildFadeOverlay()

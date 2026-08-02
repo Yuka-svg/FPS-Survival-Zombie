@@ -476,6 +476,8 @@ MonoBehaviour:
   shootStopDuration: 0.35
   speedSmoothTime: 0.15
   abandonCombatDistance: 12
+  teleportDistance: 30
+  teleportBehindOffset: 3
   fireMode: 0
   burstInterval: 0.08
   detectRange: 20
@@ -499,6 +501,7 @@ MonoBehaviour:
   destroyDistance: 1.5
   fadeOutDuration: 0.5
   enemyDamageTickInterval: 1
+  damageCooldown: 3
   enemyDamagePerTick: 10
   enemyDamageRadius: 2
   gunChildName: CompanionShotgun
@@ -522,11 +525,18 @@ MonoBehaviour:
   fadeIn: 0.3
   speechHoldDuration: 4
   fadeOut: 0.8
+  typewriterSpeed: 0.025
+  defaultSpeakerName: NPC
+  defaultSpeakerAvatar: {fileID: 0}
   textColor: {r: 0.95, g: 0.92, b: 0.8, a: 1}
   choiceColor: {r: 1, g: 0.85, b: 0.3, a: 1}
   scrimColor: {r: 0, g: 0, b: 0, a: 0.6}
   lineFontSize: 26
   choiceFontSize: 22
+  hintColor: {r: 0.306, g: 0.804, b: 0.769, a: 1}
+  hintFontSize: 14
+  typeSFX: {fileID: 0}
+  clickSFX: {fileID: 0}
 --- !u!114 &6768075256788150034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,6 +553,7 @@ MonoBehaviour:
   interactable: 0
   interactText: "N\xF3i chuy\u1EC7n"
   instantInteraction: 1
+  customHoldDuration: 0
   interactableEvents:
     OnInteract:
       m_PersistentCalls:
@@ -550,7 +561,7 @@ MonoBehaviour:
   stage1Line: "N\xE0y anh b\u1EA1n, t\xF4i c\u1EA7n \xEDt \u0111\u1EA1n. Anh c\xF3
     d\u01B0 40 vi\xEAn kh\xF4ng?"
   stage2Line: "C\u1EA3m \u01A1n \u0111\u1EA1n. Gi\u1EDD t\xF4i c\u1EA7n anh gi\xFAp
-    \u2014 v\xE0o 2 ti\u1EC7m kia t\xECm nhu y\u1EBFu ph\u1EA9m gi\xFAp t\xF4i. T\xF4i
+    \u2014 v\xE0o ti\u1EC7m kia t\xECm nhu y\u1EBFu ph\u1EA9m gi\xFAp t\xF4i. T\xF4i
     b\u1ECB th\u01B0\u01A1ng kh\xF4ng \u0111i \u0111\u01B0\u1EE3c."
   stage3Line: "Anh l\u1EA5y \u0111\u01B0\u1EE3c nhu y\u1EBFu ph\u1EA9m r\u1ED3i \xE0?
     \u0110\u01B0a cho t\xF4i, r\u1ED3i t\xF4i s\u1EBD \u0111i c\xF9ng anh."
@@ -561,6 +572,20 @@ MonoBehaviour:
   stage2InteractText: "N\xF3i chuy\u1EC7n"
   stage3InteractText: "N\xF3i chuy\u1EC7n"
   stage4InteractText: "N\xF3i chuy\u1EC7n"
+  smallTalkLines:
+  - "Anh c\xF3 kh\u1ECFe kh\xF4ng? Tr\xF4ng anh nh\u01B0 v\u1EEBa l\u0103n l\u1ED9n
+    v\u1EDBi \u0111\xE1m zombie."
+  - "C\u1EA9n th\u1EADn \u0111\u1EA5y. Quanh \u0111\xE2y zombie nhi\u1EC1u l\u1EAFm."
+  - "T\xF4i c\xF2n nh\u1EDB h\u1ED3i th\u1ECB tr\u1EA5n ch\u01B0a lo\u1EA1n... Gi\u1EDD
+    ch\u1EC9 c\xF2n tro t\xE0n."
+  - "\u0110\u1EA1n c\xF3 h\u1EBFt kh\xF4ng? T\xF4i c\xF3 th\u1EC3 chia \xEDt cho
+    anh."
+  rescuedThankLines:
+  - "C\u1EA3m \u01A1n anh \u0111\xE3 c\u1EE9u t\xF4i l\xFAc n\xE3y. Anh c\xF3 b\u1ECB
+    th\u01B0\u01A1ng g\xEC kh\xF4ng?"
+  - "Nh\u1EDD anh m\xE0 t\xF4i c\xF2n \u0111\u1EE9ng \u0111\u01B0\u1EE3c \u0111\xE2y.
+    C\u1EA3m \u01A1n nhi\u1EC1u. Anh \u1ED5n ch\u1EE9?"
+  smallTalkInteractText: "N\xF3i chuy\u1EC7n"
   proximityDistance: 4
   proximityKey: 101
 --- !u!114 &7240098511191516129

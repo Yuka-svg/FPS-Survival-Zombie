@@ -5,11 +5,12 @@
 
     <ui:VisualElement name="EpilogueRoot" picking-mode="Ignore">
         <ui:VisualElement name="Background" />
+        <ui:VisualElement name="Vignette" />
         <ui:VisualElement name="Content">
             <ui:Label name="Title" text="KẾT THÚC" class="epilogue-title" />
             <ui:VisualElement name="Divider" class="epilogue-divider" />
             <ui:VisualElement name="Illustration" />
-            <ui:Label name="BodyText" />
+            <ui:Label name="BodyText" class="epilogue-body" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
