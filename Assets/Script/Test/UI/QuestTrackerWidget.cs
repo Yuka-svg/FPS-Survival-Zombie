@@ -424,6 +424,13 @@ public class QuestTrackerWidget : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Time.timeScale == 0f ||
+            (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver) ||
+            (PauseManager.Instance != null && PauseManager.Instance.IsOpenOrTransitioning))
+        {
+            return;
+        }
+
         if (_isMinimapMode || _isTransitioning)
         {
             Transform pTrans = MinimapController.Instance != null && MinimapController.Instance.PlayerTransform != null

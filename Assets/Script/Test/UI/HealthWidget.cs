@@ -115,7 +115,7 @@ public class HealthWidget : MonoBehaviour
             else _currentGhostPct = Mathf.Lerp(_currentGhostPct, _target, 1f - Mathf.Exp(-ghostDamping * dt));
             _healthGhost.style.width = Length.Percent(_currentGhostPct * 100f);
         }
-        if (_target <= lowThreshold && _root != null)
+        if (_target <= lowThreshold && _root != null && Time.timeScale > 0f && !(GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver))
         {
             _root.MarkDirtyRepaint();
         }

@@ -60,6 +60,9 @@ public class ThreatWidget : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f || (GameOverManager.Instance != null && GameOverManager.Instance.IsGameOver))
+            return;
+
         // Animate the pulsing border/LED/warning repaint at all times
         _container?.MarkDirtyRepaint();
     }

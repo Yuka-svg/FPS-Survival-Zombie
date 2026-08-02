@@ -258,6 +258,33 @@ namespace cowsins
             landingPosOffset = Vector3.zero;
         }
 
+        /// <summary>
+        /// Resets all camera wobble, sway, tilt, landing, and shake offsets immediately.
+        /// </summary>
+        public void ResetCamera()
+        {
+            if (landingShakeRoutine != null) StopCoroutine(landingShakeRoutine);
+            headBobPosOffset = Vector3.zero;
+            headBobRotOffset = Quaternion.identity;
+            breathingPosOffset = Vector3.zero;
+            breathingRotOffset = Quaternion.identity;
+            landingPosOffset = Vector3.zero;
+            tiltRot = Quaternion.identity;
+            Trauma = 0f;
+
+            if (camShakeTarget != null)
+            {
+                camShakeTarget.localPosition = Vector3.zero;
+                camShakeTarget.localRotation = Quaternion.identity;
+            }
+
+            if (playerCamera != null)
+            {
+                playerCamera.localPosition = origPos;
+                playerCamera.localRotation = origRot;
+            }
+        }
+
         #endregion
     }
 }

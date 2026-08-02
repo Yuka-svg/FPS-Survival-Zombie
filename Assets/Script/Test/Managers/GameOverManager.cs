@@ -171,6 +171,10 @@ public class GameOverManager : MonoBehaviour
         if (isGameOver)
             return;
         isGameOver = true;
+
+        var camFx = FindAnyObjectByType<cowsins.CameraEffects>();
+        if (camFx != null) camFx.ResetCamera();
+
         if (PanelManager.Instance != null)
         {
             PanelManager.Instance.RegisterPanelActive("GameOver", true);
