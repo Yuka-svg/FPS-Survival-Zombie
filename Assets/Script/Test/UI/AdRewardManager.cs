@@ -94,6 +94,13 @@ public class AdRewardManager : MonoBehaviour
         }
     }
 
+    private bool _isQuitting = false;
+
+    private void OnApplicationQuit()
+    {
+        _isQuitting = true;
+    }
+
     private void OnDestroy()
     {
         if (_instance == this)
@@ -102,16 +109,21 @@ public class AdRewardManager : MonoBehaviour
 
     private void OnEnable() { SetupUI(); }
 
+    [SerializeField] private UIDocument canvasUIDocument;
+
     private void OnDisable()
     {
         UnsubscribeUIEvents();
-        if (_isPanelOpen || _currentState != AdUIState.Idle)
+        if (!_isQuitting && Application.isPlaying && gameObject.scene.isLoaded)
         {
-            ClosePanelInternal();
-        }
-        else if (PanelManager.Instance != null)
-        {
-            PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
+            if (_isPanelOpen || _currentState != AdUIState.Idle)
+            {
+                ClosePanelInternal();
+            }
+            else if (PanelManager.Instance != null && PanelManager.Instance.gameObject.activeInHierarchy)
+            {
+                PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
+            }
         }
         _currentState = AdUIState.Idle;
         _currentGiftBox = null;
@@ -133,14 +145,14 @@ public class AdRewardManager : MonoBehaviour
             var docComp = GetComponent<UIDocument>();
             if (docComp != null) _doc = docComp.rootVisualElement;
         }
-        if (_doc == null)
+        if (_doc == null && canvasUIDocument != null)
         {
-            var go = GameObject.Find("GameUICanvas");
-            if (go != null)
-            {
-                var docComp = go.GetComponent<UIDocument>();
-                if (docComp != null) _doc = docComp.rootVisualElement;
-            }
+            _doc = canvasUIDocument.rootVisualElement;
+        }
+        if (_doc == null && Application.isPlaying && gameObject.scene.isLoaded)
+        {
+            var uiDoc = FindFirstObjectByType<UIDocument>();
+            if (uiDoc != null) _doc = uiDoc.rootVisualElement;
         }
         if (_doc == null) return;
 

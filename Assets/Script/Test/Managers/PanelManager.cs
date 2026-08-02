@@ -26,6 +26,76 @@ public class PanelManager : MonoBehaviour
         }
     }
 
+    private bool _isQuitting = false;
+    private bool _isDestroyed = false;
+
+    [SerializeField] private GameObject gameUICanvas;
+    [SerializeField] private PlayerControl playerControl;
+
+    private GameObject _cachedCanvasGo;
+    private PlayerControl _cachedPlayerControl;
+    private cowsins.Crosshair _cachedCrosshair;
+
+    private void OnApplicationQuit()
+    {
+        _isQuitting = true;
+        Time.timeScale = 1f;
+        cowsins.PauseMenu.isPaused = false;
+    }
+
+    private void OnDestroy()
+    {
+        _isDestroyed = true;
+        Time.timeScale = 1f;
+        cowsins.PauseMenu.isPaused = false;
+    }
+
+    private GameObject CanvasGoSafe
+    {
+        get
+        {
+            if (_cachedCanvasGo == null)
+            {
+                if (gameUICanvas != null) _cachedCanvasGo = gameUICanvas;
+                else if (!_isQuitting && !_isDestroyed && gameObject.scene.isLoaded)
+                {
+                    var uiDoc = FindFirstObjectByType<UIDocument>();
+                    if (uiDoc != null) _cachedCanvasGo = uiDoc.gameObject;
+                }
+            }
+            return _cachedCanvasGo;
+        }
+    }
+
+    private PlayerControl PlayerControlSafe
+    {
+        get
+        {
+            if (_cachedPlayerControl == null)
+            {
+                if (playerControl != null) _cachedPlayerControl = playerControl;
+                else if (!_isQuitting && !_isDestroyed && gameObject.scene.isLoaded)
+                {
+                    _cachedPlayerControl = FindFirstObjectByType<PlayerControl>();
+                }
+            }
+            return _cachedPlayerControl;
+        }
+    }
+
+    private cowsins.Crosshair CrosshairSafe
+    {
+        get
+        {
+            if (_cachedCrosshair == null)
+            {
+                var pc = PlayerControlSafe;
+                if (pc != null) _cachedCrosshair = pc.GetComponentInChildren<cowsins.Crosshair>(true);
+            }
+            return _cachedCrosshair;
+        }
+    }
+
     private Coroutine _lockCoroutine;
     private static readonly Dictionary<string, bool> _hudActiveState = new Dictionary<string, bool>();
     private readonly Dictionary<string, bool> _desiredActiveStates = new Dictionary<string, bool>();
@@ -163,6 +233,9 @@ public class PanelManager : MonoBehaviour
 
     private void UpdateGameplayState()
     {
+        if (_isQuitting || _isDestroyed || !gameObject.activeInHierarchy || !enabled || !gameObject.scene.isLoaded)
+            return;
+
         if (_lockCoroutine != null)
         {
             StopCoroutine(_lockCoroutine);
@@ -178,9 +251,8 @@ public class PanelManager : MonoBehaviour
             if (val) { anyDesiredActive = true; break; }
         }
 
-        var player = GameObject.FindGameObjectWithTag("Player");
-        var playerControl = player != null ? player.GetComponentInChildren<PlayerControl>() : null;
-        var canvasGo = GameObject.Find("GameUICanvas");
+        var pControl = PlayerControlSafe;
+        var canvasGo = CanvasGoSafe;
 
         // 1. Manage Timescale and Control based on actual active states (after transitions finish)
         if (anyActive)
@@ -196,8 +268,8 @@ public class PanelManager : MonoBehaviour
                 UnityEngine.Cursor.visible = true;
             }
 
-            if (playerControl != null)
-                playerControl.LoseControl();
+            if (pControl != null)
+                pControl.LoseControl();
         }
         else
         {
@@ -207,8 +279,8 @@ public class PanelManager : MonoBehaviour
                 Time.timeScale = 1f;
             }
 
-            if (playerControl != null)
-                playerControl.GrantControl();
+            if (pControl != null)
+                pControl.GrantControl();
 
             if (gameObject.activeInHierarchy)
             {
@@ -254,7 +326,10 @@ public class PanelManager : MonoBehaviour
 
     private void Update()
     {
-        var canvasGo = GameObject.Find("GameUICanvas");
+        if (_isQuitting || _isDestroyed || !gameObject.activeInHierarchy || !enabled || !gameObject.scene.isLoaded)
+            return;
+
+        var canvasGo = CanvasGoSafe;
         if (canvasGo == null) return;
 
         var uiDoc = canvasGo.GetComponent<UIDocument>();
@@ -331,6 +406,14 @@ public class PanelManager : MonoBehaviour
 
     public static void SetHUDVisible(Transform canvasRoot, bool visible)
     {
+        if (Instance != null && !Instance._isQuitting && !Instance._isDestroyed && Instance.gameObject.scene.isLoaded)
+        {
+            Instance.SetHUDVisibleInstance(canvasRoot, visible);
+        }
+    }
+
+    private void SetHUDVisibleInstance(Transform canvasRoot, bool visible)
+    {
         if (canvasRoot != null)
         {
             string[] overlayNames = { "PausePanel", "GameOverPanel", "JournalUI", "SkillTreeWidget", "QuestTrackerWidget", "StatsPanel" };
@@ -399,11 +482,10 @@ public class PanelManager : MonoBehaviour
             }
         }
 
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        var crosshair = CrosshairSafe;
+        if (crosshair != null)
         {
-            var crosshair = player.GetComponentInChildren<cowsins.Crosshair>(true);
-            if (crosshair != null) crosshair.gameObject.SetActive(visible);
+            crosshair.gameObject.SetActive(visible);
         }
     }
 
