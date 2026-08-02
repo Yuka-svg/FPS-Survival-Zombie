@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 namespace cowsins
@@ -26,7 +27,11 @@ namespace cowsins
         [Tooltip("Maximum distance at which the checkpoint view is visible. Set to 0 or less to always show.")]
         [SerializeField] private float maxViewDistance = 50f;
 
+        [Tooltip("When enabled, the checkpoint icon and distance text render on top of everything (visible through walls).")]
+        [SerializeField] private bool seeThrough = true;
+
         private Transform playerTransform;
+        private Image _icon;
         private bool _ready;
 
         private readonly float[] ConversionFactors =
@@ -42,8 +47,39 @@ namespace cowsins
         private void Start()
         {
             playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+            _icon = transform.Find("Canvas/Container/Image")?.GetComponent<Image>();
+            ApplySeeThrough();
             _ready = true;
             StartUpdateRoutine();
+        }
+
+        private void ApplySeeThrough()
+        {
+            if (!seeThrough) return;
+
+            // Render the checkpoint text and icon on top of everything by
+            // swapping to materials whose shaders use ZTest Always:
+            // - Text: "TextMeshPro/Mobile/Distance Field Overlay" (project copy,
+            //   identical to the mobile SDF shader but with ZTest Always).
+            // - Icon: "Custom/SeeThroughUI" (unlit sprite, ZTest Always).
+            if (text != null)
+            {
+                var mat = new Material(text.fontSharedMaterial);
+                mat.shader = Shader.Find("TextMeshPro/Mobile/Distance Field Overlay");
+                if (mat.shader != null) text.fontMaterial = mat;
+                else Object.Destroy(mat);
+            }
+
+            if (_icon != null)
+            {
+                var shader = Shader.Find("Custom/SeeThroughUI");
+                if (shader != null)
+                {
+                    var mat = new Material(_icon.material);
+                    mat.shader = shader;
+                    _icon.material = mat;
+                }
+            }
         }
 
         private void OnEnable()
