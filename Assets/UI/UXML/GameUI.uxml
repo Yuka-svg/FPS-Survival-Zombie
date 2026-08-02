@@ -476,6 +476,47 @@
                     <ui:Button name="AdCloseButton" text="NHẬN THƯỞNG" class="ad-button" style="display: none;" />
                 </ui:VisualElement>
             </ui:VisualElement>
+
+            <!-- AdMob Mockup Fullscreen Overlay -->
+            <ui:VisualElement name="AdMobMockupOverlay" style="display: none;">
+                <ui:VisualElement name="AdMobMockupHeader">
+                    <ui:VisualElement name="AdMobMockupBadge">
+                        <ui:Label text="Sample Ad • Google AdMob" name="AdMobBadgeLabel" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="AdMobHeaderRight">
+                        <ui:Button name="AdMobSkipButton" text="BỎ QUA" class="admob-skip-btn" />
+                        <ui:Button name="AdMobMockupCloseBtn" text="✕" class="admob-close-btn" style="display: none;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="AdMobMockupBody">
+                    <ui:VisualElement name="AdMobBannerContainer">
+                        <ui:Label text="NICE AD! - SAMPLE AD" name="AdMobBannerTitle" />
+                        <ui:Label text="Google Mobile Ads Test Announcement" name="AdMobBannerSub" />
+                        <ui:VisualElement name="AdMobMediaBox">
+                            <ui:VisualElement name="AdMobMediaIcon" />
+                            <ui:Label name="AdMobMockupTimerLabel" text="Quảng cáo kết thúc sau 5s" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="AdMobProgressBarTrack">
+                        <ui:VisualElement name="AdMobProgressBarFill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="AdMobMockupFooter">
+                    <ui:Label text="Mô phỏng xem quảng cáo AdMob (Unity Editor)" name="AdMobFooterHint" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Modal Xác Nhận Skip Quảng Cáo -->
+            <ui:VisualElement name="AdMobSkipConfirmModal" style="display: none;">
+                <ui:VisualElement name="AdMobConfirmCard">
+                    <ui:Label text="XÁC NHẬN BỎ QUA" name="AdMobConfirmTitle" />
+                    <ui:Label text="Bỏ qua quảng cáo sẽ không nhận được phần thưởng. Bạn có chắc chắn muốn bỏ qua?" name="AdMobConfirmMsg" />
+                    <ui:VisualElement name="AdMobConfirmFooter">
+                        <ui:Button name="AdMobResumeBtn" text="TIẾP TỤC XEM" class="admob-btn-primary" />
+                        <ui:Button name="AdMobConfirmSkipBtn" text="BỎ QUA" class="admob-btn-danger" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
 
         <!-- ==================== WeaponSelectionPanel ==================== -->

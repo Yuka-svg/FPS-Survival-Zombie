@@ -45,6 +45,56 @@ public class PanelManager : MonoBehaviour
 
     public bool forceFreezeTimeScale = false;
 
+    private Dictionary<string, List<Coroutine>> _panelCoroutines = new Dictionary<string, List<Coroutine>>();
+
+    private void StartTrackedCoroutine(string name, IEnumerator routine)
+    {
+        if (_panelCoroutines.TryGetValue(name, out var list) && list != null)
+        {
+            foreach (var co in list)
+            {
+                if (co != null) StopCoroutine(co);
+            }
+            list.Clear();
+        }
+        else
+        {
+            list = new List<Coroutine>();
+            _panelCoroutines[name] = list;
+        }
+
+        var newCo = StartCoroutine(routine);
+        list.Add(newCo);
+    }
+
+    public void ClosePanelImmediate(string name, VisualElement panel = null, VisualElement card = null)
+    {
+        if (_panelCoroutines.TryGetValue(name, out var list) && list != null)
+        {
+            foreach (var co in list)
+            {
+                if (co != null) StopCoroutine(co);
+            }
+            list.Clear();
+        }
+
+        _transitioningPanels.Remove(name);
+        _desiredActiveStates[name] = false;
+        _activePanels.Remove(name);
+
+        if (panel != null)
+        {
+            panel.RemoveFromClassList("visible");
+            panel.style.display = DisplayStyle.None;
+        }
+        if (card != null)
+        {
+            card.RemoveFromClassList("visible");
+        }
+
+        UpdateGameplayState();
+    }
+
     public void OpenPanel(string name, VisualElement panel, VisualElement card, System.Action closeCallback = null)
     {
         _desiredActiveStates[name] = true;
@@ -60,7 +110,7 @@ public class PanelManager : MonoBehaviour
         }
 
         RegisterPanelActive(name, true, closeCallback);
-        StartCoroutine(RegisterTransition(name, PanelTransitionDuration));
+        StartTrackedCoroutine(name, RegisterTransition(name, PanelTransitionDuration));
     }
 
     public void ClosePanel(string name, VisualElement panel, VisualElement card, System.Action onTransitionComplete = null)
@@ -74,7 +124,7 @@ public class PanelManager : MonoBehaviour
             onTransitionComplete?.Invoke();
             return;
         }
-        StartCoroutine(ClosePanelCoroutine(name, panel, card, onTransitionComplete));
+        StartTrackedCoroutine(name, ClosePanelCoroutine(name, panel, card, onTransitionComplete));
     }
 
     private IEnumerator ClosePanelCoroutine(string name, VisualElement panel, VisualElement card, System.Action onTransitionComplete)
@@ -82,7 +132,7 @@ public class PanelManager : MonoBehaviour
         if (panel != null) panel.RemoveFromClassList("visible");
         if (card != null) card.RemoveFromClassList("visible");
 
-        StartCoroutine(RegisterTransition(name, PanelTransitionDuration));
+        StartTrackedCoroutine(name, RegisterTransition(name, PanelTransitionDuration));
 
         yield return new WaitForSecondsRealtime(PanelTransitionDuration);
 
@@ -105,6 +155,7 @@ public class PanelManager : MonoBehaviour
         else
         {
             _activePanels.Remove(name);
+            _desiredActiveStates[name] = false;
         }
 
         UpdateGameplayState();

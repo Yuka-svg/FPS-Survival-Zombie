@@ -156,6 +156,12 @@ public class MusicManager : MonoBehaviour
         }
     }
 
+    private bool _isMutedByAd;
+    private float _mutedFade = 1f;
+
+    public void PauseMusic() => _isMutedByAd = true;
+    public void ResumeMusic() => _isMutedByAd = false;
+
     private void Update()
     {
         // Periodically re-read volume settings from PlayerPrefs so changes made
@@ -167,8 +173,11 @@ public class MusicManager : MonoBehaviour
             RefreshSettingsVolume();
         }
 
+        float targetMute = _isMutedByAd ? 0f : 1f;
+        _mutedFade = Mathf.MoveTowards(_mutedFade, targetMute, Time.unscaledDeltaTime / 0.2f);
+
         // Apply the combined volume to both sources each frame.
-        float v = _settingsVolume * baseVolume;
+        float v = _mutedFade * _settingsVolume * baseVolume;
         _srcA.volume = _fadeA * v;
         _srcB.volume = _fadeB * v;
     }

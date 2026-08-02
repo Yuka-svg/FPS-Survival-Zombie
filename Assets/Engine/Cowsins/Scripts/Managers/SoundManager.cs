@@ -23,6 +23,7 @@ namespace cowsins
 
             src = GetComponent<AudioSource>();
             src.spatialBlend = 0f;
+            src.ignoreListenerPause = true;
 
             if (source3D != null && PoolManager.Instance != null) PoolManager.Instance.RegisterPool(source3D.gameObject, 5);
         }

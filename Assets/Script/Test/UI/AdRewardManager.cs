@@ -6,7 +6,7 @@ using GoogleMobileAds.Api;
 
 public class AdRewardManager : MonoBehaviour
 {
-    public enum AdUIState { Idle, Preview, Playing, Claimed }
+    public enum AdUIState { Idle, Preview, Playing, ConfirmSkip, Claimed }
 
     private static AdRewardManager _instance;
     public static AdRewardManager Instance
@@ -32,17 +32,37 @@ public class AdRewardManager : MonoBehaviour
     private Button _watchButton;
     private Button _closeButton;
 
+    // AdMob Mockup Visual Elements
+    private VisualElement _adMobMockupOverlay;
+    private Label _adMobMockupTimerLabel;
+    private VisualElement _adMobProgressBarFill;
+    private Button _adMobSkipButton;
+    private Button _adMobMockupCloseBtn;
+
+    // Skip Confirm Modal Elements
+    private VisualElement _adMobSkipConfirmModal;
+    private Button _adMobResumeBtn;
+    private Button _adMobConfirmSkipBtn;
+
     private bool _ready;
     private bool _isPanelOpen;
     private Coroutine _adCoroutine;
     private Transform _currentPlayer;
     private PlayerControl _playerControl;
     private float _previousTimeScale = 1f;
+    private bool _previousAudioListenerPause;
 
     private AdUIState _currentState = AdUIState.Idle;
     private GiftBox _currentGiftBox;
     private GiftBox.GiftRewardType _cachedType;
     private int _cachedAmount;
+    private bool _hasClaimedReward;
+
+    // Mobile Thread-Safe Callbacks (#else)
+    private volatile bool _isRewardEarned;
+    private volatile bool _pendingAdClosed;
+    private volatile bool _pendingAdFailed;
+    private float _adClosedTimer;
 
     [Header("AdMob Settings")]
     [Tooltip("AdMob Rewarded Ad Unit ID cho Android.")]
@@ -81,13 +101,22 @@ public class AdRewardManager : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_watchButton != null) _watchButton.clicked -= OnWatchButtonClicked;
-        if (_closeButton != null) _closeButton.clicked -= OnCloseButtonClicked;
-        if (_card != null) _card.generateVisualContent -= OnGenerateCardBackground;
-        
+        UnsubscribeUIEvents();
         _currentState = AdUIState.Idle;
         _currentGiftBox = null;
         DestroyAd();
+    }
+
+    private void UnsubscribeUIEvents()
+    {
+        if (_watchButton != null) _watchButton.clicked -= OnWatchButtonClicked;
+        if (_closeButton != null) _closeButton.clicked -= OnCloseButtonClicked;
+        if (_card != null) _card.generateVisualContent -= OnGenerateCardBackground;
+
+        if (_adMobSkipButton != null) _adMobSkipButton.clicked -= OnAdMobSkipClicked;
+        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.clicked -= OnAdMobMockupCloseClicked;
+        if (_adMobResumeBtn != null) _adMobResumeBtn.clicked -= OnAdMobResumeClicked;
+        if (_adMobConfirmSkipBtn != null) _adMobConfirmSkipBtn.clicked -= OnAdMobConfirmSkipClicked;
     }
 
     private void SetupUI()
@@ -123,6 +152,17 @@ public class AdRewardManager : MonoBehaviour
         _watchButton = _panel.Q<Button>("WatchAdButton");
         _closeButton = _panel.Q<Button>("AdCloseButton");
 
+        // AdMob Mockup Overlay & Modal elements
+        _adMobMockupOverlay = _panel.Q("AdMobMockupOverlay");
+        _adMobMockupTimerLabel = _panel.Q<Label>("AdMobMockupTimerLabel");
+        _adMobProgressBarFill = _panel.Q("AdMobProgressBarFill");
+        _adMobSkipButton = _panel.Q<Button>("AdMobSkipButton");
+        _adMobMockupCloseBtn = _panel.Q<Button>("AdMobMockupCloseBtn");
+
+        _adMobSkipConfirmModal = _panel.Q("AdMobSkipConfirmModal");
+        _adMobResumeBtn = _panel.Q<Button>("AdMobResumeBtn");
+        _adMobConfirmSkipBtn = _panel.Q<Button>("AdMobConfirmSkipBtn");
+
         _panel.style.display = DisplayStyle.None;
 
         if (_card != null)
@@ -142,10 +182,63 @@ public class AdRewardManager : MonoBehaviour
             _closeButton.clicked += OnCloseButtonClicked;
         }
 
+        if (_adMobSkipButton != null)
+        {
+            _adMobSkipButton.clicked -= OnAdMobSkipClicked;
+            _adMobSkipButton.clicked += OnAdMobSkipClicked;
+        }
+        if (_adMobMockupCloseBtn != null)
+        {
+            _adMobMockupCloseBtn.clicked -= OnAdMobMockupCloseClicked;
+            _adMobMockupCloseBtn.clicked += OnAdMobMockupCloseClicked;
+        }
+        if (_adMobResumeBtn != null)
+        {
+            _adMobResumeBtn.clicked -= OnAdMobResumeClicked;
+            _adMobResumeBtn.clicked += OnAdMobResumeClicked;
+        }
+        if (_adMobConfirmSkipBtn != null)
+        {
+            _adMobConfirmSkipBtn.clicked -= OnAdMobConfirmSkipClicked;
+            _adMobConfirmSkipBtn.clicked += OnAdMobConfirmSkipClicked;
+        }
+
         SetButtonState(_watchButton, false, false, false, "XEM QUẢNG CÁO");
         SetButtonState(_closeButton, false, false, false, "BỎ QUA");
 
         _ready = true;
+    }
+
+    private void Update()
+    {
+        if (_isRewardEarned && !_hasClaimedReward)
+        {
+            _hasClaimedReward = true;
+            OnAdCompletedSuccessfully();
+        }
+
+        if (_pendingAdClosed)
+        {
+            if (_hasClaimedReward || _isRewardEarned)
+            {
+                _pendingAdClosed = false;
+            }
+            else
+            {
+                _adClosedTimer -= Time.unscaledDeltaTime;
+                if (_adClosedTimer <= 0f)
+                {
+                    _pendingAdClosed = false;
+                    ClosePanelInternal();
+                }
+            }
+        }
+
+        if (_pendingAdFailed)
+        {
+            _pendingAdFailed = false;
+            OnAdFailed();
+        }
     }
 
     private void InitializeAdMob()
@@ -204,6 +297,8 @@ public class AdRewardManager : MonoBehaviour
                 Debug.Log("Rewarded ad closed.");
                 _isAdReady = false;
                 _rewardedAd = null;
+                _pendingAdClosed = true;
+                _adClosedTimer = 2.0f; // 2.0s Grace period for reward callback handshake
             };
 
             _rewardedAd.OnAdFullScreenContentFailed += (adError) =>
@@ -211,7 +306,7 @@ public class AdRewardManager : MonoBehaviour
                 Debug.LogError("Rewarded ad failed to show: " + adError);
                 _isAdReady = false;
                 _rewardedAd = null;
-                OnAdFailed();
+                _pendingAdFailed = true;
             };
         });
     }
@@ -237,6 +332,10 @@ public class AdRewardManager : MonoBehaviour
         _currentPlayer = player;
         _playerControl = player != null ? player.GetComponentInChildren<PlayerControl>() : null;
         _currentGiftBox = giftBox;
+        _hasClaimedReward = false;
+        _isRewardEarned = false;
+        _pendingAdClosed = false;
+        _pendingAdFailed = false;
 
         if (!_ready)
         {
@@ -274,6 +373,10 @@ public class AdRewardManager : MonoBehaviour
         }
 
         // Setup PREVIEW UI State
+        if (_card != null) _card.style.display = DisplayStyle.Flex;
+        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
+        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
+
         if (_titleLabel != null) _titleLabel.text = "QUẢNG CÁO";
         if (_timerLabel != null) _timerLabel.text = "Nhấn XEM QUẢNG CÁO để nhận quà!";
 
@@ -347,13 +450,70 @@ public class AdRewardManager : MonoBehaviour
 
     private void OnEscapeCloseRequested()
     {
-        if (_currentState == AdUIState.Idle || _currentState == AdUIState.Playing) return;
+        if (_currentState == AdUIState.Idle) return;
+
+        if (_isAdLoading)
+        {
+            ClosePanelInternal();
+            return;
+        }
+
+        if (_currentState == AdUIState.Preview || _currentState == AdUIState.Claimed)
+        {
+            ClosePanelInternal();
+            return;
+        }
+
+        if (_currentState == AdUIState.Playing)
+        {
+            ShowSkipConfirmModal();
+            return;
+        }
+
+        if (_currentState == AdUIState.ConfirmSkip)
+        {
+            // ESC pressed again while ConfirmSkip modal is open -> Confirm cancel
+            ClosePanelInternal();
+            return;
+        }
+    }
+
+    private void ShowSkipConfirmModal()
+    {
+        _currentState = AdUIState.ConfirmSkip;
+        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.Flex;
+    }
+
+    private void HideSkipConfirmModal()
+    {
+        _currentState = AdUIState.Playing;
+        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
+    }
+
+    private void OnAdMobSkipClicked()
+    {
+        ShowSkipConfirmModal();
+    }
+
+    private void OnAdMobResumeClicked()
+    {
+        HideSkipConfirmModal();
+    }
+
+    private void OnAdMobConfirmSkipClicked()
+    {
+        ClosePanelInternal();
+    }
+
+    private void OnAdMobMockupCloseClicked()
+    {
         ClosePanelInternal();
     }
 
     private void StartAd()
     {
         _currentState = AdUIState.Playing;
+        _previousAudioListenerPause = AudioListener.pause;
 
         if (_adCoroutine != null)
         {
@@ -363,17 +523,27 @@ public class AdRewardManager : MonoBehaviour
 
         if (_watchButton != null) _watchButton.style.display = DisplayStyle.None;
         if (_closeButton != null) _closeButton.style.display = DisplayStyle.None;
+
+        if (MusicManager.Instance != null) MusicManager.Instance.PauseMusic();
+        AudioListener.pause = true;
+
+#if UNITY_EDITOR
+        if (_card != null) _card.style.display = DisplayStyle.None;
+        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.Flex;
+        if (_adMobSkipButton != null) _adMobSkipButton.style.display = DisplayStyle.Flex;
+        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.style.display = DisplayStyle.None;
+        if (_adMobProgressBarFill != null) _adMobProgressBarFill.style.width = Length.Percent(0);
+
+        _adCoroutine = StartCoroutine(EditorSimulateAd());
+#else
         if (_adContainer != null) _adContainer.AddToClassList("ad-playing");
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.Flex;
 
-#if UNITY_EDITOR
-        _adCoroutine = StartCoroutine(EditorSimulateAd());
-#else
         if (_isAdReady && _rewardedAd != null && _rewardedAd.CanShowAd())
         {
             _rewardedAd.Show(reward =>
             {
-                OnAdCompletedSuccessfully();
+                _isRewardEarned = true;
             });
         }
         else
@@ -398,7 +568,7 @@ public class AdRewardManager : MonoBehaviour
         {
             _rewardedAd.Show(reward =>
             {
-                OnAdCompletedSuccessfully();
+                _isRewardEarned = true;
             });
         }
         else
@@ -410,14 +580,29 @@ public class AdRewardManager : MonoBehaviour
 
     private IEnumerator EditorSimulateAd()
     {
-        float timer = 5f;
-        while (timer > 0)
+        float duration = 5f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            if (_timerLabel != null)
-                _timerLabel.text = $"Quảng cáo kết thúc sau {timer:F0}s";
-            timer -= Time.unscaledDeltaTime;
+            if (_currentState == AdUIState.Idle) yield break;
+
+            if (_currentState == AdUIState.ConfirmSkip)
+            {
+                yield return null;
+                continue;
+            }
+
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float remaining = duration - elapsed;
+
+            if (_adMobProgressBarFill != null) _adMobProgressBarFill.style.width = Length.Percent(progress * 100f);
+            if (_adMobMockupTimerLabel != null) _adMobMockupTimerLabel.text = $"Quảng cáo kết thúc sau {remaining:F0}s";
+
             yield return null;
         }
+
         _adCoroutine = null;
         OnAdCompletedSuccessfully();
     }
@@ -428,12 +613,19 @@ public class AdRewardManager : MonoBehaviour
 
         ApplyCachedReward();
 
+#if UNITY_EDITOR
+        if (_adMobSkipButton != null) _adMobSkipButton.style.display = DisplayStyle.None;
+        if (_adMobMockupCloseBtn != null) _adMobMockupCloseBtn.style.display = DisplayStyle.Flex;
+        if (_adMobMockupTimerLabel != null) _adMobMockupTimerLabel.text = "Đã nhận thưởng thành công!";
+#else
+        if (_card != null) _card.style.display = DisplayStyle.Flex;
         if (_timerLabel != null) _timerLabel.text = "Đã nhận thưởng thành công!";
         if (_adPlayingOverlay != null) _adPlayingOverlay.style.display = DisplayStyle.None;
         if (_adContainer != null) _adContainer.RemoveFromClassList("ad-playing");
 
         SetButtonState(_watchButton, false, false, false, "");
         SetButtonState(_closeButton, true, true, false, "NHẬN THƯỞNG");
+#endif
 
         LoadRewardedAd();
     }
@@ -465,6 +657,9 @@ public class AdRewardManager : MonoBehaviour
 
     private void ApplyCachedReward()
     {
+        if (_hasClaimedReward && _currentState != AdUIState.Claimed) return;
+        _hasClaimedReward = true;
+
         switch (_cachedType)
         {
             case GiftBox.GiftRewardType.Coin:
@@ -530,7 +725,7 @@ public class AdRewardManager : MonoBehaviour
 
     private void ClosePanelInternal()
     {
-        if (_currentState == AdUIState.Idle) return;
+        if (_currentState == AdUIState.Idle && !_isPanelOpen) return;
 
         AdUIState prevState = _currentState;
         _currentState = AdUIState.Idle;
@@ -543,6 +738,16 @@ public class AdRewardManager : MonoBehaviour
         }
 
         DestroyAd();
+
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.ResumeMusic();
+        }
+        AudioListener.pause = _previousAudioListenerPause;
+
+        if (_adMobMockupOverlay != null) _adMobMockupOverlay.style.display = DisplayStyle.None;
+        if (_adMobSkipConfirmModal != null) _adMobSkipConfirmModal.style.display = DisplayStyle.None;
+        if (_card != null) _card.style.display = DisplayStyle.Flex;
 
         if (_currentGiftBox != null && _currentGiftBox.gameObject != null)
         {
@@ -557,10 +762,10 @@ public class AdRewardManager : MonoBehaviour
             _currentGiftBox = null;
         }
 
-        // Close UI via PanelManager
+        // Close UI via PanelManager Immediate
         if (PanelManager.Instance != null)
         {
-            PanelManager.Instance.ClosePanel("AdReward", _panel, _card);
+            PanelManager.Instance.ClosePanelImmediate("AdReward", _panel, _card);
         }
         else
         {
