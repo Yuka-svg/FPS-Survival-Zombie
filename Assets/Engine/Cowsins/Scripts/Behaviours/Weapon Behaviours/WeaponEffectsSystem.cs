@@ -65,6 +65,12 @@ namespace cowsins
         }
         private void HandleBulletHoleImpacts(int layer, RaycastHit h)
         {
+            if (h.collider == null) return;
+
+            // Invisible boundary walls (EndlessBoundary / ChapterBoundary) must
+            // not accumulate bullet holes or slash marks.
+            if (h.collider.CompareTag("Boundary")) return;
+
             Quaternion normalRot = Quaternion.LookRotation(h.normal);
             Vector3 hitPoint = h.point;
 
@@ -80,8 +86,6 @@ namespace cowsins
                 hitPoint,
                 Quaternion.identity
             );
-
-            if (h.collider == null) return;
 
             if (impactEffect != null)
             {

@@ -57,6 +57,7 @@ public class EndlessBoundary : MonoBehaviour
             var go = new GameObject("Wall_" + i);
             go.transform.SetParent(transform, false);
             go.transform.localPosition = centers[i];
+            go.tag = "Boundary";
 
             var col = go.AddComponent<BoxCollider>();
             col.size = sizes[i];

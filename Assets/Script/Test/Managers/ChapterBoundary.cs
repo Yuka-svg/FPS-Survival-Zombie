@@ -135,6 +135,7 @@ public class ChapterBoundary : MonoBehaviour
             var wallGO = new GameObject($"Ch{chapter}_Boundary_{wallNames[i]}");
             wallGO.transform.SetParent(transform, false);
             wallGO.transform.localPosition = wallCenters[i];
+            wallGO.tag = "Boundary";
             var col = wallGO.AddComponent<BoxCollider>();
             col.isTrigger = false;
             col.size = wallSizes[i];

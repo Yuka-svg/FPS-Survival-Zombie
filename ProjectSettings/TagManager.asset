@@ -10,6 +10,7 @@ TagManager:
   - Weapons
   - Ramp
   - BodyShot
+  - Boundary
   layers:
   - Default
   - TransparentFX
