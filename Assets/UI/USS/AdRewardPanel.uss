@@ -414,8 +414,8 @@
     width: 48px;
     height: 48px;
     margin-bottom: 10px;
-    background-image: resource("Icons/AdIcon");
-    -unity-background-image-tint: rgb(217, 199, 115);
+    background-image: url("project://database/Assets/UI/Resources/Icons/icon_ad.svg");
+    -unity-background-image-tint-color: rgb(217, 199, 115);
 }
 
 #AdMobMockupTimerLabel {
