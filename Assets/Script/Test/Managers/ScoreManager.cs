@@ -24,6 +24,14 @@ public class ScoreManager : MonoBehaviour
         Instance = this;
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatic()
+    {
+        // DisableDomainReload: clear the singleton so a stale destroyed
+        // reference doesn't leak across play sessions.
+        Instance = null;
+    }
+
     private void Update()
     {
         survivalTimer += Time.deltaTime;

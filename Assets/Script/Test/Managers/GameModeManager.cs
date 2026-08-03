@@ -26,4 +26,14 @@ public class GameModeManager : MonoBehaviour
         currentMode = mode;
         _persistedMode = mode;
     }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatic()
+    {
+        // DisableDomainReload: clear the singleton and the persisted mode so
+        // a stale destroyed reference / leftover mode doesn't leak across
+        // play sessions (e.g. Story kept in memory after an Endless run).
+        Instance = null;
+        _persistedMode = GameMode.Story;
+    }
 }

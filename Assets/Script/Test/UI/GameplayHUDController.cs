@@ -91,41 +91,72 @@ public class GameplayHUDController : MonoBehaviour
         }
     }
 
+    private bool _subscribed;
+    private bool _subscriptionWarned;
+
     private void OnEnable()
     {
-        if (ScoreManager.Instance != null)
-        {
-            ScoreManager.Instance.OnKillsChanged += OnKillsChanged;
-            ScoreManager.Instance.OnScoreChanged += OnScoreChanged;
-            ScoreManager.Instance.OnCritsChanged += OnCritsChanged;
-        }
-        if (WaveManager.Instance != null)
-        {
-            WaveManager.Instance.OnWaveStarted += OnWaveStarted;
-            WaveManager.Instance.OnWaveCompleted += OnWaveCompleted;
-            WaveManager.Instance.OnWaveProgressChanged += OnWaveProgressChanged;
-
-            if (WaveManager.Instance.currentWave > 0)
-            {
-                OnWaveProgressChanged(WaveManager.Instance.zombiesKilledThisWave, WaveManager.Instance.zombiesToKill);
-            }
-        }
+        TrySubscribe();
         StartCoroutine(TimerRoutine());
+    }
+
+    private void Update()
+    {
+        // Self-heal: if the singleton managers were not ready when OnEnable
+        // ran (execution-order edge case), retry until subscribed so the HUD
+        // never silently freezes at its default values.
+        if (!_subscribed)
+            TrySubscribe();
+    }
+
+    private void TrySubscribe()
+    {
+        if (_subscribed) return;
+
+        var sm = ScoreManager.Instance;
+        var wm = WaveManager.Instance;
+        if (sm == null || wm == null)
+        {
+            if (!_subscriptionWarned)
+            {
+                _subscriptionWarned = true;
+                Debug.LogWarning("[GameplayHUDController] Managers not ready at OnEnable (score=" + (sm != null) + ", wave=" + (wm != null) + "); retrying until subscribed.");
+            }
+            return;
+        }
+
+        sm.OnKillsChanged += OnKillsChanged;
+        sm.OnScoreChanged += OnScoreChanged;
+        sm.OnCritsChanged += OnCritsChanged;
+        wm.OnWaveStarted += OnWaveStarted;
+        wm.OnWaveCompleted += OnWaveCompleted;
+        wm.OnWaveProgressChanged += OnWaveProgressChanged;
+
+        if (wm.currentWave > 0)
+        {
+            OnWaveProgressChanged(wm.zombiesKilledThisWave, wm.zombiesToKill);
+        }
+
+        _subscribed = true;
     }
 
     private void OnDisable()
     {
-        if (ScoreManager.Instance != null)
+        if (_subscribed)
         {
-            ScoreManager.Instance.OnKillsChanged -= OnKillsChanged;
-            ScoreManager.Instance.OnScoreChanged -= OnScoreChanged;
-            ScoreManager.Instance.OnCritsChanged -= OnCritsChanged;
-        }
-        if (WaveManager.Instance != null)
-        {
-            WaveManager.Instance.OnWaveStarted -= OnWaveStarted;
-            WaveManager.Instance.OnWaveCompleted -= OnWaveCompleted;
-            WaveManager.Instance.OnWaveProgressChanged -= OnWaveProgressChanged;
+            if (ScoreManager.Instance != null)
+            {
+                ScoreManager.Instance.OnKillsChanged -= OnKillsChanged;
+                ScoreManager.Instance.OnScoreChanged -= OnScoreChanged;
+                ScoreManager.Instance.OnCritsChanged -= OnCritsChanged;
+            }
+            if (WaveManager.Instance != null)
+            {
+                WaveManager.Instance.OnWaveStarted -= OnWaveStarted;
+                WaveManager.Instance.OnWaveCompleted -= OnWaveCompleted;
+                WaveManager.Instance.OnWaveProgressChanged -= OnWaveProgressChanged;
+            }
+            _subscribed = false;
         }
         StopAllCoroutines();
     }

@@ -19,7 +19,6 @@ using cowsins;
 public class SpecialEnemyDirector : MonoBehaviour
 {
     public static SpecialEnemyDirector Instance;
-
     [Header("Special Enemies Pool (Tier 1: Boomer, Big Guy, Witch)")]
     [Tooltip("The Boomer prefab to spawn (SM_Chr_ZombieBoss_Slobber_01).")]
     public GameObject boomerPrefab;
@@ -104,6 +103,14 @@ public class SpecialEnemyDirector : MonoBehaviour
             _audioSource = gameObject.AddComponent<AudioSource>();
         _audioSource.playOnAwake = false;
         _audioSource.spatialBlend = 0f; // 2D — nghe toàn map
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatic()
+    {
+        // DisableDomainReload: clear the singleton so a stale destroyed
+        // reference doesn't leak across play sessions.
+        Instance = null;
     }
 
     private void Start()
