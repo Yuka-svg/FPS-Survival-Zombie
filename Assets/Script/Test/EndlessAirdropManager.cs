@@ -13,6 +13,8 @@ public class EndlessAirdropManager : MonoBehaviour
     public float intervalRandomRange = 0.2f;
     public float dropHeight = 15f;
     public GameObject[] lootboxPrefabs;
+    [Tooltip("Giá coin để mở lootbox từ airdrop (Endless). 0 = miễn phí.")]
+    public int lootboxPrice = 1000;
 
     [Header("GiftBox Drop (Endless Mode)")]
     [Tooltip("GiftBox prefab mà zombie có thể drop khi chết. Chỉ cần gán ở đây, tất cả enemy tự dùng chung.")]
@@ -139,7 +141,7 @@ public class EndlessAirdropManager : MonoBehaviour
 
         var lb = lootbox.GetComponent<Lootbox>();
         if (lb != null)
-            lb.Price = 0;
+            lb.Price = lootboxPrice;
 
         _dropPending = false;
 
